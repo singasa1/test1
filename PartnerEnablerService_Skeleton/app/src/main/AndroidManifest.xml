@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.cariad.technology.partnerenablerservice">
+
+    <!-- Permission to read phone status-->
+    <uses-permission android:name="android.permission.READ_PRIVILEGED_PHONE_STATE" />
+    <!-- permission to read the Car Steering Angle-->
+    <uses-permission android:name="android.car.permission.READ_CAR_STEERING"/>
+    <!-- Permission to read/check the VIN-->
+    <uses-permission android:name="android.car.permission.CAR_IDENTIFICATION" />
+    <!-- Permission to read the Odometer -->
+    <uses-permission android:name="android.car.permission.CAR_MILEAGE" />
+    <!-- Permission to read the Fog Lights and Turn Signal State -->
+    <uses-permission android:name="android.car.permission.CAR_EXTERIOR_LIGHTS" />
+    <!-- Permission to read the Navigation Apis getActiveSimpleRoute -->
+    <uses-permission android:name="com.volkswagenag.nav.NAV_CORE_USER" />
+
+    <!-- Esolution framework permissions -->
+    <uses-permission android:name="de.esolutions.fw.rsi.permission.CONSUME_INTERIORLIGHTUI" />
+    <uses-permission android:name="de.esolutions.fw.rsi.permission.CONSUME_INTERIORLIGHTUIEXT" />
+    <uses-permission android:name="de.esolutions.fw.rsi.permission.CONSUME_SEATING" />
+    <uses-permission android:name="de.esolutions.fw.rsi.permission.CONSUME_HVAC" />
+    <uses-permission android:name="de.esolutions.fw.rsi.permission.CONSUME_DRIVERNOTIFICATION" />
+    <uses-permission android:name="de.esolutions.fw.rsi.permission.CONSUME_WARNINGSTOREEXTENSION" />
+    <uses-permission android:name="de.esolutions.fw.rsi.permission.CONSUME_MAINTENANCE" />
+    <uses-permission android:name="de.esolutions.fw.rsi.permission.CONSUME_SUNROOFCONTROL" />
+    <uses-permission android:name="de.esolutions.fw.rsi.permission.CONSUME_TIRES" />
+    <uses-permission android:name="de.esolutions.fw.rsi.permission.CONSUME_DRIVINGPROFILESELECTION" />
+    <uses-permission android:name="de.esolutions.fw.rsi.permission.CONSUME_DOORCONTROL" />
+    <uses-permission android:name="de.esolutions.fw.rsi.permission.CONSUME_CHARGINGMANAGEMENTCORE" />
+    <uses-permission android:name="de.esolutions.fw.rsi.permission.CONSUME_DRIVINGRANGE" />
+    <uses-permission android:name="de.esolutions.fw.rsi.permission.CONSUME_TRIPCOMPUTER" />
+    <uses-permission android:name="de.esolutions.fw.android.rsi.gateway.BIND_RSI_ADMIN" />
+    <uses-permission android:name="de.esolutions.android.framework.gateway.BIND_SERVICE_ADMIN_SERVICE" />
+    <uses-permission android:name="de.esolutions.fw.comm.permission.CONSUME_ASI_DIAG_PERS_STORAGE" />
+
+
+    <application
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.PartnerEnablerService"
+        tools:targetApi="31">
+
+    </application>
+</manifest>
