@@ -1,3 +1,21 @@
+/*
+ * CONFIDENTIAL CARIAD Estonia AS
+ *
+ * (c) 2023 CARIAD Estonia AS, All rights reserved.
+ *
+ * NOTICE: All information contained herein is, and remains the property of CARIAD Estonia AS (registry code 14945253).
+ * The intellectual and technical concepts contained herein are proprietary to CARIAD Estonia AS. and may be covered by
+ * patents, patents in process, and are protected by trade secret or copyright law.
+ * Usage or dissemination of this information or reproduction of this material is strictly forbidden unless prior
+ * written permission is obtained from CARIAD Estonia AS.
+ * The copyright notice above does not evidence any actual or intended publication or disclosure of this source code,
+ * which includes information that is confidential and/or proprietary, and is a trade secret of CARIAD Estonia AS.
+ * Any reproduction, modification, distribution, public performance, or public display of or through use of this source
+ * code without the prior written consent of CARIAD Estonia AS is strictly prohibited and in violation of applicable
+ * laws and international treaties. The receipt or possession of this source code and/ or related information does not
+ * convey or imply any rights to reproduce, disclose or distribute its contents or to manufacture, use or sell anything
+ * that it may describe in whole or in part.
+ */
 package technology.cariad.partnerlibrary;
 
 import android.content.ComponentName;
@@ -14,6 +32,7 @@ import androidx.annotation.NonNull;
 import technology.cariad.partnerenablerservice.IPartnerEnabler;
 import technology.cariad.partnerverifierlibrary.ISignatureVerifier;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -31,8 +50,8 @@ public class PartnerLibrary {
     private IPartnerEnabler mService;
     private PartnerEnablerServiceConnection mServiceConnection;
     private Context mContext;
-    private boolean mIsServiceInitialized = false;
-    private ILibStateChangeListener mClientListener = null;
+    private boolean mIsPartnerEnablerServiceConnected = false;
+    private List<ILibStateChangeListener> mClientListeners = new ArrayList<>();
 
     private static final String partnerApiServiceName = "technology.cariad.partnerenablerservice.enabler";
     private static final String partnerApiServicePackageName = "technology.cariad.partnerenablerservice";
@@ -46,11 +65,13 @@ public class PartnerLibrary {
         public void onServiceConnected(ComponentName name, IBinder boundService) {
             mService = IPartnerEnabler.Stub.asInterface((IBinder) boundService);
             Log.d(TAG, "onServiceConnected() connected");
-            mIsServiceInitialized = true;
-            if (mClientListener != null) {
+            mIsPartnerEnablerServiceConnected = true;
+            if (mClientListeners != null) {
                 try {
-                    Log.d(TAG, "calling listener onLibStateReady with value: " + mIsServiceInitialized);
-                    mClientListener.onLibStateReady(mIsServiceInitialized);
+                    Log.d(TAG, "calling listener onLibStateReady with value: " + mIsPartnerEnablerServiceConnected);
+                    for(ILibStateChangeListener listener: mClientListeners) {
+                        listener.onLibStateReady(mIsPartnerEnablerServiceConnected);
+                    }
                 } catch (RemoteException e) {
                     e.printStackTrace();
                 }
@@ -60,11 +81,13 @@ public class PartnerLibrary {
         public void onServiceDisconnected(ComponentName name) {
             mService = null;
             Log.d(TAG, "onServiceDisconnected() disconnected");
-            mIsServiceInitialized = false;
-            if (mClientListener != null) {
+            mIsPartnerEnablerServiceConnected = false;
+            if (mClientListeners != null) {
                 try {
-                    Log.d(TAG, "calling listener onLibStateReady with value: " + mIsServiceInitialized);
-                    mClientListener.onLibStateReady(mIsServiceInitialized);
+                    Log.d(TAG, "calling listener onLibStateReady with value: " + mIsPartnerEnablerServiceConnected);
+                    for(ILibStateChangeListener listener: mClientListeners) {
+                        listener.onLibStateReady(mIsPartnerEnablerServiceConnected);
+                    }
                 } catch (RemoteException e) {
                     e.printStackTrace();
                 }
@@ -89,8 +112,8 @@ public class PartnerLibrary {
     /**
      * This method unbinds the PartnerEnabler service
      */
-    public void deinitialize() {
-        Log.d(TAG,"deinitialize");
+    public void release() {
+        Log.d(TAG,"release");
         // unbind service
         releaseService();
 
@@ -101,7 +124,7 @@ public class PartnerLibrary {
      */
     public void start() {
         Log.d(TAG,"start");
-        if (mIsServiceInitialized) {
+        if (mIsPartnerEnablerServiceConnected) {
             try {
                 mService.initialize();
             } catch (RemoteException e) {
@@ -115,7 +138,7 @@ public class PartnerLibrary {
      */
     public void stop() {
         Log.d(TAG,"stop");
-        if (mIsServiceInitialized) {
+        if (mIsPartnerEnablerServiceConnected) {
             try {
                 mService.release();
             } catch (RemoteException e) {
@@ -129,14 +152,14 @@ public class PartnerLibrary {
      * @param listener ILibStateChangeListener object from client/app.
      */
     public void addListener(ILibStateChangeListener listener) {
-        mClientListener = listener;
+        mClientListeners.add(listener);
     }
 
     /**
      * This method is to remove the listener.
      */
     public void removeListener(ILibStateChangeListener listener) {
-        mClientListener = null;
+        mClientListeners.remove(listener);
     }
 
     /**
@@ -147,7 +170,7 @@ public class PartnerLibrary {
      */
     public boolean verifyDigitalSignature(@NonNull String packageName) {
         boolean retVal = false;
-        if (mIsServiceInitialized) {
+        if (mIsPartnerEnablerServiceConnected) {
             try {
                 ISignatureVerifier verifier = mService.getPartnerVerifierService();
                 retVal = verifier.verifyDigitalSignature(packageName);
