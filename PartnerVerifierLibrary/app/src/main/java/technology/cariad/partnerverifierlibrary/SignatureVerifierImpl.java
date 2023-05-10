@@ -1,3 +1,21 @@
+/*
+ * CONFIDENTIAL CARIAD Estonia AS
+ *
+ * (c) 2023 CARIAD Estonia AS, All rights reserved.
+ *
+ * NOTICE: All information contained herein is, and remains the property of CARIAD Estonia AS (registry code 14945253).
+ * The intellectual and technical concepts contained herein are proprietary to CARIAD Estonia AS. and may be covered by
+ * patents, patents in process, and are protected by trade secret or copyright law.
+ * Usage or dissemination of this information or reproduction of this material is strictly forbidden unless prior
+ * written permission is obtained from CARIAD Estonia AS.
+ * The copyright notice above does not evidence any actual or intended publication or disclosure of this source code,
+ * which includes information that is confidential and/or proprietary, and is a trade secret of CARIAD Estonia AS.
+ * Any reproduction, modification, distribution, public performance, or public display of or through use of this source
+ * code without the prior written consent of CARIAD Estonia AS is strictly prohibited and in violation of applicable
+ * laws and international treaties. The receipt or possession of this source code and/ or related information does not
+ * convey or imply any rights to reproduce, disclose or distribute its contents or to manufacture, use or sell anything
+ * that it may describe in whole or in part.
+ */
 package technology.cariad.partnerverifierlibrary;
 
 import android.content.Context;
@@ -15,8 +33,19 @@ public class SignatureVerifierImpl extends ISignatureVerifier.Stub {
         mContext = context;
     }
 
+    /**
+     * This method verifies the digital signature of the given packagename.
+     *
+     * @param packageName package name of the app that uses the PartnerLibrary
+     *
+     * @return  returns true if verification succeeds. false if verification fails.
+     */
     public boolean verifyDigitalSignature(String packageName) {
         boolean ret = false;
+        if (packageName == null || packageName.isEmpty()) {
+            Log.e(TAG,"Given packagename is null or empty");
+            return ret;
+        }
         String metadata = getMetadata(packageName);
         if (metadata == null) {
             Log.d(TAG, "API Access Key missing in given app manifest file");
@@ -27,6 +56,13 @@ public class SignatureVerifierImpl extends ISignatureVerifier.Stub {
         return ret;
     }
 
+    /**
+     * This method uses packagemanager to read the metadata of the given package name.
+     *
+     * @param packageName package name of the app that uses the PartnerLibrary
+     *
+     * @return  returns metadata of the given package name if available else returns null;
+     */
     private String getMetadata(String packageName) {
         String result = null;
         // check for meta-data access key
@@ -35,9 +71,11 @@ public class SignatureVerifierImpl extends ISignatureVerifier.Stub {
             applicationInfo = mContext.getPackageManager().getApplicationInfo(packageName, PackageManager.GET_META_DATA);
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
+            Log.e(TAG,"Exception: " + e.getMessage());
         }
-        if (applicationInfo == null) Log.e(TAG, "appinfo is null");
-        else {
+        if (applicationInfo == null) {
+            Log.e(TAG, "appinfo is null");
+        } else {
             Bundle bundle = applicationInfo.metaData;
             if (bundle != null) {
                 result = bundle.getString(METADATA_KEY);
