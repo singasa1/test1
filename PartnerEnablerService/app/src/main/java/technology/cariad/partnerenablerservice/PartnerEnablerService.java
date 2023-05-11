@@ -1,17 +1,29 @@
+/*
+ * CONFIDENTIAL CARIAD Estonia AS
+ *
+ * (c) 2023 CARIAD Estonia AS, All rights reserved.
+ *
+ * NOTICE: All information contained herein is, and remains the property of CARIAD Estonia AS (registry code 14945253).
+ * The intellectual and technical concepts contained herein are proprietary to CARIAD Estonia AS. and may be covered by
+ * patents, patents in process, and are protected by trade secret or copyright law.
+ * Usage or dissemination of this information or reproduction of this material is strictly forbidden unless prior
+ * written permission is obtained from CARIAD Estonia AS.
+ * The copyright notice above does not evidence any actual or intended publication or disclosure of this source code,
+ * which includes information that is confidential and/or proprietary, and is a trade secret of CARIAD Estonia AS.
+ * Any reproduction, modification, distribution, public performance, or public display of or through use of this source
+ * code without the prior written consent of CARIAD Estonia AS is strictly prohibited and in violation of applicable
+ * laws and international treaties. The receipt or possession of this source code and/ or related information does not
+ * convey or imply any rights to reproduce, disclose or distribute its contents or to manufacture, use or sell anything
+ * that it may describe in whole or in part.
+ */
 package technology.cariad.partnerenablerservice;
 
-import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
-import androidx.core.app.NotificationCompat;
 
 public class PartnerEnablerService extends Service {
     private static final String TAG = PartnerEnablerService.class.getSimpleName();
@@ -25,32 +37,21 @@ public class PartnerEnablerService extends Service {
     @Override
     public void onCreate() {
         Log.d(TAG,"onCreate");
-
         super.onCreate();
-//        startforeground();
     }
 
     @Override
-    // execution of the service will
-    // stop on calling this method
+    // execution of the service will stop on calling this method
     public void onDestroy() {
         Log.d(TAG,"onDestroy");
-        mService.release();
         release();
         super.onDestroy();
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//            stopForeground(true);
-//        } else {
-//            stopSelf();
-//        }
     }
 
       @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(TAG, "onStartCommand Service started.");
         init();
-//        startforeground();
-//        return super.onStartCommand(intent, flags, startId);
         return START_STICKY;
     }
 
@@ -62,34 +63,8 @@ public class PartnerEnablerService extends Service {
 
     private void release() {
         if (mService != null) {
+            mService.release();
             mService = null;
-        }
-    }
-    private void startforeground() {
-        Log.d(TAG,"Startforeground private function");
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel notificationChannel = new NotificationChannel(ANDROID_CHANNEL_ID, "Background Service", NotificationManager.IMPORTANCE_NONE);
-            notificationChannel.enableLights(false);
-            notificationChannel.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
-            NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-            assert manager != null;
-            manager.createNotificationChannel(notificationChannel);
-            Notification.Builder builder = new Notification.Builder(this, ANDROID_CHANNEL_ID)
-                    .setContentTitle(getString(R.string.app_name))
-                    .setSmallIcon(R.drawable.ic_launcher_background)
-                    .setContentText("PartnerEnablerService Running")
-                    .setAutoCancel(true);
-            Notification notification = builder.build();
-            startForeground(NOTIFICATION_ID, notification);
-        }  else {
-            NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
-                    .setContentTitle(getString(R.string.app_name))
-                    .setSmallIcon(R.drawable.ic_launcher_background)
-                    .setContentText("PartnerEnablerService is Running, set default priority...")
-                    .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                    .setAutoCancel(true);
-            Notification notification = builder.build();
-            startForeground(NOTIFICATION_ID, notification);
         }
     }
 
