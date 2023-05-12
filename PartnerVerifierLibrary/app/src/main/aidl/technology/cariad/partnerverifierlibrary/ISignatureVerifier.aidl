@@ -5,8 +5,8 @@ package technology.cariad.partnerverifierlibrary;
 
 interface ISignatureVerifier {
     /**
-     * Demonstrates some basic types that you can use as parameters
-     * and return values in AIDL.
-     */
+     * verifies the given packagename digital signature.
+     * and returns true if the signature matches else returns false.
+    */
     boolean verifyDigitalSignature(String packageName);
 }

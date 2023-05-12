@@ -70,7 +70,7 @@ public class PartnerLibrary {
                 try {
                     Log.d(TAG, "calling listener onLibStateReady with value: " + mIsPartnerEnablerServiceConnected);
                     for(ILibStateChangeListener listener: mClientListeners) {
-                        listener.onLibStateReady(mIsPartnerEnablerServiceConnected);
+                        listener.onStateChanged(mIsPartnerEnablerServiceConnected);
                     }
                 } catch (RemoteException e) {
                     e.printStackTrace();
@@ -86,7 +86,7 @@ public class PartnerLibrary {
                 try {
                     Log.d(TAG, "calling listener onLibStateReady with value: " + mIsPartnerEnablerServiceConnected);
                     for(ILibStateChangeListener listener: mClientListeners) {
-                        listener.onLibStateReady(mIsPartnerEnablerServiceConnected);
+                        listener.onStateChanged(mIsPartnerEnablerServiceConnected);
                     }
                 } catch (RemoteException e) {
                     e.printStackTrace();

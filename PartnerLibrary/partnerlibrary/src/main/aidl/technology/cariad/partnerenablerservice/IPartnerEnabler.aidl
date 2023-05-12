@@ -5,11 +5,18 @@ package technology.cariad.partnerenablerservice;
 import technology.cariad.partnerverifierlibrary.ISignatureVerifier;
 
 interface IPartnerEnabler {
-
+    /**
+     * This method initializes the required components in the PartnerEnablerService.
+    */
     void initialize() = 0;
 
-    // Get VerifierLibrary binder handle
+    /**
+     * This method returns the PartnerVerifier Service Connection Binder Handler
+    */
     ISignatureVerifier getPartnerVerifierService() = 1;
 
+    /**
+     * This method releases/destroy the components created in the PartnerEnablerService.
+    */
     void release() = 2;
 }

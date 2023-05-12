@@ -7,5 +7,5 @@ interface ILibStateChangeListener {
     /**
      * Callback to trigger once Partner Enabler service connection state changes
      */
-    void onLibStateReady(boolean ready);
+    void onStateChanged(boolean isReady);
 }
