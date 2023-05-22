@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="technology.cariad.partnerenablerservice">
+
+    <!-- Used for runtime permissions related to reading the navigation route information. -->
+    <permission-group android:name="technology.cariad.vwae.restricted.permission-group.NAV_INFO"
+        android:description="@string/nav_info_permission_desc"
+        android:label="@string/nav_info_permission_label"/>
+    <!-- Used for runtime permissions related to reading the Phone State information. -->
+    <permission-group android:name="technology.cariad.vwae.restricted.permission-group.PHONE_INFO"
+        android:description="@string/phone_info_permission_desc"
+        android:label="@string/phone_info_permission_label"/>
+    <!-- Used for runtime permissions related to reading the vehicle information. -->
+    <permission-group android:name="technology.cariad.vwae.restricted.permission-group.CAR_INFO"
+        android:description="@string/car_info_permission_desc"
+        android:label="@string/car_info_permission_label"/>
+
+    <permission android:name="technology.cariad.vwae.restricted.permission.CAR_MILEAGE"
+        android:permissionGroup="technology.cariad.vwae.restricted.permission-group.CAR_INFO"
+        android:protectionLevel="normal"
+        android:label="@string/car_permission_label_odometer"
+        android:description="@string/car_permission_desc_odometer"/>
+    <!-- permission defined for accessing navigation info-->
+    <permission android:name="technology.cariad.vwae.restricted.permission.NAV_ACTIVE_ROUTE"
+        android:permissionGroup="technology.cariad.vwae.restricted.permission-group.NAV_INFO"
+        android:protectionLevel="normal"
+        android:label="@string/nav_permission_label_route"
+        android:description="@string/nav_permission_desc_route"/>
+    <!-- permission defined for accessing navigation info-->
+    <permission android:name="technology.cariad.vwae.restricted.permission.READ_PRIVILEGED_PHONE_STATE"
+        android:permissionGroup="technology.cariad.vwae.restricted.permission-group.PHONE_INFO"
+        android:protectionLevel="normal"
+        android:label="@string/phone_permission_label"
+        android:description="@string/phone_permission_desc"/>
+    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
+    <application
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.PartnerEnablerService"
+        tools:targetApi="31">
+        <!--receiver android:name=".ServiceStarter"
+            android:exported="true" android:enabled="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver-->
+
+        <service android:name=".PartnerEnablerService" android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="technology.cariad.partnerenablerservice.enabler"/>
+            </intent-filter>
+        </service>
+    </application>
+
+</manifest>
