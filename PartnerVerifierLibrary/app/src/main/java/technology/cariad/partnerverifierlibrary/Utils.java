@@ -66,19 +66,16 @@ public class Utils {
         PackageManager pm = context.getPackageManager();
         int flags = PackageManager.GET_PERMISSIONS;
         PackageInfo packageInfo = null;
-        PackageInfo enablerPackageInfo = null;
 
         try {
             // Get the packageInfo for the given package name(3rd party app package info)
             packageInfo = pm.getPackageInfo(packageName, flags);
-            // Get the packageInfo for the partner enabler service package name
-            enablerPackageInfo = pm.getPackageInfo(partnerEnablerServicePackageName, flags);
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
             return res;
         }
 
-        String dataString = createMetaDataString(packageInfo, enablerPackageInfo, packageName);
+        String dataString = createMetaDataString(packageInfo, packageName);
         if (dataString == null || dataString.isEmpty()) {
             return res;
         }
@@ -98,34 +95,20 @@ public class Utils {
      * This method creates the data string to be verified.
      *
      * @param packageInfo packageinfo of the verifier library service
-     * @param enablerPackageInfo package info of the PartnerEnablerService
      * @param packageName packagename of the app which uses the partner library
      * @return  returns newly created datastring
      */
-    private static String createMetaDataString(PackageInfo packageInfo, PackageInfo enablerPackageInfo, String packageName) {
+    private static String createMetaDataString(PackageInfo packageInfo, String packageName) {
         // get the request permission for the given package name(3rd part app package info)
         String[] permissionList = packageInfo.requestedPermissions;
 
-        // Read the permissions defined in PartnerEnablerService AndroidManifest.xml file and create the permission list.
-        PermissionInfo[] enablerPermissionInfoList = enablerPackageInfo.permissions;
-
-        ArrayList<String> enablerPermissionList = new ArrayList<String>();
-        for(PermissionInfo info: enablerPermissionInfoList) {
-            Log.d(TAG,"Defined Permission: " + info.name);
-            enablerPermissionList.add(info.name);
-        }
 
         // Form the meta-data string to be verified
         StringBuilder dataString = new StringBuilder(packageName).append(";");
         for (String permission : permissionList) {
             Log.d(TAG, "permission Name: " + permission);
             if (permission.startsWith(restrictedNameSpace)) {
-                if (Arrays.stream(enablerPermissionList.toArray()).anyMatch(permission::equals)) {
-                    dataString.append(permission).append(";");
-                } else {
-                    Log.d(TAG,"Given permission is not defined in the EnablerService");
-                    return null;
-                }
+                dataString.append(permission).append(";");
             }
         }
         return dataString.toString();
