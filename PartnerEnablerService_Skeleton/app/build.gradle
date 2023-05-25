@@ -30,7 +30,7 @@ android {
                         // on below line we are setting a
                         // name to our apk as GFG.apk
                     output->
-                        def name = "PartnerEnablerService(${variant.versionName}).apk"
+                        def name = "${applicationId}.apk"
                         // on below line we are setting the
                         // outputFile Name to our apk file.
                         output.outputFileName = name
@@ -45,10 +45,4 @@ android {
     packagingOptions {
         exclude 'META-INF/INDEX.LIST'
     }
-}
-
-dependencies {
-    implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'com.google.android.material:material:1.8.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
 }
