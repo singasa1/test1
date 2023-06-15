@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="dialog_message">This App requires the CARIAD Partner Core Services. \n Some features will be disabled until they are installed.</string>
+    <string name="dialog_title">The Weather Channel</string>
+</resources>

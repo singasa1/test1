@@ -20,14 +20,18 @@ package technology.cariad.partnerlibrary;
 
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 
 import technology.cariad.partnerenablerservice.IPartnerEnabler;
 import technology.cariad.partnerverifierlibrary.ISignatureVerifier;
@@ -53,8 +57,8 @@ public class PartnerLibrary {
     private boolean mIsPartnerEnablerServiceConnected = false;
     private List<ILibStateChangeListener> mClientListeners = new ArrayList<>();
 
-    private static final String partnerApiServiceName = "technology.cariad.partnerenablerservice.enabler";
-    private static final String partnerApiServicePackageName = "technology.cariad.partnerenablerservice";
+    private static final String PARTNER_ENABLER_SERVICE_NAME = "technology.cariad.partnerenablerservice.enabler";
+    private static final String PARTNER_ENABLER_SERVICE_PACKAGE_NAME = "technology.cariad.partnerenablerservice";
 
     /**
      * This class represents the actual service connection. It casts the bound
@@ -98,6 +102,71 @@ public class PartnerLibrary {
     public PartnerLibrary(Context context) {
         Log.d(TAG,"PartnerLibrary");
         mContext = context;
+    }
+
+    /**
+     * This method checks whether the PartnerEnablerService is installed or not.
+     * If installed, check the version number of PartnerenablerService
+     * @return true - if correct version of PartnerEnablerService is installed.
+     */
+    public boolean isPartnerEnablerServiceReady() {
+        try {
+            mContext.getPackageManager().getApplicationInfo(PARTNER_ENABLER_SERVICE_PACKAGE_NAME, 0);
+            PackageInfo packageInfo = mContext.getPackageManager().getPackageInfo(PARTNER_ENABLER_SERVICE_PACKAGE_NAME, 0);
+            Log.i(TAG,"PackageVersionName: " + packageInfo.versionName + ",versionCode; " + packageInfo.getLongVersionCode());
+            long versionNumber = packageInfo.getLongVersionCode();
+            if (versionNumber <= 1) return false;
+            return true;
+        }
+        catch (PackageManager.NameNotFoundException e) {
+            return false;
+        }
+    }
+
+    /**
+     * This method creates AlertDialog with 3rd PartyAppName as Tile and description and
+     * positive button with url to AppStore to download+install PES. Negative button to
+     * skip the installation.
+     */
+    public void requestUserToInstallDependency() {
+        AlertDialog.Builder builder;
+        builder = new AlertDialog.Builder(mContext);
+
+        //Uncomment the below code to Set the message and title from the strings.xml file
+        builder.setMessage(R.string.dialog_message) .setTitle(R.string.dialog_title);
+
+        //Setting message manually and performing action on button click
+        //builder.setMessage("Do you want to close this application ?")
+        builder.setCancelable(false)
+                .setPositiveButton("Install from AppStore", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.dismiss();
+                        Toast.makeText(mContext,"you choose Install from AppStore action for alertbox",
+                                Toast.LENGTH_SHORT).show();
+                        showContacts();
+                    }
+                })
+                .setNegativeButton("Skip", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        //  Action for 'NO' Button
+                        dialog.cancel();
+                        Toast.makeText(mContext,"you choose Skip action for alertbox",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                });
+        //Creating dialog box
+        AlertDialog alert = builder.create();
+        alert.show();
+    }
+
+    private void showContacts()
+    {
+        Intent i = new Intent();
+        i.setComponent(new ComponentName("com.android.contacts", "com.android.contacts.DialtactsContactsEntryActivity"));
+        i.setAction("android.intent.action.MAIN");
+        i.addCategory("android.intent.category.LAUNCHER");
+        i.addCategory("android.intent.category.DEFAULT");
+        mContext.startActivity(i);
     }
 
     /**
@@ -185,7 +254,7 @@ public class PartnerLibrary {
     private void initService() {
         Log.d(TAG,"initService trying to bindService");
         mServiceConnection = new PartnerEnablerServiceConnection();
-        Intent i = new Intent(partnerApiServiceName).setPackage(partnerApiServicePackageName);
+        Intent i = new Intent(PARTNER_ENABLER_SERVICE_NAME).setPackage(PARTNER_ENABLER_SERVICE_PACKAGE_NAME);
         boolean ret = mContext.bindService(i, mServiceConnection, Context.BIND_AUTO_CREATE);
         Log.d(TAG, "initService() bound with " + ret);
     }
