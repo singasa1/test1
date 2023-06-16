@@ -23,6 +23,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.IBinder;
@@ -156,6 +157,10 @@ public class PartnerLibrary {
                 });
         //Creating dialog box
         AlertDialog alert = builder.create();
+        ApplicationInfo applicationInfo = mContext.getApplicationInfo();
+        int stringId = applicationInfo.labelRes;
+        String appName = stringId == 0 ? applicationInfo.nonLocalizedLabel.toString() : mContext.getString(stringId);
+        alert.setTitle(appName);
         alert.show();
     }
 
