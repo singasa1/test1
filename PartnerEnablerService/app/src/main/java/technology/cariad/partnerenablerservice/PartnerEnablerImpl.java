@@ -23,14 +23,8 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.content.pm.PackageManager;
 import android.os.IBinder;
-import android.os.RemoteException;
 import android.util.Log;
-
-import androidx.annotation.GuardedBy;
-import android.car.Car;
-import android.car.hardware.property.CarPropertyManager;
 
 import technology.cariad.partnerverifierlibrary.ISignatureVerifier;
 
@@ -40,17 +34,10 @@ public class PartnerEnablerImpl extends IPartnerEnabler.Stub {
 
     private static final String PARTNER_VERIFIER_ACTION_NAME = "technology.cariad.partnerverifierlibrary.verifier";
     private static final String PARTNER_VERIFIER_PACKAGE_NAME = "technology.cariad.partnerverifierlibrary";
-    private static final String VWAE_CAR_MILEAGE_PERMISSION = "technology.cariad.vwae.restricted.permission.CAR_MILEAGE";
 
     private final Context mContext;
     private ISignatureVerifier mSignatureVerifier;
     private VerifierServiceConnection mServiceConnection;
-
-    @GuardedBy("mLock")
-    private Car mCar;
-
-    @GuardedBy("mLock")
-    private CarPropertyManager mCarPropertyManager;
 
     /**
      * This class represents the actual service connection. It casts the bound
@@ -91,39 +78,7 @@ public class PartnerEnablerImpl extends IPartnerEnabler.Stub {
     }
 
     @Override
-    public int getCurrentMileage() throws RemoteException {
-        // Permission check
-        if (PackageManager.PERMISSION_GRANTED != mContext.checkCallingOrSelfPermission(
-                VWAE_CAR_MILEAGE_PERMISSION)) {
-            throw new SecurityException("getCurrentMileage requires CAR_MILEAGE permission");
-        }
-        return 0;
-    }
-
-    @Override
-    public int getTurnSignalIndicator() throws RemoteException {
-        return 0;
-    }
-
-    @Override
-    public int getFogLightsState() throws RemoteException {
-        return 0;
-    }
-
-    @Override
-    public int getSteeringAngle() throws RemoteException {
-        return 0;
-    }
-
-    @Override
-    public String getVehicleIdentityNumber() throws RemoteException {
-        return null;
-    }
-
-    @Override
     public ISignatureVerifier getPartnerVerifierService() {
         return mSignatureVerifier;
     }
-
-
 }
