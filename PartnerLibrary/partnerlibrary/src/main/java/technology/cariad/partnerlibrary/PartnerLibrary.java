@@ -55,6 +55,8 @@ public class PartnerLibrary {
 
     private IPartnerEnabler mService;
     private PartnerEnablerServiceConnection mServiceConnection;
+    private CarDataManager mCarDataManager;
+
     private Context mContext;
     private boolean mIsPartnerEnablerServiceConnected = false;
     private List<ILibStateChangeListener> mClientListeners = new ArrayList<>();
@@ -72,6 +74,7 @@ public class PartnerLibrary {
             mService = IPartnerEnabler.Stub.asInterface((IBinder) boundService);
             Log.d(TAG, "onServiceConnected() connected");
             mIsPartnerEnablerServiceConnected = true;
+            mCarDataManager = new CarDataManager(mService);
             if (mClientListeners != null) {
                 try {
                     Log.d(TAG, "calling listener onLibStateReady with value: " + mIsPartnerEnablerServiceConnected);
@@ -187,107 +190,8 @@ public class PartnerLibrary {
         return retVal;
     }
 
-    /**
-     * This method gets the Car current Odometer value from PartnerEnablerService
-     * @return int - return current odometer value in Kilometer
-     */
-    public int getCurrentMileage() {
-        int mileage = 0;
-        if (mIsPartnerEnablerServiceConnected) {
-            try {
-                mileage = mService.getCurrentMileage(); // TODO: Do we need to return some value if there is a permission failure or just throwing security exception is good enough
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
-        }
-        return mileage;
-    }
-
-    /**
-     * This method gets the current turn signal indicator value from PartnerEnablerService
-     * @return VehicleSignalIndicator - return current signal indicator value(None/Right/Left).
-     */
-    public VehicleSignalIndicator getTurnSignalIndicator() {
-        VehicleSignalIndicator indicator = VehicleSignalIndicator.NONE;
-        if (mIsPartnerEnablerServiceConnected) {
-            try {
-                int retVal = mService.getTurnSignalIndicator(); // TODO: Do we need to return some value if there is a permission failure or just throwing security exception is good enough
-                switch (retVal) {
-                    case VEHICLE_SIGNAL_INDICATOR_RIGHT:
-                        indicator = VehicleSignalIndicator.RIGHT;
-                        break;
-                    case VEHICLE_SIGNAL_INDICATOR_LEFT:
-                        indicator = VehicleSignalIndicator.LEFT;
-                        break;
-                    case VEHICLE_SIGNAL_INDICATOR_NONE:
-                    default:
-                        indicator = VehicleSignalIndicator.NONE;
-                        break;
-                }
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
-        }
-        return indicator;
-    }
-
-    /**
-     * This method gets the current fog lights state from PartnerEnablerService
-     * @return VehicleLightState - return current fog light state value(Off/On/DayTimeRunning).
-     */
-    public VehicleLightState getFogLightsState() {
-        VehicleLightState lightState = VehicleLightState.OFF;
-        if (mIsPartnerEnablerServiceConnected) {
-            try {
-                int retVal = mService.getFogLightsState(); // TODO: Do we need to return some value if there is a permission failure or just throwing security exception is good enough
-                switch (retVal) {
-                    case VEHICLE_LIGHT_STATE_ON:
-                        lightState = VehicleLightState.ON;
-                        break;
-                    case VEHICLE_LIGHT_STATE_DAYTIME_RUNNING:
-                        lightState = VehicleLightState.DAYTIME_RUNNING;
-                        break;
-                    case VEHICLE_LIGHT_STATE_OFF:
-                    default:
-                        lightState = VehicleLightState.OFF;
-                        break;
-                }
-
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
-        }
-        return lightState;
-    }
-
-    /**
-     * This method returns the Car steering angle in degrees. positive - right; negative - left.
-     */
-    public int getSteeringAngle() {
-        int steeringAngle = 0;
-        if (mIsPartnerEnablerServiceConnected) {
-            try {
-                steeringAngle = mService.getSteeringAngle(); // TODO: Do we need to return some value if there is a permission failure or just throwing security exception is good enough
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
-        }
-        return steeringAngle;
-    }
-
-    /**
-     * This method returns the Car VIN Number.
-     */
-    public String getVehicleIdentityNumber() {
-        String vinNo = null;
-        if (mIsPartnerEnablerServiceConnected) {
-            try {
-                vinNo = mService.getVehicleIdentityNumber(); // TODO: Do we need to return some value if there is a permission failure or just throwing security exception is good enough
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
-        }
-        return vinNo;
+    public CarDataManager getCarDataManager() {
+        return mCarDataManager;
     }
 
     /** Binds the user activity to the service. */
