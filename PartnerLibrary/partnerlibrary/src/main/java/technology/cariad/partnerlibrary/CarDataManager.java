@@ -34,7 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import technology.cariad.partnerenablerservice.IPartnerEnabler;
-import technology.cariad.partnerverifierlibrary.ISignatureVerifier;
+import technology.cariad.partnerenablerservice.ICarDataChangeListener;
 
 /**
  * <h1>Partner Library</h1>
@@ -49,6 +49,8 @@ public class CarDataManager {
     private static final String TAG = CarDataManager.class.getSimpleName();
 
     private IPartnerEnabler mService;
+
+    private ICarDataChangeListener mCarDataChangeListener = new CarDataChangeListener();
 
     private List<MileageListener> mMileageListeners = new ArrayList<>();
     private List<TurnSignalListener> mTurnSignalListener = new ArrayList<>();
@@ -66,6 +68,23 @@ public class CarDataManager {
     public CarDataManager(IPartnerEnabler service) {
         Log.d(TAG,"CarDataManager");
         mService = service;
+        addCarDataListener();
+    }
+
+    private void addCarDataListener() {
+        try {
+            mService.addCarDataChangeListener(mCarDataChangeListener);
+        } catch (RemoteException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void removeCarDataListener() {
+        try {
+            mService.removeCarDataChangeListener(mCarDataChangeListener);
+        } catch (RemoteException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -137,18 +156,7 @@ public class CarDataManager {
         VehicleSignalIndicator indicator = VehicleSignalIndicator.NONE;
         try {
             int retVal = mService.getTurnSignalIndicator();
-            switch (retVal) {
-                case VEHICLE_SIGNAL_INDICATOR_RIGHT:
-                    indicator = VehicleSignalIndicator.RIGHT;
-                    break;
-                case VEHICLE_SIGNAL_INDICATOR_LEFT:
-                    indicator = VehicleSignalIndicator.LEFT;
-                    break;
-                case VEHICLE_SIGNAL_INDICATOR_NONE:
-                default:
-                    indicator = VehicleSignalIndicator.NONE;
-                    break;
-            }
+            indicator = convertTurnSignalIndicator(retVal);
         } catch (RemoteException e) {
             e.printStackTrace();
         } catch (RuntimeException e) {
@@ -188,19 +196,7 @@ public class CarDataManager {
         VehicleLightState lightState = VehicleLightState.OFF;
         try {
             int retVal = mService.getFogLightsState();
-            switch (retVal) {
-                case VEHICLE_LIGHT_STATE_ON:
-                    lightState = VehicleLightState.ON;
-                    break;
-                case VEHICLE_LIGHT_STATE_DAYTIME_RUNNING:
-                    lightState = VehicleLightState.DAYTIME_RUNNING;
-                    break;
-                case VEHICLE_LIGHT_STATE_OFF:
-                default:
-                    lightState = VehicleLightState.OFF;
-                    break;
-            }
-
+            lightState = convertToVehicleLightState(retVal);
         } catch (RemoteException e) {
             e.printStackTrace();
         } catch (RuntimeException e) {
@@ -276,5 +272,79 @@ public class CarDataManager {
         }
         Log.d(TAG,"VinNo: " + Integer.parseInt(vinNo));
         return vinNo;
+    }
+
+    private VehicleLightState convertToVehicleLightState(int lightState) {
+        VehicleLightState retVal = VehicleLightState.OFF;
+        switch (lightState) {
+            case VEHICLE_LIGHT_STATE_ON:
+                retVal = VehicleLightState.ON;
+                break;
+            case VEHICLE_LIGHT_STATE_DAYTIME_RUNNING:
+                retVal = VehicleLightState.DAYTIME_RUNNING;
+                break;
+            case VEHICLE_LIGHT_STATE_OFF:
+            default:
+                retVal = VehicleLightState.OFF;
+                break;
+        }
+        return retVal;
+    }
+
+    private VehicleSignalIndicator convertTurnSignalIndicator(int indicator) {
+        VehicleSignalIndicator turnSignalIndicator = VehicleSignalIndicator.NONE;
+        switch (indicator) {
+            case VEHICLE_SIGNAL_INDICATOR_RIGHT:
+                turnSignalIndicator = VehicleSignalIndicator.RIGHT;
+                break;
+            case VEHICLE_SIGNAL_INDICATOR_LEFT:
+                turnSignalIndicator = VehicleSignalIndicator.LEFT;
+                break;
+            case VEHICLE_SIGNAL_INDICATOR_NONE:
+            default:
+                turnSignalIndicator = VehicleSignalIndicator.NONE;
+                break;
+        }
+        return turnSignalIndicator;
+    }
+
+    private class CarDataChangeListener extends ICarDataChangeListener.Stub {
+        public void onMileageValueChanged(int mileageValue) {
+            Log.d(TAG, "calling listener onMileageValueChanged with value: " + mileageValue);
+            if (mMileageListeners != null) {
+                for(MileageListener listener: mMileageListeners) {
+                    listener.onMileageValueChanged(mileageValue);
+                }
+            }
+        }
+
+        public void onFogLightsChanged(int fogLightState) {
+            Log.d(TAG, "calling listener onFogLightStateChange with value: " + fogLightState);
+            if (mFogLightStateListener != null) {
+                for(FogLightStateListener listener: mFogLightStateListener) {
+                    VehicleLightState lightState = convertToVehicleLightState(fogLightState);
+                    listener.onFogLightsChanged(lightState);
+                }
+            }
+        }
+
+        public void onSteeringAngleChanged(int steeringAngle) {
+            Log.d(TAG, "calling listener onSteeringAngleChanged with value: " + steeringAngle);
+            if (mSteeringAngleListener != null) {
+                for(SteeringAngleListener listener: mSteeringAngleListener) {
+                    listener.onSteeringAngleChanged(steeringAngle);
+                }
+            }
+        }
+
+        public void onTurnSignalStateChanged(int signalIndicator) {
+            Log.d(TAG, "calling listener onTurnSignalStateChanged with value: " + signalIndicator);
+            if (mTurnSignalListener != null) {
+                for(TurnSignalListener listener: mTurnSignalListener) {
+                    VehicleSignalIndicator indicator = convertTurnSignalIndicator(signalIndicator);
+                    listener.onTurnSignalStateChanged(indicator);
+                }
+            }
+        }
     }
 }

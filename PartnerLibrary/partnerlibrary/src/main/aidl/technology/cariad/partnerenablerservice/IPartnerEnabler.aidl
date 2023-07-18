@@ -2,6 +2,7 @@
 package technology.cariad.partnerenablerservice;
 
 // Declare any non-default types here with import statements
+import technology.cariad.partnerenablerservice.ICarDataChangeListener;
 import technology.cariad.partnerverifierlibrary.ISignatureVerifier;
 
 interface IPartnerEnabler {
@@ -53,4 +54,14 @@ interface IPartnerEnabler {
      * This method returns the Car VIN Number.
     */
     String getVehicleIdentityNumber() = 7;
+
+    /**
+     * Registers a listener to be called when the car data(Steering Angle, FogLights, TurnSignalState, Odometer) has changed.
+    */
+    void addCarDataChangeListener(in ICarDataChangeListener listener) = 8;
+
+    /**
+    * Removes the provided listener from receiving the callbacks.
+    */
+    void removeCarDataChangeListener(in ICarDataChangeListener listener) = 9;
 }
