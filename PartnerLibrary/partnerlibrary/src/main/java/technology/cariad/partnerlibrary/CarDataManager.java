@@ -57,14 +57,6 @@ public class CarDataManager {
     private List<FogLightStateListener> mFogLightStateListener = new ArrayList<>();
     private List<SteeringAngleListener> mSteeringAngleListener = new ArrayList<>();
 
-
-    enum ListenerType {
-        MILEAGE,
-        TURN_SIGNAL_STATE,
-        FOG_LIGHT_STATE,
-        STEERING_ANGLE
-    }
-
     public CarDataManager(IPartnerEnabler service) {
         Log.d(TAG,"CarDataManager");
         mService = service;
@@ -108,12 +100,12 @@ public class CarDataManager {
 
     /**
      * This method gets the Car current Odometer value from PartnerEnablerService
-     * @return int - return current odometer value in Kilometer
+     * @return float - return current odometer value in Kilometer
      * -1 - if permission to access the odometer api is denied
      *  0 - if there is no odometer value/vhal property available.
      */
-    public int getCurrentMileage() {
-        int mileage = 0;
+    public float getCurrentMileage() {
+        float mileage = 0.0f;
         try {
             mileage = mService.getCurrentMileage(); // TODO: Do we need to return some value if there is a permission failure or just throwing security exception is good enough
         } catch (RemoteException e) {
@@ -144,7 +136,7 @@ public class CarDataManager {
      * This method is to remove the listener.
      */
     public void unregisterTurnSignalListener(TurnSignalListener turnSignalListener) {
-        mMileageListeners.remove(turnSignalListener);
+        mTurnSignalListener.remove(turnSignalListener);
     }
 
     /**
@@ -230,13 +222,13 @@ public class CarDataManager {
 
     /**
      * This method returns the Car steering angle in degrees. positive - right; negative - left.
-     *  @return int - return current steering angle value in degrees.
+     *  @return float - return current steering angle value in degrees.
      * -1 - if permission to access the steering angle api is denied
      * positive value - right
      * negative value - left
      */
-    public int getSteeringAngle() {
-        int steeringAngle = 0;
+    public float getSteeringAngle() {
+        float steeringAngle = 0;
         try {
             steeringAngle = mService.getSteeringAngle(); // TODO: Do we need to return some value if there is a permission failure or just throwing security exception is good enough
         } catch (RemoteException e) {
@@ -309,7 +301,7 @@ public class CarDataManager {
     }
 
     private class CarDataChangeListener extends ICarDataChangeListener.Stub {
-        public void onMileageValueChanged(int mileageValue) {
+        public void onMileageValueChanged(float mileageValue) {
             Log.d(TAG, "calling listener onMileageValueChanged with value: " + mileageValue);
             if (mMileageListeners != null) {
                 for(MileageListener listener: mMileageListeners) {
@@ -328,7 +320,7 @@ public class CarDataManager {
             }
         }
 
-        public void onSteeringAngleChanged(int steeringAngle) {
+        public void onSteeringAngleChanged(float steeringAngle) {
             Log.d(TAG, "calling listener onSteeringAngleChanged with value: " + steeringAngle);
             if (mSteeringAngleListener != null) {
                 for(SteeringAngleListener listener: mSteeringAngleListener) {

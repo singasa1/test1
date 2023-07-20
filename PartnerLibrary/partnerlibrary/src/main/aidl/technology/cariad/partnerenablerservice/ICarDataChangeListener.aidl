@@ -7,11 +7,11 @@ interface ICarDataChangeListener {
     /**
      * Callback to trigger once Partner Enabler service connection state changes
      */
-    void onMileageValueChanged(int mileageValue) = 0;
+    void onMileageValueChanged(float mileageValue) = 0;
 
     void onFogLightsChanged(int fogLightState) = 1;
 
-    void onSteeringAngleChanged(int steeringAngle) = 2;
+    void onSteeringAngleChanged(float steeringAngle) = 2;
 
     void onTurnSignalStateChanged(int signalIndicator) = 3;
 }

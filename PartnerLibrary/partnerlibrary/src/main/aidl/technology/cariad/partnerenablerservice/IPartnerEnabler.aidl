@@ -64,7 +64,7 @@ interface IPartnerEnabler {
      * This method returns the Car current Odometer value. continuous change prop type
      * @return: It returns value ranges from 0 to 4294967293.
     */
-    int getCurrentMileage() = 3;
+    float getCurrentMileage() = 3;
 
     /**
      * This method returns the Car current signal indicator value. on_change prop type
@@ -86,7 +86,7 @@ interface IPartnerEnabler {
      * This method returns the Car steering angle in degrees. positive - right; negative - left. continuous change prop type.
      * @return: It returns value ranges from -1200 to 1200.
     */
-    int getSteeringAngle() = 6;
+    float getSteeringAngle() = 6;
 
     /**
      * This method returns the Car VIN Number.
