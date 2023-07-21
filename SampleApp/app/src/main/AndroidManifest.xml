@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.cariad.technology.sampleapp">
+
+    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
+    <uses-permission android:name="technology.cariad.vwae.restricted.permission.CAR_MILEAGE" />
+    <!--uses-permission android:name="technology.cariad.vwae.restricted.permission.NAV_ACTIVE_ROUTE" /-->
+
+    <application
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.SampleApp"
+        tools:targetApi="31">
+
+        <meta-data android:name="VWAE_Sig_V1" android:value="poey44s5ft4GlslH+sMO8LUkXt54SVVNUEI7WxAOOCuHuaSZ+HHAhhpt5vnkGytBrabIz3F5YvawdPICHfs1rBqJ+mTzZlRg0es6sB2jPJf/Rhg5lUeLvxFNr+60BH9cea61ifKhLpZnlvgbGPXJziNvlbsIIaNLxugUqwqwGxxYWellVWXu47F7gpT9a215C8V59gWF+/mP8uyGnRAJ0pnkJkW1dswW4w221fIN+/oOXSPaFuEFj5fnhEdHZ0yyAA3oTF+mO5i3QEUp4+2ZY+j+tysRr9nKl6rcQjotwHjCQYp9u1GYsNp6JNBDMc/qP3H3dh3rs6tuOq0f6JQmeA=="/>
+        <activity
+            android:name=".MainActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>
