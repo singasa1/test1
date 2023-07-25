@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="technology.cariad">
+    package="technology.cariad.partnerenablerservice">
 
     <!-- Used for runtime permissions related to reading the navigation route information. -->
     <permission-group android:name="technology.cariad.vwae.restricted.permission-group.NAV_INFO"
@@ -51,13 +51,13 @@
             </intent-filter>
         </receiver-->
 
-        <service android:name=".partnerenablerservice.PartnerEnablerService" android:enabled="true"
+        <service android:name=".PartnerEnablerService" android:enabled="true"
             android:exported="true">
             <intent-filter>
                 <action android:name="technology.cariad.partnerenablerservice.enabler"/>
             </intent-filter>
         </service>
-        <service android:name=".partnerverifierlibrary.DigitalSignatureVerifier" android:enabled="true"
+        <service android:name=".verifierservice.DigitalSignatureVerifier" android:enabled="true"
             android:exported="true">
             <intent-filter>
                 <action android:name="technology.cariad.partnerverifierlibrary.verifier"/>

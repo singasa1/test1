@@ -16,12 +16,11 @@
  * convey or imply any rights to reproduce, disclose or distribute its contents or to manufacture, use or sell anything
  * that it may describe in whole or in part.
  */
-package technology.cariad.partnerverifierlibrary;
+package technology.cariad.partnerenablerservice.verifierservice;
 
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.content.pm.PermissionInfo;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -35,11 +34,8 @@ import java.security.Signature;
 import java.security.spec.X509EncodedKeySpec;
 import java.security.InvalidKeyException;
 import java.security.SignatureException;
-import java.security.NoSuchProviderException;
 import java.security.NoSuchAlgorithmException;
 import java.lang.IllegalArgumentException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Base64;
 
 public class Utils {
