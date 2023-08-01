@@ -23,15 +23,26 @@ package technology.cariad.partnerenablerservice;
 
 interface ICarDataChangeListener {
     /**
-     * Binder callback for changes to the following Car Data
-     * Mileage/Odometer, Steering Angle, FogLights, TurnSignalIndicator
+     * Binder callback for changes to the Mileage/Odometer
      * @hide
      */
     void onMileageValueChanged(float mileageValue) = 0;
 
+    /**
+     * Binder callback for changes to the FogLights
+     * @hide
+     */
     void onFogLightsChanged(int fogLightState) = 1;
 
+    /**
+     * Binder callback for changes to Steering Angle
+     * @hide
+    */
     void onSteeringAngleChanged(float steeringAngle) = 2;
 
+    /**
+     * Binder callback for changes to the TurnSignalIndicator
+     * @hide
+    */
     void onTurnSignalStateChanged(int signalIndicator) = 3;
 }

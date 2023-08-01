@@ -32,6 +32,7 @@ import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.HashSet;
 
 import technology.cariad.partnerenablerservice.IPartnerEnabler;
 import technology.cariad.partnerenablerservice.ICarDataChangeListener;
@@ -52,10 +53,10 @@ public class CarDataManager {
 
     private ICarDataChangeListener mCarDataChangeListener = new CarDataChangeListener();
 
-    private List<MileageListener> mMileageListeners = new ArrayList<>();
-    private List<TurnSignalListener> mTurnSignalListener = new ArrayList<>();
-    private List<FogLightStateListener> mFogLightStateListener = new ArrayList<>();
-    private List<SteeringAngleListener> mSteeringAngleListener = new ArrayList<>();
+    private HashSet<MileageListener> mMileageListeners = new HashSet<MileageListener>();
+    private HashSet<TurnSignalListener> mTurnSignalListener = new HashSet<TurnSignalListener>();
+    private HashSet<FogLightStateListener> mFogLightStateListener = new HashSet<FogLightStateListener>();
+    private HashSet<SteeringAngleListener> mSteeringAngleListener = new HashSet<SteeringAngleListener>();
 
     public CarDataManager(IPartnerEnabler service) {
         Log.d(TAG,"CarDataManager");
@@ -65,7 +66,9 @@ public class CarDataManager {
 
     private void addCarDataListener() {
         try {
-            mService.addCarDataChangeListener(mCarDataChangeListener);
+            if (!isClientListenerNotRegistered()) {
+                mService.addCarDataChangeListener(mCarDataChangeListener);
+            }
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }
@@ -73,10 +76,21 @@ public class CarDataManager {
 
     private void removeCarDataListener() {
         try {
-            mService.removeCarDataChangeListener(mCarDataChangeListener);
+            if (isClientListenerNotRegistered()) {
+                mService.removeCarDataChangeListener(mCarDataChangeListener);
+            }
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private boolean isClientListenerNotRegistered() {
+        boolean retVal = false;
+        if (mMileageListeners.isEmpty() && mTurnSignalListener.isEmpty() &&
+                mFogLightStateListener.isEmpty() && mSteeringAngleListener.isEmpty()) {
+            retVal = true;
+        }
+        return retVal;
     }
 
     /**
@@ -96,6 +110,7 @@ public class CarDataManager {
      */
     public void unregisterMileageListener(MileageListener mileageListener) {
         mMileageListeners.remove(mileageListener);
+        removeCarDataListener();
     }
 
     /**
@@ -137,6 +152,7 @@ public class CarDataManager {
      */
     public void unregisterTurnSignalListener(TurnSignalListener turnSignalListener) {
         mTurnSignalListener.remove(turnSignalListener);
+        removeCarDataListener();
     }
 
     /**
@@ -178,6 +194,7 @@ public class CarDataManager {
      */
     public void unregisterFogLightStateListener(FogLightStateListener lightStateListener) {
         mFogLightStateListener.remove(lightStateListener);
+        removeCarDataListener();
     }
 
     /**
@@ -218,6 +235,7 @@ public class CarDataManager {
      */
     public void unregisterSteeringAngleListener(SteeringAngleListener steeringAngleListener) {
         mSteeringAngleListener.remove(steeringAngleListener);
+        removeCarDataListener();
     }
 
     /**
@@ -303,39 +321,31 @@ public class CarDataManager {
     private class CarDataChangeListener extends ICarDataChangeListener.Stub {
         public void onMileageValueChanged(float mileageValue) {
             Log.d(TAG, "calling listener onMileageValueChanged with value: " + mileageValue);
-            if (mMileageListeners != null) {
-                for(MileageListener listener: mMileageListeners) {
-                    listener.onMileageValueChanged(mileageValue);
-                }
+            for(MileageListener listener: mMileageListeners) {
+                listener.onMileageValueChanged(mileageValue);
             }
         }
 
         public void onFogLightsChanged(int fogLightState) {
             Log.d(TAG, "calling listener onFogLightStateChange with value: " + fogLightState);
-            if (mFogLightStateListener != null) {
-                for(FogLightStateListener listener: mFogLightStateListener) {
-                    VehicleLightState lightState = convertToVehicleLightState(fogLightState);
-                    listener.onFogLightsChanged(lightState);
-                }
+            for(FogLightStateListener listener: mFogLightStateListener) {
+                VehicleLightState lightState = convertToVehicleLightState(fogLightState);
+                listener.onFogLightsChanged(lightState);
             }
         }
 
         public void onSteeringAngleChanged(float steeringAngle) {
             Log.d(TAG, "calling listener onSteeringAngleChanged with value: " + steeringAngle);
-            if (mSteeringAngleListener != null) {
-                for(SteeringAngleListener listener: mSteeringAngleListener) {
-                    listener.onSteeringAngleChanged(steeringAngle);
-                }
+            for(SteeringAngleListener listener: mSteeringAngleListener) {
+                listener.onSteeringAngleChanged(steeringAngle);
             }
         }
 
         public void onTurnSignalStateChanged(int signalIndicator) {
             Log.d(TAG, "calling listener onTurnSignalStateChanged with value: " + signalIndicator);
-            if (mTurnSignalListener != null) {
-                for(TurnSignalListener listener: mTurnSignalListener) {
-                    VehicleSignalIndicator indicator = convertTurnSignalIndicator(signalIndicator);
-                    listener.onTurnSignalStateChanged(indicator);
-                }
+            for(TurnSignalListener listener: mTurnSignalListener) {
+                VehicleSignalIndicator indicator = convertTurnSignalIndicator(signalIndicator);
+                listener.onTurnSignalStateChanged(indicator);
             }
         }
     }
