@@ -36,12 +36,15 @@ import java.security.InvalidKeyException;
 import java.security.SignatureException;
 import java.security.NoSuchAlgorithmException;
 import java.lang.IllegalArgumentException;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Collections;
+import java.util.List;
 
 public class Utils {
     private static final String TAG = Utils.class.getSimpleName();
-    private static final String restrictedNameSpace = "technology.cariad.vwae.restricted.";
-    private static final String partnerEnablerServicePackageName = "technology.cariad.partnerenablerservice";
+    private static final String CARIAD_VWAE_RESTRICTED_NAMESPACE = "technology.cariad.vwae.restricted.";
+    private static final String PARTNER_ENABLER_SERVICE_PACKAGE_NAME = "technology.cariad.partnerenablerservice";
 
     /**
      * This method verifies the app digital signature.
@@ -60,7 +63,7 @@ public class Utils {
         }
 
         PackageManager pm = context.getPackageManager();
-        int flags = PackageManager.GET_PERMISSIONS;
+        int flags = PackageManager.GET_PERMISSIONS | PackageManager.GET_SIGNING_CERTIFICATES;
         PackageInfo packageInfo = null;
 
         try {
@@ -90,6 +93,21 @@ public class Utils {
     /**
      * This method creates the data string to be verified.
      *
+     * @param context context of the caller
+     * @param packageName packagename of the app which uses the partner library
+     * @return  returns newly created datastring
+     */
+    private static String createMetaDataString(Context context, String packageName) {
+        StringBuilder dataString = new StringBuilder();
+        // get permission list
+
+        //get certificate
+        return dataString.toString();
+    }
+
+    /**
+     * This method creates the data string to be verified.
+     *
      * @param packageInfo packageinfo of the verifier library service
      * @param packageName packagename of the app which uses the partner library
      * @return  returns newly created datastring
@@ -97,16 +115,18 @@ public class Utils {
     private static String createMetaDataString(PackageInfo packageInfo, String packageName) {
         // get the request permission for the given package name(3rd part app package info)
         String[] permissionList = packageInfo.requestedPermissions;
-
+        List<String> filteredPermissionList = new ArrayList<>();
 
         // Form the meta-data string to be verified
         StringBuilder dataString = new StringBuilder(packageName).append(";");
         for (String permission : permissionList) {
             Log.d(TAG, "permission Name: " + permission);
-            if (permission.startsWith(restrictedNameSpace)) {
-                dataString.append(permission).append(";");
+            if (permission.startsWith(CARIAD_VWAE_RESTRICTED_NAMESPACE)) {
+                filteredPermissionList.add(permission);
             }
         }
+        Collections.sort(filteredPermissionList);
+        dataString.append(String.join(";", filteredPermissionList));
         return dataString.toString();
     }
 
