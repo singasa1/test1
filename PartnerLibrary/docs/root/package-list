@@ -1,0 +1,52 @@
+$dokka.format:gfm-v1
+$dokka.linkExtension:md
+$dokka.location:technology.cariad.partnerlibrary////PointingToDeclaration/root/technology.cariad.partnerlibrary/index.md
+$dokka.location:technology.cariad.partnerlibrary/CarDataManager///PointingToDeclaration/root/technology.cariad.partnerlibrary/-car-data-manager/index.md
+$dokka.location:technology.cariad.partnerlibrary/CarDataManager/CarDataManager/#IPartnerEnabler/PointingToDeclaration/root/technology.cariad.partnerlibrary/-car-data-manager/-car-data-manager.md
+$dokka.location:technology.cariad.partnerlibrary/CarDataManager/getCurrentMileage/#/PointingToDeclaration/root/technology.cariad.partnerlibrary/-car-data-manager/get-current-mileage.md
+$dokka.location:technology.cariad.partnerlibrary/CarDataManager/getFogLightsState/#/PointingToDeclaration/root/technology.cariad.partnerlibrary/-car-data-manager/get-fog-lights-state.md
+$dokka.location:technology.cariad.partnerlibrary/CarDataManager/getSteeringAngle/#/PointingToDeclaration/root/technology.cariad.partnerlibrary/-car-data-manager/get-steering-angle.md
+$dokka.location:technology.cariad.partnerlibrary/CarDataManager/getTurnSignalIndicator/#/PointingToDeclaration/root/technology.cariad.partnerlibrary/-car-data-manager/get-turn-signal-indicator.md
+$dokka.location:technology.cariad.partnerlibrary/CarDataManager/getVehicleIdentityNumber/#/PointingToDeclaration/root/technology.cariad.partnerlibrary/-car-data-manager/get-vehicle-identity-number.md
+$dokka.location:technology.cariad.partnerlibrary/CarDataManager/registerFogLightStateListener/#FogLightStateListener/PointingToDeclaration/root/technology.cariad.partnerlibrary/-car-data-manager/register-fog-light-state-listener.md
+$dokka.location:technology.cariad.partnerlibrary/CarDataManager/registerMileageListener/#MileageListener/PointingToDeclaration/root/technology.cariad.partnerlibrary/-car-data-manager/register-mileage-listener.md
+$dokka.location:technology.cariad.partnerlibrary/CarDataManager/registerSteeringAngleListener/#SteeringAngleListener/PointingToDeclaration/root/technology.cariad.partnerlibrary/-car-data-manager/register-steering-angle-listener.md
+$dokka.location:technology.cariad.partnerlibrary/CarDataManager/registerTurnSignalListener/#TurnSignalListener/PointingToDeclaration/root/technology.cariad.partnerlibrary/-car-data-manager/register-turn-signal-listener.md
+$dokka.location:technology.cariad.partnerlibrary/CarDataManager/unregisterFogLightStateListener/#FogLightStateListener/PointingToDeclaration/root/technology.cariad.partnerlibrary/-car-data-manager/unregister-fog-light-state-listener.md
+$dokka.location:technology.cariad.partnerlibrary/CarDataManager/unregisterMileageListener/#MileageListener/PointingToDeclaration/root/technology.cariad.partnerlibrary/-car-data-manager/unregister-mileage-listener.md
+$dokka.location:technology.cariad.partnerlibrary/CarDataManager/unregisterSteeringAngleListener/#SteeringAngleListener/PointingToDeclaration/root/technology.cariad.partnerlibrary/-car-data-manager/unregister-steering-angle-listener.md
+$dokka.location:technology.cariad.partnerlibrary/CarDataManager/unregisterTurnSignalListener/#TurnSignalListener/PointingToDeclaration/root/technology.cariad.partnerlibrary/-car-data-manager/unregister-turn-signal-listener.md
+$dokka.location:technology.cariad.partnerlibrary/FogLightStateListener///PointingToDeclaration/root/technology.cariad.partnerlibrary/-fog-light-state-listener/index.md
+$dokka.location:technology.cariad.partnerlibrary/FogLightStateListener/onFogLightsChanged/#VehicleLightState/PointingToDeclaration/root/technology.cariad.partnerlibrary/-fog-light-state-listener/on-fog-lights-changed.md
+$dokka.location:technology.cariad.partnerlibrary/MileageListener///PointingToDeclaration/root/technology.cariad.partnerlibrary/-mileage-listener/index.md
+$dokka.location:technology.cariad.partnerlibrary/MileageListener/onMileageValueChanged/#float/PointingToDeclaration/root/technology.cariad.partnerlibrary/-mileage-listener/on-mileage-value-changed.md
+$dokka.location:technology.cariad.partnerlibrary/PartnerLibrary///PointingToDeclaration/root/technology.cariad.partnerlibrary/-partner-library/index.md
+$dokka.location:technology.cariad.partnerlibrary/PartnerLibrary/PartnerLibrary/#Context/PointingToDeclaration/root/technology.cariad.partnerlibrary/-partner-library/-partner-library.md
+$dokka.location:technology.cariad.partnerlibrary/PartnerLibrary/addListener/#ILibStateChangeListener/PointingToDeclaration/root/technology.cariad.partnerlibrary/-partner-library/add-listener.md
+$dokka.location:technology.cariad.partnerlibrary/PartnerLibrary/getCarDataManager/#/PointingToDeclaration/root/technology.cariad.partnerlibrary/-partner-library/get-car-data-manager.md
+$dokka.location:technology.cariad.partnerlibrary/PartnerLibrary/initialize/#/PointingToDeclaration/root/technology.cariad.partnerlibrary/-partner-library/initialize.md
+$dokka.location:technology.cariad.partnerlibrary/PartnerLibrary/release/#/PointingToDeclaration/root/technology.cariad.partnerlibrary/-partner-library/release.md
+$dokka.location:technology.cariad.partnerlibrary/PartnerLibrary/removeListener/#ILibStateChangeListener/PointingToDeclaration/root/technology.cariad.partnerlibrary/-partner-library/remove-listener.md
+$dokka.location:technology.cariad.partnerlibrary/PartnerLibrary/start/#/PointingToDeclaration/root/technology.cariad.partnerlibrary/-partner-library/start.md
+$dokka.location:technology.cariad.partnerlibrary/PartnerLibrary/stop/#/PointingToDeclaration/root/technology.cariad.partnerlibrary/-partner-library/stop.md
+$dokka.location:technology.cariad.partnerlibrary/PartnerLibrary/verifyDigitalSignature/#java.lang.String/PointingToDeclaration/root/technology.cariad.partnerlibrary/-partner-library/verify-digital-signature.md
+$dokka.location:technology.cariad.partnerlibrary/SteeringAngleListener///PointingToDeclaration/root/technology.cariad.partnerlibrary/-steering-angle-listener/index.md
+$dokka.location:technology.cariad.partnerlibrary/SteeringAngleListener/onSteeringAngleChanged/#float/PointingToDeclaration/root/technology.cariad.partnerlibrary/-steering-angle-listener/on-steering-angle-changed.md
+$dokka.location:technology.cariad.partnerlibrary/TurnSignalListener///PointingToDeclaration/root/technology.cariad.partnerlibrary/-turn-signal-listener/index.md
+$dokka.location:technology.cariad.partnerlibrary/TurnSignalListener/onTurnSignalStateChanged/#VehicleSignalIndicator/PointingToDeclaration/root/technology.cariad.partnerlibrary/-turn-signal-listener/on-turn-signal-state-changed.md
+$dokka.location:technology.cariad.partnerlibrary/VehicleLightState.DAYTIME_RUNNING///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}root/technology.cariad.partnerlibrary/-vehicle-light-state/-d-a-y-t-i-m-e_-r-u-n-n-i-n-g/index.md
+$dokka.location:technology.cariad.partnerlibrary/VehicleLightState.OFF///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}root/technology.cariad.partnerlibrary/-vehicle-light-state/-o-f-f/index.md
+$dokka.location:technology.cariad.partnerlibrary/VehicleLightState.ON///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}root/technology.cariad.partnerlibrary/-vehicle-light-state/-o-n/index.md
+$dokka.location:technology.cariad.partnerlibrary/VehicleLightState.PERMISSION_DENIED///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}root/technology.cariad.partnerlibrary/-vehicle-light-state/-p-e-r-m-i-s-s-i-o-n_-d-e-n-i-e-d/index.md
+$dokka.location:technology.cariad.partnerlibrary/VehicleLightState///PointingToDeclaration/root/technology.cariad.partnerlibrary/-vehicle-light-state/index.md
+$dokka.location:technology.cariad.partnerlibrary/VehicleLightState/valueOf/#java.lang.String/PointingToDeclaration/root/technology.cariad.partnerlibrary/-vehicle-light-state/value-of.md
+$dokka.location:technology.cariad.partnerlibrary/VehicleLightState/values/#/PointingToDeclaration/root/technology.cariad.partnerlibrary/-vehicle-light-state/values.md
+$dokka.location:technology.cariad.partnerlibrary/VehicleSignalIndicator.LEFT///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}root/technology.cariad.partnerlibrary/-vehicle-signal-indicator/-l-e-f-t/index.md
+$dokka.location:technology.cariad.partnerlibrary/VehicleSignalIndicator.NONE///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}root/technology.cariad.partnerlibrary/-vehicle-signal-indicator/-n-o-n-e/index.md
+$dokka.location:technology.cariad.partnerlibrary/VehicleSignalIndicator.PERMISSION_DENIED///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}root/technology.cariad.partnerlibrary/-vehicle-signal-indicator/-p-e-r-m-i-s-s-i-o-n_-d-e-n-i-e-d/index.md
+$dokka.location:technology.cariad.partnerlibrary/VehicleSignalIndicator.RIGHT///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}root/technology.cariad.partnerlibrary/-vehicle-signal-indicator/-r-i-g-h-t/index.md
+$dokka.location:technology.cariad.partnerlibrary/VehicleSignalIndicator///PointingToDeclaration/root/technology.cariad.partnerlibrary/-vehicle-signal-indicator/index.md
+$dokka.location:technology.cariad.partnerlibrary/VehicleSignalIndicator/valueOf/#java.lang.String/PointingToDeclaration/root/technology.cariad.partnerlibrary/-vehicle-signal-indicator/value-of.md
+$dokka.location:technology.cariad.partnerlibrary/VehicleSignalIndicator/values/#/PointingToDeclaration/root/technology.cariad.partnerlibrary/-vehicle-signal-indicator/values.md
+technology.cariad.partnerlibrary
+
