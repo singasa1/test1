@@ -17,13 +17,32 @@
  * that it may describe in whole or in part.
  */
 
-package technology.cariad.partnerlibrary;
+package technology.cariad.partnerenablerservice;
 
 // Declare any non-default types here with import statements
 
-interface ILibStateChangeListener {
+interface ICarDataChangeListener {
     /**
-     * Callback to trigger once Partner Enabler service connection state changes
+     * Binder callback for changes to the Mileage/Odometer
+     * @hide
      */
-    void onStateChanged(boolean isReady);
+    void onMileageValueChanged(float mileageValue) = 0;
+
+    /**
+     * Binder callback for changes to the FogLights
+     * @hide
+     */
+    void onFogLightsChanged(int fogLightState) = 1;
+
+    /**
+     * Binder callback for changes to Steering Angle
+     * @hide
+    */
+    void onSteeringAngleChanged(float steeringAngle) = 2;
+
+    /**
+     * Binder callback for changes to the TurnSignalIndicator
+     * @hide
+    */
+    void onTurnSignalStateChanged(int signalIndicator) = 3;
 }
