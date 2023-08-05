@@ -18,6 +18,13 @@
  */
 package technology.cariad.partnerlibrary;
 
+import static technology.cariad.partnerenablerservice.IPartnerEnabler.VEHICLE_LIGHT_STATE_DAYTIME_RUNNING;
+import static technology.cariad.partnerenablerservice.IPartnerEnabler.VEHICLE_LIGHT_STATE_OFF;
+import static technology.cariad.partnerenablerservice.IPartnerEnabler.VEHICLE_LIGHT_STATE_ON;
+import static technology.cariad.partnerenablerservice.IPartnerEnabler.VEHICLE_SIGNAL_INDICATOR_LEFT;
+import static technology.cariad.partnerenablerservice.IPartnerEnabler.VEHICLE_SIGNAL_INDICATOR_NONE;
+import static technology.cariad.partnerenablerservice.IPartnerEnabler.VEHICLE_SIGNAL_INDICATOR_RIGHT;
+
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -25,7 +32,6 @@ import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
@@ -49,6 +55,8 @@ public class PartnerLibrary {
 
     private IPartnerEnabler mService;
     private PartnerEnablerServiceConnection mServiceConnection;
+    private CarDataManager mCarDataManager;
+
     private Context mContext;
     private boolean mIsPartnerEnablerServiceConnected = false;
     private List<ILibStateChangeListener> mClientListeners = new ArrayList<>();
@@ -66,6 +74,7 @@ public class PartnerLibrary {
             mService = IPartnerEnabler.Stub.asInterface((IBinder) boundService);
             Log.d(TAG, "onServiceConnected() connected");
             mIsPartnerEnablerServiceConnected = true;
+            mCarDataManager = new CarDataManager(mService);
             if (mClientListeners != null) {
                 try {
                     Log.d(TAG, "calling listener onLibStateReady with value: " + mIsPartnerEnablerServiceConnected);
@@ -179,6 +188,10 @@ public class PartnerLibrary {
             }
         }
         return retVal;
+    }
+
+    public CarDataManager getCarDataManager() {
+        return mCarDataManager;
     }
 
     /** Binds the user activity to the service. */
