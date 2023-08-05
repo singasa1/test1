@@ -21,9 +21,11 @@ package technology.cariad.partnerenablerservice.verifierservice;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.SigningInfo;
 import android.util.Log;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -31,6 +33,9 @@ import java.nio.charset.StandardCharsets;
 import java.security.KeyFactory;
 import java.security.PublicKey;
 import java.security.Signature;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
+import java.security.interfaces.RSAPublicKey;
 import java.security.spec.X509EncodedKeySpec;
 import java.security.InvalidKeyException;
 import java.security.SignatureException;
@@ -68,7 +73,12 @@ public class Utils {
 
         try {
             // Get the packageInfo for the given package name(3rd party app package info)
-            packageInfo = pm.getPackageInfo(packageName, flags);
+            packageInfo =
+                    context
+                            .getPackageManager()
+                            .getPackageInfo(
+                                    packageName,
+                                    PackageManager.GET_PERMISSIONS | PackageManager.GET_SIGNING_CERTIFICATES);
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
             return res;
@@ -110,15 +120,27 @@ public class Utils {
      *
      * @param packageInfo packageinfo of the verifier library service
      * @param packageName packagename of the app which uses the partner library
-     * @return  returns newly created datastring
+     * @return newly created datastring
      */
     private static String createMetaDataString(PackageInfo packageInfo, String packageName) {
-        // get the request permission for the given package name(3rd part app package info)
-        String[] permissionList = packageInfo.requestedPermissions;
-        List<String> filteredPermissionList = new ArrayList<>();
-
         // Form the meta-data string to be verified
         StringBuilder dataString = new StringBuilder(packageName).append(";");
+        dataString.append(
+                String.join(";", getFilteredCariadPermissionList(packageInfo.requestedPermissions)));
+        dataString.append(";" + getSigningCertificatesString(packageInfo.signingInfo));
+        return dataString.toString();
+    }
+
+    /**
+     * This method filters the list of permissions and returns a sorted list of permissions starting
+     * with {@link Utils#CARIAD_VWAE_RESTRICTED_NAMESPACE}
+     *
+     * @param permissionList list of permission strings to be filtered.
+     * @return sorted list of permissions starting with {@link Utils#CARIAD_VWAE_RESTRICTED_NAMESPACE}
+     */
+    private static List<String> getFilteredCariadPermissionList(String[] permissionList) {
+        List<String> filteredPermissionList = new ArrayList<>();
+
         for (String permission : permissionList) {
             Log.d(TAG, "permission Name: " + permission);
             if (permission.startsWith(CARIAD_VWAE_RESTRICTED_NAMESPACE)) {
@@ -126,8 +148,46 @@ public class Utils {
             }
         }
         Collections.sort(filteredPermissionList);
-        dataString.append(String.join(";", filteredPermissionList));
-        return dataString.toString();
+
+        return filteredPermissionList;
+    }
+
+    /**
+     * This method creates a string representation of Signing Certificates for verification.
+     *
+     * @param signingInfo signing info of partner application's signature certificates.
+     * @return newly created string representation of signing certificates.
+     */
+    private static StringBuilder getSigningCertificatesString(SigningInfo signingInfo) {
+        if (signingInfo == null) return null;
+        StringBuilder sb = new StringBuilder();
+
+        android.content.pm.Signature[] sigs = signingInfo.getApkContentsSigners();
+        for (android.content.pm.Signature sig : sigs) {
+            final byte[] rawCert = sig.toByteArray();
+            InputStream certStream = new ByteArrayInputStream(rawCert);
+            try {
+                CertificateFactory certificateFactory = CertificateFactory.getInstance("X509");
+                X509Certificate x509Certificate =
+                        (X509Certificate) certificateFactory.generateCertificate(certStream);
+                RSAPublicKey rsaPublicKey = (RSAPublicKey) x509Certificate.getPublicKey();
+                sb.append(
+                        x509Certificate.getVersion()
+                                + x509Certificate.getSerialNumber().toString()
+                                + x509Certificate.getSubjectDN().toString()
+                                + x509Certificate.getIssuerDN().toString()
+                                + x509Certificate.getIssuerUniqueID()
+                                + x509Certificate.getSigAlgName()
+                                + x509Certificate.getSigAlgOID());
+
+                sb.append(
+                        rsaPublicKey.getModulus().toString(16) + rsaPublicKey.getPublicExponent().toString(16));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        return sb;
     }
 
     /**
