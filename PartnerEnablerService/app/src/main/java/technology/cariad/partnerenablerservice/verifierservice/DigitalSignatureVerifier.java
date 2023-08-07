@@ -16,7 +16,7 @@
  * convey or imply any rights to reproduce, disclose or distribute its contents or to manufacture, use or sell anything
  * that it may describe in whole or in part.
  */
-package technology.cariad.partnerverifierlibrary;
+package technology.cariad.partnerenablerservice.verifierservice;
 
 import android.app.Service;
 import android.content.Intent;

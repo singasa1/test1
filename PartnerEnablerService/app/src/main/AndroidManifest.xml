@@ -57,6 +57,8 @@
                 <action android:name="technology.cariad.partnerenablerservice.enabler"/>
             </intent-filter>
         </service>
-    </application>
+        <service android:name=".verifierservice.DigitalSignatureVerifier" android:enabled="true"
+		android:exported="true"/>
 
+    </application>
 </manifest>
