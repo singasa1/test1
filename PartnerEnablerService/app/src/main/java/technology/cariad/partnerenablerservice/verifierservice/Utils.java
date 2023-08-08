@@ -103,21 +103,6 @@ public class Utils {
     /**
      * This method creates the data string to be verified.
      *
-     * @param context context of the caller
-     * @param packageName packagename of the app which uses the partner library
-     * @return  returns newly created datastring
-     */
-    private static String createMetaDataString(Context context, String packageName) {
-        StringBuilder dataString = new StringBuilder();
-        // get permission list
-
-        //get certificate
-        return dataString.toString();
-    }
-
-    /**
-     * This method creates the data string to be verified.
-     *
      * @param packageInfo packageinfo of the verifier library service
      * @param packageName packagename of the app which uses the partner library
      * @return newly created datastring
