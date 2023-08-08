@@ -20,6 +20,7 @@ package technology.cariad.partnerenablerservice;
 
 import android.app.Service;
 import android.content.Intent;
+import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -33,11 +34,14 @@ public class PartnerEnablerService extends Service {
 
     // declaring PartnerEnabler binder instance
     private PartnerEnablerImpl mService;
+    private PartnerAccessManager mPartnerAccessManager;
 
     @Override
     public void onCreate() {
         Log.d(TAG,"onCreate");
         super.onCreate();
+        mPartnerAccessManager = PartnerAccessManager.getInstance(this);
+        mPartnerAccessManager.initialize();
     }
 
     @Override
@@ -45,6 +49,7 @@ public class PartnerEnablerService extends Service {
     public void onDestroy() {
         Log.d(TAG,"onDestroy");
         release();
+        mPartnerAccessManager.cleanUp();
         super.onDestroy();
     }
 
@@ -57,7 +62,7 @@ public class PartnerEnablerService extends Service {
 
     private void init() {
         if (mService == null) {
-            mService = new PartnerEnablerImpl(this);
+            mService = new PartnerEnablerImpl(this, mPartnerAccessManager);
         }
     }
 
@@ -71,7 +76,7 @@ public class PartnerEnablerService extends Service {
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        Log.d(TAG,"onBind");
+        Log.d(TAG,"onBind: ");
         init();
         return mService;
     }

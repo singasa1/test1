@@ -19,66 +19,57 @@
 package technology.cariad.partnerenablerservice;
 
 
-import android.content.ComponentName;
 import android.content.Context;
-import android.content.Intent;
-import android.content.ServiceConnection;
-import android.os.IBinder;
+import android.os.Binder;
+import android.os.RemoteException;
 import android.util.Log;
-
-import technology.cariad.partnerverifierlibrary.ISignatureVerifier;
 
 public class PartnerEnablerImpl extends IPartnerEnabler.Stub {
 
     private static final String TAG = "PartnerEnablerService:" + PartnerEnablerImpl.class.getSimpleName();
-
-    private static final String PARTNER_VERIFIER_ACTION_NAME = "technology.cariad.partnerverifierlibrary.verifier";
-    private static final String PARTNER_VERIFIER_PACKAGE_NAME = "technology.cariad.partnerverifierlibrary";
+    private static final boolean DEBUG_MODE = false;
 
     private final Context mContext;
-    private ISignatureVerifier mSignatureVerifier;
-    private VerifierServiceConnection mServiceConnection;
+    private PartnerAccessManager mPartnerAccessManager;
+
+    PartnerEnablerImpl(Context context, PartnerAccessManager partnerAccessManager) {
+        mContext = context;
+        mPartnerAccessManager = partnerAccessManager;
+    }
+
+    @Override
+    public void initialize() throws SecurityException {
+        Log.d(TAG, "initialize");
+        verifyAccess(mContext.getPackageManager().getNameForUid(Binder.getCallingUid()));
+    }
+
+    @Override
+    public void release() throws SecurityException {
+        Log.d(TAG, "release");
+        verifyAccess(mContext.getPackageManager().getNameForUid(Binder.getCallingUid()));
+    }
 
     /**
-     * This class represents the actual service connection. It casts the bound
-     * stub implementation of the service to the AIDL interface.
+     * Check if access is allowed and throw SecurityException if the access is not allowed for the
+     * package.
+     * @param packageName package name of the application to which access is verified.
+     * @throws SecurityException if the access is not allowed.
      */
-    class VerifierServiceConnection implements ServiceConnection {
-
-        public void onServiceConnected(ComponentName name, IBinder boundService) {
-            mSignatureVerifier = ISignatureVerifier.Stub.asInterface((IBinder) boundService);
-            Log.d(TAG, "onServiceConnected() connected");
+    private void verifyAccess(String packageName) throws SecurityException {
+        Log.d(TAG, "Calling app is: " + packageName);
+        if (DEBUG_MODE) {
+            Log.d(TAG, "Debug mode is enabled - disabling verification");
+            return;
         }
 
-        public void onServiceDisconnected(ComponentName name) {
-            mSignatureVerifier = null;
-            Log.d(TAG, "onServiceDisconnected() disconnected");
+        try {
+            if (!mPartnerAccessManager.isAccessAllowed(packageName)) {
+                throw new SecurityException(
+                        "The app " + packageName +
+                                " doesn't have the permission to access Partner API's");
+            }
+        } catch (RemoteException e) {
+            e.printStackTrace();
         }
-    }
-
-    PartnerEnablerImpl(Context context) {
-        mContext = context;
-    }
-
-    @Override
-    public void initialize() {
-        Log.d(TAG,"initialize");
-        mServiceConnection = new VerifierServiceConnection();
-        Intent i = new Intent(PARTNER_VERIFIER_ACTION_NAME).setPackage(PARTNER_VERIFIER_PACKAGE_NAME);
-        boolean ret = mContext.bindService(i, mServiceConnection, Context.BIND_AUTO_CREATE);
-        Log.d(TAG,"bind verifier service result: " + ret);
-    }
-
-    @Override
-    public void release() {
-        Log.d(TAG, "release");
-        mContext.unbindService(mServiceConnection);
-        mServiceConnection = null;
-        Log.d(TAG, "releaseService() unbound.");
-    }
-
-    @Override
-    public ISignatureVerifier getPartnerVerifierService() {
-        return mSignatureVerifier;
     }
 }

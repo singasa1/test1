@@ -103,21 +103,6 @@ public class Utils {
     /**
      * This method creates the data string to be verified.
      *
-     * @param context context of the caller
-     * @param packageName packagename of the app which uses the partner library
-     * @return  returns newly created datastring
-     */
-    private static String createMetaDataString(Context context, String packageName) {
-        StringBuilder dataString = new StringBuilder();
-        // get permission list
-
-        //get certificate
-        return dataString.toString();
-    }
-
-    /**
-     * This method creates the data string to be verified.
-     *
      * @param packageInfo packageinfo of the verifier library service
      * @param packageName packagename of the app which uses the partner library
      * @return newly created datastring
@@ -200,13 +185,14 @@ public class Utils {
      */
     private static boolean verifySignature(PublicKey pubKey, String metadata, String dataString) {
         boolean res = false;
+        Log.d(TAG, "metadata: " + metadata);
         try {
             byte[] dataBytes = dataString.getBytes(); // TODO: encoding!
             Base64.Decoder mimeDecoder = Base64.getMimeDecoder();
             Signature sig = Signature.getInstance("SHA256WithRSA");
             sig.initVerify(pubKey);
             byte[] metadataByte = mimeDecoder.decode(metadata);
-            Log.d(TAG,"Metadata value Bytes: " + metadataByte);
+            Log.d(TAG,"Metadata value bytes: " + metadataByte);
             sig.update(dataBytes);
             res = sig.verify(metadataByte);
             Log.d(TAG,"Verification result: " + res);
