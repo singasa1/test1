@@ -1,0 +1,6 @@
+/.idea/
+/gradle/
+/app/build/
+gradlew
+gradlew.bat
+/app/release/
