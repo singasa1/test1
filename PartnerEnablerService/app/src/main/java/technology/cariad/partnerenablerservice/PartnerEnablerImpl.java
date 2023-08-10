@@ -27,6 +27,10 @@ import android.util.Log;
 public class PartnerEnablerImpl extends IPartnerEnabler.Stub {
 
     private static final String TAG = "PartnerEnablerService:" + PartnerEnablerImpl.class.getSimpleName();
+<<<<<<< HEAD
+=======
+    private static final boolean DEBUG_MODE = false;
+>>>>>>> 983c854a722c6ffe923abb5d41d894ae7521a4c9
 
     private final Context mContext;
     private PartnerAccessManager mPartnerAccessManager;
@@ -56,6 +60,14 @@ public class PartnerEnablerImpl extends IPartnerEnabler.Stub {
      */
     private void verifyAccess(String packageName) throws SecurityException {
         Log.d(TAG, "Calling app is: " + packageName);
+<<<<<<< HEAD
+=======
+        if (DEBUG_MODE) {
+            Log.d(TAG, "Debug mode is enabled - disabling verification");
+            return;
+        }
+
+>>>>>>> 983c854a722c6ffe923abb5d41d894ae7521a4c9
         try {
             if (!mPartnerAccessManager.isAccessAllowed(packageName)) {
                 throw new SecurityException(
