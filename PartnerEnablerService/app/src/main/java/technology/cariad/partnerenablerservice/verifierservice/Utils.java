@@ -185,14 +185,13 @@ public class Utils {
      */
     private static boolean verifySignature(PublicKey pubKey, String metadata, String dataString) {
         boolean res = false;
-        Log.d(TAG, "metadata: " + metadata);
         try {
             byte[] dataBytes = dataString.getBytes(); // TODO: encoding!
             Base64.Decoder mimeDecoder = Base64.getMimeDecoder();
             Signature sig = Signature.getInstance("SHA256WithRSA");
             sig.initVerify(pubKey);
             byte[] metadataByte = mimeDecoder.decode(metadata);
-            Log.d(TAG,"Metadata value bytes: " + metadataByte);
+            Log.d(TAG,"Metadata value Bytes: " + metadataByte);
             sig.update(dataBytes);
             res = sig.verify(metadataByte);
             Log.d(TAG,"Verification result: " + res);

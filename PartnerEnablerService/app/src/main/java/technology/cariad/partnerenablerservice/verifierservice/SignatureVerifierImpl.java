@@ -21,7 +21,6 @@ package technology.cariad.partnerenablerservice.verifierservice;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
-import android.os.Binder;
 import android.os.Bundle;
 import android.util.Log;
 
