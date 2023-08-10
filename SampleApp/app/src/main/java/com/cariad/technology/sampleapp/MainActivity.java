@@ -9,10 +9,10 @@ import android.widget.Button;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
-import technology.cariad.partnerlibrary.MileageListener;
-import technology.cariad.partnerlibrary.PartnerLibrary;
-import technology.cariad.partnerlibrary.CarDataManager;
-import technology.cariad.partnerlibrary.ILibStateChangeListener;
+import com.volkswagenag.partnerlibrary.MileageListener;
+import com.volkswagenag.partnerlibrary.PartnerLibrary;
+import com.volkswagenag.partnerlibrary.CarDataManager;
+import com.volkswagenag.partnerlibrary.ILibStateChangeListener;
 
 //import technology.cariad.dynamicfunctionblocking
 
