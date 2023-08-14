@@ -49,10 +49,12 @@ public class MainActivity extends AppCompatActivity {
 
                     mPartnerLibrary.start();
                 } catch (Exception e) {
+                    mCarDataButton.setVisibility(View.INVISIBLE);
                     mServiceStatusTextView.setText(e.getMessage());
                     e.printStackTrace();
                 }
             } else {
+                mCarDataButton.setVisibility(View.INVISIBLE);
                 mPartnerLibrary.stop();
                 mServiceStatusTextView.setText(R.string.service_state_error);
             }
@@ -144,7 +146,7 @@ public class MainActivity extends AppCompatActivity {
                 mIsServiceConnected = false;
                 mPartnerLibrary.stop();
                 mPartnerLibrary.release();
-            } catch (RemoteException e) {
+            } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         }
