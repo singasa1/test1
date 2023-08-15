@@ -84,9 +84,9 @@ Download Partner Library ver. X.Y (TODO: Add download URL)
 
 4. We also have a sample application which shows how the library can be initialised from your application
 
-Downlaod sample application (TODO: Add download URL)
+Download sample application (TODO: Add download URL)
 
-(TODO: Add diagram for library initialization calls or code snippet reference from sample app. 
+(TODO Sathya S.: Add diagram for library initialization calls or code snippet reference from sample app. 
 
 ### To summarize the above steps, here is a checklist of pre-requisites you need to use the Partner API library
 
@@ -100,7 +100,7 @@ Downlaod sample application (TODO: Add download URL)
 
 The end-to-end flow is best tested on a Cariad emulator and/or Cariad test-bench. As these are not available to Partners at this point, we have implemented a functionality called 'demo-mode' which allows testing using any Android emulator. 
 
-Steps to enable demo mode: (TODO: Add steps )
+Steps to enable demo mode: (TODO Naina N.: Add steps )
 1. .....
 2. .....
 3. .....
