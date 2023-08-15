@@ -17,8 +17,13 @@
  * that it may describe in whole or in part.
  */
 
-package technology.cariad.partnerlibrary;
+package com.volkswagenag.partnerlibrary;
 
-public interface TurnSignalListener {
-    public abstract void onTurnSignalStateChanged(VehicleSignalIndicator signalIndicator);
+// Declare any non-default types here with import statements
+
+interface ILibStateChangeListener {
+    /**
+     * Callback to trigger once Partner Enabler service connection state changes
+     */
+    void onStateChanged(boolean isReady);
 }

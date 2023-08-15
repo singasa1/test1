@@ -17,8 +17,8 @@
  * that it may describe in whole or in part.
  */
 
-package technology.cariad.partnerlibrary;
+package com.volkswagenag.partnerlibrary;
 
-public interface MileageListener {
-    public abstract void onMileageValueChanged(float mileageValue);
+public interface SteeringAngleListener {
+    public abstract void onSteeringAngleChanged(float steeringAngle);
 }

@@ -17,11 +17,11 @@
  * that it may describe in whole or in part.
  */
 
-package technology.cariad.partnerlibrary;
+package com.volkswagenag.partnerlibrary;
 
-public enum VehicleSignalIndicator {
+public enum VehicleLightState {
     PERMISSION_DENIED,
-    NONE,
-    RIGHT,
-    LEFT,
+    OFF,
+    ON,
+    DAYTIME_RUNNING,
 }
