@@ -16,7 +16,7 @@
  * convey or imply any rights to reproduce, disclose or distribute its contents or to manufacture, use or sell anything
  * that it may describe in whole or in part.
  */
-package technology.cariad.partnerlibrary;
+package com.volkswagenag.partnerlibrary;
 
 import static technology.cariad.partnerenablerservice.IPartnerEnabler.VEHICLE_LIGHT_STATE_DAYTIME_RUNNING;
 import static technology.cariad.partnerenablerservice.IPartnerEnabler.VEHICLE_LIGHT_STATE_OFF;

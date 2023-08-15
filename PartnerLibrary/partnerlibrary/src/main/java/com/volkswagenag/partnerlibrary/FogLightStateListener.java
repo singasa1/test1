@@ -17,8 +17,8 @@
  * that it may describe in whole or in part.
  */
 
-package technology.cariad.partnerlibrary;
+package com.volkswagenag.partnerlibrary;
 
-public interface SteeringAngleListener {
-    public abstract void onSteeringAngleChanged(float steeringAngle);
+public interface FogLightStateListener {
+    public abstract void onFogLightsChanged(VehicleLightState fogLightState);
 }
