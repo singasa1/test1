@@ -2,8 +2,8 @@ package com.cariad.technology.sampleapp;
 
 import android.content.Context;
 
-import technology.cariad.partnerlibrary.CarDataManager;
-import technology.cariad.partnerlibrary.PartnerLibrary;
+import com.volkswagenag.partnerlibrary.PartnerLibrary;
+import com.volkswagenag.partnerlibrary.CarDataManager;
 
 /**
  * Common place for all activities to get the PartnerLibrary Managers.
