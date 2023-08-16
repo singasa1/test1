@@ -49,7 +49,6 @@ import java.util.List;
 public class Utils {
     private static final String TAG = Utils.class.getSimpleName();
     private static final String CARIAD_VWAE_RESTRICTED_NAMESPACE = "technology.cariad.vwae.restricted.";
-    private static final String PARTNER_ENABLER_SERVICE_PACKAGE_NAME = "technology.cariad.partnerenablerservice";
 
     /**
      * This method verifies the app digital signature.
@@ -67,7 +66,6 @@ public class Utils {
             return res;
         }
 
-        PackageManager pm = context.getPackageManager();
         int flags = PackageManager.GET_PERMISSIONS | PackageManager.GET_SIGNING_CERTIFICATES;
         PackageInfo packageInfo = null;
 
@@ -145,7 +143,7 @@ public class Utils {
      */
     private static StringBuilder getSigningCertificatesString(SigningInfo signingInfo) {
         if (signingInfo == null) return null;
-        StringBuilder sb = new StringBuilder();
+        StringBuilder signingCertificatesString = new StringBuilder();
 
         android.content.pm.Signature[] sigs = signingInfo.getApkContentsSigners();
         for (android.content.pm.Signature sig : sigs) {
@@ -156,7 +154,7 @@ public class Utils {
                 X509Certificate x509Certificate =
                         (X509Certificate) certificateFactory.generateCertificate(certStream);
                 RSAPublicKey rsaPublicKey = (RSAPublicKey) x509Certificate.getPublicKey();
-                sb.append(
+                signingCertificatesString.append(
                         x509Certificate.getVersion()
                                 + x509Certificate.getSerialNumber().toString()
                                 + x509Certificate.getSubjectDN().toString()
@@ -165,14 +163,14 @@ public class Utils {
                                 + x509Certificate.getSigAlgName()
                                 + x509Certificate.getSigAlgOID());
 
-                sb.append(
+                signingCertificatesString.append(
                         rsaPublicKey.getModulus().toString(16) + rsaPublicKey.getPublicExponent().toString(16));
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
 
-        return sb;
+        return signingCertificatesString;
     }
 
     /**
