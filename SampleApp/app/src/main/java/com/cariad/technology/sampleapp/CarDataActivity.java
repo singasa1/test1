@@ -12,8 +12,8 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import technology.cariad.partnerlibrary.CarDataManager;
-import technology.cariad.partnerlibrary.MileageListener;
+import com.volkswagenag.partnerlibrary.CarDataManager;
+import com.volkswagenag.partnerlibrary.MileageListener;
 
 public class CarDataActivity extends AppCompatActivity implements MileageListener, AdapterView.OnItemSelectedListener {
 
@@ -102,7 +102,11 @@ public class CarDataActivity extends AppCompatActivity implements MileageListene
         float val = mCarDataManager.getCurrentMileage();
 
         Log.d(TAG,"Current Mileage Value: " + val);
-        mListenerUpdateTextView.setText("Odomometer value: " + val);
+        runOnUiThread (new Thread(new Runnable() {
+            public void run() {
+                mListenerUpdateTextView.setText("Odomometer value: " + val);
+            }
+        }));
     }
 
 

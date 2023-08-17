@@ -18,13 +18,6 @@
  */
 package com.volkswagenag.partnerlibrary;
 
-import static technology.cariad.partnerenablerservice.IPartnerEnabler.VEHICLE_LIGHT_STATE_DAYTIME_RUNNING;
-import static technology.cariad.partnerenablerservice.IPartnerEnabler.VEHICLE_LIGHT_STATE_OFF;
-import static technology.cariad.partnerenablerservice.IPartnerEnabler.VEHICLE_LIGHT_STATE_ON;
-import static technology.cariad.partnerenablerservice.IPartnerEnabler.VEHICLE_SIGNAL_INDICATOR_LEFT;
-import static technology.cariad.partnerenablerservice.IPartnerEnabler.VEHICLE_SIGNAL_INDICATOR_NONE;
-import static technology.cariad.partnerenablerservice.IPartnerEnabler.VEHICLE_SIGNAL_INDICATOR_RIGHT;
-
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -33,10 +26,7 @@ import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
 
-import androidx.annotation.NonNull;
-
 import technology.cariad.partnerenablerservice.IPartnerEnabler;
-import technology.cariad.partnerverifierlibrary.ISignatureVerifier;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +34,7 @@ import java.util.List;
 /**
  * <h1>Partner Library</h1>
  * Partner Library provides wrapper apis for different app developers.
- * It has signature verification apis and other apis for getting the Active Route, Interior/Exterior Light status.
+ * It has apis for getting the Active Route, Interior/Exterior Light status.
  *
  * @author Sathya Singaravelu
  * @version 1.0
@@ -52,6 +42,8 @@ import java.util.List;
  */
 public class PartnerLibrary {
     private static final String TAG = PartnerLibrary.class.getSimpleName();
+    private static final String PARTNER_API_SERVICE_NAME = "technology.cariad.partnerenablerservice.enabler";
+    private static final String PARTNER_API_SERVICE_PACKAGE_NAME = "technology.cariad.partnerenablerservice";
 
     private IPartnerEnabler mService;
     private PartnerEnablerServiceConnection mServiceConnection;
@@ -61,8 +53,6 @@ public class PartnerLibrary {
     private boolean mIsPartnerEnablerServiceConnected = false;
     private List<ILibStateChangeListener> mClientListeners = new ArrayList<>();
 
-    private static final String partnerApiServiceName = "technology.cariad.partnerenablerservice.enabler";
-    private static final String partnerApiServicePackageName = "technology.cariad.partnerenablerservice";
 
     /**
      * This class represents the actual service connection. It casts the bound
@@ -125,18 +115,18 @@ public class PartnerLibrary {
         Log.d(TAG,"release");
         // unbind service
         releaseService();
-
     }
 
     /**
      * This method initializes the PartnerEnabler service components
      */
-    public void start() {
+    public void start() throws SecurityException, RemoteException {
         Log.d(TAG,"start");
         if (mIsPartnerEnablerServiceConnected) {
             try {
                 mService.initialize();
-            } catch (RemoteException e) {
+            } catch(SecurityException e) {
+                // TODO: Add proper error communication for all APIs
                 e.printStackTrace();
             }
         }
@@ -145,12 +135,13 @@ public class PartnerLibrary {
     /**
      * This method uninitializes the PartnerEnabler service components
      */
-    public void stop() {
+    public void stop() throws SecurityException, RemoteException {
         Log.d(TAG,"stop");
         if (mIsPartnerEnablerServiceConnected) {
             try {
                 mService.release();
-            } catch (RemoteException e) {
+            } catch(SecurityException e) {
+                // TODO: Add proper error communication for all APIs
                 e.printStackTrace();
             }
         }
@@ -171,25 +162,6 @@ public class PartnerLibrary {
         mClientListeners.remove(listener);
     }
 
-    /**
-     * This method verifies the provided package signature
-     * matches with signed config provided by the SignatureGenerator tool.
-     * @param packageName Package name of the 3rd party app.
-     * @return true - if signature verification succeeds. False - if signature verification fails.
-     */
-    public boolean verifyDigitalSignature(@NonNull String packageName) {
-        boolean retVal = false;
-        if (mIsPartnerEnablerServiceConnected) {
-            try {
-                ISignatureVerifier verifier = mService.getPartnerVerifierService();
-                retVal = verifier.verifyDigitalSignature(packageName);
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
-        }
-        return retVal;
-    }
-
     public CarDataManager getCarDataManager() {
         return mCarDataManager;
     }
@@ -198,7 +170,7 @@ public class PartnerLibrary {
     private void initService() {
         Log.d(TAG,"initService trying to bindService");
         mServiceConnection = new PartnerEnablerServiceConnection();
-        Intent i = new Intent(partnerApiServiceName).setPackage(partnerApiServicePackageName);
+        Intent i = new Intent(PARTNER_API_SERVICE_NAME).setPackage(PARTNER_API_SERVICE_PACKAGE_NAME);
         boolean ret = mContext.bindService(i, mServiceConnection, Context.BIND_AUTO_CREATE);
         Log.d(TAG, "initService() bound with " + ret);
     }
