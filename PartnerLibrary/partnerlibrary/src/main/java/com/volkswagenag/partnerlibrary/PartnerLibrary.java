@@ -18,28 +18,14 @@
  */
 package com.volkswagenag.partnerlibrary;
 
-import static technology.cariad.partnerenablerservice.IPartnerEnabler.VEHICLE_LIGHT_STATE_DAYTIME_RUNNING;
-import static technology.cariad.partnerenablerservice.IPartnerEnabler.VEHICLE_LIGHT_STATE_OFF;
-import static technology.cariad.partnerenablerservice.IPartnerEnabler.VEHICLE_LIGHT_STATE_ON;
-import static technology.cariad.partnerenablerservice.IPartnerEnabler.VEHICLE_SIGNAL_INDICATOR_LEFT;
-import static technology.cariad.partnerenablerservice.IPartnerEnabler.VEHICLE_SIGNAL_INDICATOR_NONE;
-import static technology.cariad.partnerenablerservice.IPartnerEnabler.VEHICLE_SIGNAL_INDICATOR_RIGHT;
-
-import android.content.ComponentName;
 import android.content.Context;
-import android.content.Intent;
-import android.content.ServiceConnection;
-import android.os.IBinder;
-import android.os.RemoteException;
-import android.util.Log;
 
-import androidx.annotation.NonNull;
+import com.volkswagenag.partnerlibrary.demomode.DemoModeUtils;
+import com.volkswagenag.partnerlibrary.demomode.PartnerLibraryDemoModeImpl;
+import com.volkswagenag.partnerlibrary.impl.PartnerLibraryImpl;
 
-import technology.cariad.partnerenablerservice.IPartnerEnabler;
-import technology.cariad.partnerverifierlibrary.ISignatureVerifier;
+import com.volkswagenag.partnerlibrary.ILibStateChangeListener;
 
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * <h1>Partner Library</h1>
@@ -50,126 +36,51 @@ import java.util.List;
  * @version 1.0
  * @since 2023-04-20
  */
-public class PartnerLibrary {
-    private static final String TAG = PartnerLibrary.class.getSimpleName();
+public interface PartnerLibrary {
 
-    private IPartnerEnabler mService;
-    private PartnerEnablerServiceConnection mServiceConnection;
-    private CarDataManager mCarDataManager;
-
-    private Context mContext;
-    private boolean mIsPartnerEnablerServiceConnected = false;
-    private List<ILibStateChangeListener> mClientListeners = new ArrayList<>();
-
-    private static final String partnerApiServiceName = "technology.cariad.partnerenablerservice.enabler";
-    private static final String partnerApiServicePackageName = "technology.cariad.partnerenablerservice";
+    boolean ENABLE_DEMO_MODE_CODE = true;
 
     /**
-     * This class represents the actual service connection. It casts the bound
-     * stub implementation of the service to the AIDL interface.
+     * Returns the Singleton instance of PartnerLibrary to access Partner APIs
+     * @param context Application context
+     * @return {@link PartnerLibrary} instance
      */
-    class PartnerEnablerServiceConnection implements ServiceConnection {
-
-        public void onServiceConnected(ComponentName name, IBinder boundService) {
-            mService = IPartnerEnabler.Stub.asInterface((IBinder) boundService);
-            Log.d(TAG, "onServiceConnected() connected");
-            mIsPartnerEnablerServiceConnected = true;
-            mCarDataManager = new CarDataManager(mService);
-            if (mClientListeners != null) {
-                try {
-                    Log.d(TAG, "calling listener onLibStateReady with value: " + mIsPartnerEnablerServiceConnected);
-                    for(ILibStateChangeListener listener: mClientListeners) {
-                        listener.onStateChanged(mIsPartnerEnablerServiceConnected);
-                    }
-                } catch (RemoteException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        public void onServiceDisconnected(ComponentName name) {
-            mService = null;
-            Log.d(TAG, "onServiceDisconnected() disconnected");
-            mIsPartnerEnablerServiceConnected = false;
-            if (mClientListeners != null) {
-                try {
-                    Log.d(TAG, "calling listener onLibStateReady with value: " + mIsPartnerEnablerServiceConnected);
-                    for(ILibStateChangeListener listener: mClientListeners) {
-                        listener.onStateChanged(mIsPartnerEnablerServiceConnected);
-                    }
-                } catch (RemoteException e) {
-                    e.printStackTrace();
-                }
-            }
+    static PartnerLibrary getInstance(Context context) {
+        if (ENABLE_DEMO_MODE_CODE && DemoModeUtils.isDemoModeEnabled()) {
+            return PartnerLibraryDemoModeImpl.getInstance(context);
+        } else {
+            return PartnerLibraryImpl.getInstance(context);
         }
     }
-
-    public PartnerLibrary(Context context) {
-        Log.d(TAG,"PartnerLibrary");
-        mContext = context;
-    }
-
     /**
      * This method binds to the PartnerEnabler service.
      */
-    public void initialize() {
-        Log.d(TAG,"initialize required services");
-        // bind to the enabler service.
-        initService();
-    }
+    void initialize();
 
     /**
      * This method unbinds the PartnerEnabler service
      */
-    public void release() {
-        Log.d(TAG,"release");
-        // unbind service
-        releaseService();
-
-    }
+    void release();
 
     /**
      * This method initializes the PartnerEnabler service components
      */
-    public void start() {
-        Log.d(TAG,"start");
-        if (mIsPartnerEnablerServiceConnected) {
-            try {
-                mService.initialize();
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
-        }
-    }
+    void start();
 
     /**
      * This method uninitializes the PartnerEnabler service components
      */
-    public void stop() {
-        Log.d(TAG,"stop");
-        if (mIsPartnerEnablerServiceConnected) {
-            try {
-                mService.release();
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
+    void stop();
     /**
      * This method is to add the listener to get PartnerEnablerServiceConnection status.
      * @param listener ILibStateChangeListener object from client/app.
      */
-    public void addListener(ILibStateChangeListener listener) {
-        mClientListeners.add(listener);
-    }
+    void addListener(ILibStateChangeListener listener);
 
     /**
      * This method is to remove the listener.
      */
-    public void removeListener(ILibStateChangeListener listener) {
-        mClientListeners.remove(listener);
-    }
+    void removeListener(ILibStateChangeListener listener);
 
     /**
      * This method verifies the provided package signature
@@ -177,36 +88,11 @@ public class PartnerLibrary {
      * @param packageName Package name of the 3rd party app.
      * @return true - if signature verification succeeds. False - if signature verification fails.
      */
-    public boolean verifyDigitalSignature(@NonNull String packageName) {
-        boolean retVal = false;
-        if (mIsPartnerEnablerServiceConnected) {
-            try {
-                ISignatureVerifier verifier = mService.getPartnerVerifierService();
-                retVal = verifier.verifyDigitalSignature(packageName);
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
-        }
-        return retVal;
-    }
+    boolean verifyDigitalSignature(String packageName);
 
-    public CarDataManager getCarDataManager() {
-        return mCarDataManager;
-    }
-
-    /** Binds the user activity to the service. */
-    private void initService() {
-        Log.d(TAG,"initService trying to bindService");
-        mServiceConnection = new PartnerEnablerServiceConnection();
-        Intent i = new Intent(partnerApiServiceName).setPackage(partnerApiServicePackageName);
-        boolean ret = mContext.bindService(i, mServiceConnection, Context.BIND_AUTO_CREATE);
-        Log.d(TAG, "initService() bound with " + ret);
-    }
-
-    /** Unbinds the user activity from the service. */
-    private void releaseService() {
-        mContext.unbindService(mServiceConnection);
-        mServiceConnection = null;
-        Log.d(TAG, "releaseService() unbound.");
-    }
+    /**
+     * Get {@link CarDataManager} instance to get car related data/information
+     * @return {@link CarDataManager}
+     */
+    CarDataManager getCarDataManager();
 }
