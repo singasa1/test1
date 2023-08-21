@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 import com.volkswagenag.partnerlibrary.PartnerLibrary;
 import com.volkswagenag.partnerlibrary.CarDataManager;
+import com.volkswagenag.partnerlibrary.NavigationManager;
 import com.volkswagenag.partnerlibrary.MileageListener;
 import com.volkswagenag.partnerlibrary.FogLightStateListener;
 import com.volkswagenag.partnerlibrary.SteeringAngleListener;
@@ -35,6 +36,8 @@ public class CarDataActivity extends AppCompatActivity implements MileageListene
 
     private CarDataManager mCarDataManager;
 
+    private NavigationManager mNavigationManager;
+
     private int mSelectedPosition;
 
     // NOTE: Donot change the order - only add new ones at the end.
@@ -44,6 +47,8 @@ public class CarDataActivity extends AppCompatActivity implements MileageListene
             "getTurnSignalIndicator",
             "getFogLightsState",
             "getSteeringAngle",
+            "isNavAppStarted",
+            "getCurrentRoute"
     };
 
     @Override
@@ -58,6 +63,7 @@ public class CarDataActivity extends AppCompatActivity implements MileageListene
     public void onResume() {
         super.onResume();
         mCarDataManager = PartnerLibrary.getInstance(this).getCarDataManager();
+        mNavigationManager = PartnerLibrary.getInstance(this).getNavigationManager();
         mCarDataManager.registerMileageListener(CarDataActivity.this);
         mCarDataManager.registerTurnSignalListener(CarDataActivity.this);
         mCarDataManager.registerFogLightStateListener(CarDataActivity.this);
@@ -97,6 +103,12 @@ public class CarDataActivity extends AppCompatActivity implements MileageListene
                     break;
                 case 3:
                     mResultTextView.setText("Steering Angle: " + mCarDataManager.getSteeringAngle());
+                    break;
+                case 4:
+                    mResultTextView.setText("Navigation Application State: " + mNavigationManager.isNavStarted());
+                    break;
+                case 5:
+                    mResultTextView.setText("Current Route: " + mNavigationManager.getActiveRoute());
                     break;
                 default:
                     Toast.makeText(CarDataActivity.this, "Cannot process, please select again", Toast.LENGTH_LONG).show();

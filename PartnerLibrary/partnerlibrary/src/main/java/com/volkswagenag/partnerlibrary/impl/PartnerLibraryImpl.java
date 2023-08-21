@@ -29,6 +29,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.volkswagenag.partnerlibrary.CarDataManager;
+import com.volkswagenag.partnerlibrary.NavigationManager;
 import com.volkswagenag.partnerlibrary.PartnerLibrary;
 
 import technology.cariad.partnerenablerservice.IPartnerEnabler;
@@ -53,6 +54,7 @@ public class PartnerLibraryImpl implements PartnerLibrary {
     private IPartnerEnabler mService;
     private PartnerEnablerServiceConnection mServiceConnection;
     private CarDataManager mCarDataManager;
+    private NavigationManager mNavigationManager;
 
     private Context mContext;
     private boolean mIsPartnerEnablerServiceConnected = false;
@@ -81,6 +83,7 @@ public class PartnerLibraryImpl implements PartnerLibrary {
             Log.d(TAG, "onServiceConnected() connected");
             mIsPartnerEnablerServiceConnected = true;
             mCarDataManager = new CarDataManagerImpl(mService);
+            mNavigationManager = new NavigationManagerImpl(mService);
             if (mClientListeners != null) {
                 try {
                     Log.d(TAG, "calling listener onLibStateReady with value: " + mIsPartnerEnablerServiceConnected);
@@ -179,6 +182,11 @@ public class PartnerLibraryImpl implements PartnerLibrary {
 
     public CarDataManager getCarDataManager() {
         return mCarDataManager;
+    }
+
+    @Override
+    public NavigationManager getNavigationManager() {
+        return mNavigationManager;
     }
 
     /** Binds the user activity to the service. */

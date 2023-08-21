@@ -86,4 +86,10 @@ public interface PartnerLibrary {
      */
     CarDataManager getCarDataManager();
 
+    /**
+     * Get {@link NavigationManager} instance to get current route
+     * @return {@link NavigationManager}
+     */
+    NavigationManager getNavigationManager();
+
 }

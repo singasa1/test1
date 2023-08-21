@@ -5,6 +5,7 @@ import android.os.RemoteException;
 import android.util.Log;
 
 import com.volkswagenag.partnerlibrary.CarDataManager;
+import com.volkswagenag.partnerlibrary.NavigationManager;
 import com.volkswagenag.partnerlibrary.PartnerLibrary;
 
 import java.util.ArrayList;
@@ -93,5 +94,10 @@ public class PartnerLibraryDemoModeImpl implements PartnerLibrary {
     public CarDataManager getCarDataManager() {
         Log.d(TAG, "getCarDataManager");
         return mCarDataManagerDemoMode;
+    }
+
+    @Override
+    public NavigationManager getNavigationManager() {
+        return null;
     }
 }
