@@ -120,7 +120,7 @@ public class CarDataActivity extends AppCompatActivity implements MileageListene
         Log.d(TAG,"Current Mileage Value: " + val);
         runOnUiThread (new Thread(new Runnable() {
             public void run() {
-                mListenerUpdateTextView.setText("Odomometer value: " + val);
+                mTextViewListenerUpdateMileage.setText("Odomometer value: " + val);
             }
         }));
     }

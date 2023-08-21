@@ -34,7 +34,6 @@ import com.volkswagenag.partnerlibrary.PartnerLibrary;
 import technology.cariad.partnerenablerservice.IPartnerEnabler;
 import com.volkswagenag.partnerlibrary.ILibStateChangeListener;
 
-import technology.cariad.partnerverifierlibrary.ISignatureVerifier;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -176,25 +175,6 @@ public class PartnerLibraryImpl implements PartnerLibrary {
      */
     public void removeListener(ILibStateChangeListener listener) {
         mClientListeners.remove(listener);
-    }
-
-    /**
-     * This method verifies the provided package signature
-     * matches with signed config provided by the SignatureGenerator tool.
-     * @param packageName Package name of the 3rd party app.
-     * @return true - if signature verification succeeds. False - if signature verification fails.
-     */
-    public boolean verifyDigitalSignature(@NonNull String packageName) {
-        boolean retVal = false;
-        if (mIsPartnerEnablerServiceConnected) {
-            try {
-                ISignatureVerifier verifier = mService.getPartnerVerifierService();
-                retVal = verifier.verifyDigitalSignature(packageName);
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
-        }
-        return retVal;
     }
 
     public CarDataManager getCarDataManager() {

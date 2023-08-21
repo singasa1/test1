@@ -70,9 +70,7 @@ public class CarDataManagerImpl implements CarDataManager {
 
     private void addCarDataListener() {
         try {
-            if (!isClientListenerNotRegistered()) {
-                mService.addCarDataChangeListener(mCarDataChangeListener);
-            }
+            mService.addCarDataChangeListener(mCarDataChangeListener);
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }

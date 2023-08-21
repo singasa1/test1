@@ -18,15 +18,11 @@
  */
 package com.volkswagenag.partnerlibrary;
 
-import android.content.ComponentName;
 import android.content.Context;
 
 import com.volkswagenag.partnerlibrary.demomode.DemoModeUtils;
 import com.volkswagenag.partnerlibrary.demomode.PartnerLibraryDemoModeImpl;
 import com.volkswagenag.partnerlibrary.impl.PartnerLibraryImpl;
-
-import com.volkswagenag.partnerlibrary.ILibStateChangeListener;
-import technology.cariad.partnerenablerservice.IPartnerEnabler;
 
 
 /**
@@ -39,20 +35,7 @@ import technology.cariad.partnerenablerservice.IPartnerEnabler;
  * @since 2023-04-20
  */
 public interface PartnerLibrary {
-
     boolean ENABLE_DEMO_MODE_CODE = true;
-
-    private static final String TAG = PartnerLibrary.class.getSimpleName();
-    private static final String PARTNER_API_SERVICE_NAME = "technology.cariad.partnerenablerservice.enabler";
-    private static final String PARTNER_API_SERVICE_PACKAGE_NAME = "technology.cariad.partnerenablerservice";
-
-    private IPartnerEnabler mService;
-    private PartnerEnablerServiceConnection mServiceConnection;
-    private CarDataManager mCarDataManager;
-
-    private Context mContext;
-    private boolean mIsPartnerEnablerServiceConnected = false;
-    private List<ILibStateChangeListener> mClientListeners = new ArrayList<>();
 
     /**
      * Returns the Singleton instance of PartnerLibrary to access Partner APIs
