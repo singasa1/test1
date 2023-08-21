@@ -73,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         initializeViews();
         mLibStateChangeListener = new LibStateListener();
-        mPartnerLibrary = PartnerLibraryManager.getInstance(this).getPartnerLibrary();
+        mPartnerLibrary = PartnerLibrary.getInstance(this);
         mIsServiceConnected = false;
     }
 
