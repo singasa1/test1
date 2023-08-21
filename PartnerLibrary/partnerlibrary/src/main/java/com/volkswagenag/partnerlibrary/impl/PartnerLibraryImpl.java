@@ -35,7 +35,6 @@ import com.volkswagenag.partnerlibrary.PartnerLibrary;
 import technology.cariad.partnerenablerservice.IPartnerEnabler;
 import com.volkswagenag.partnerlibrary.ILibStateChangeListener;
 
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -184,7 +183,6 @@ public class PartnerLibraryImpl implements PartnerLibrary {
         return mCarDataManager;
     }
 
-    @Override
     public NavigationManager getNavigationManager() {
         return mNavigationManager;
     }

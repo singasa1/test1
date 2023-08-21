@@ -20,10 +20,7 @@ package com.volkswagenag.partnerlibrary;
 
 import android.content.Context;
 
-import com.volkswagenag.partnerlibrary.demomode.DemoModeUtils;
-import com.volkswagenag.partnerlibrary.demomode.PartnerLibraryDemoModeImpl;
-import com.volkswagenag.partnerlibrary.impl.PartnerLibraryImpl;
-
+import com.volkswagenag.partnerlibrary.impl.PartnerLibraryFactory;
 
 /**
  * <h1>Partner Library</h1>
@@ -35,19 +32,13 @@ import com.volkswagenag.partnerlibrary.impl.PartnerLibraryImpl;
  * @since 2023-04-20
  */
 public interface PartnerLibrary {
-    boolean ENABLE_DEMO_MODE_CODE = true;
-
     /**
      * Returns the Singleton instance of PartnerLibrary to access Partner APIs
      * @param context Application context
      * @return {@link PartnerLibrary} instance
      */
     static PartnerLibrary getInstance(Context context) {
-        if (ENABLE_DEMO_MODE_CODE && DemoModeUtils.isDemoModeEnabled()) {
-            return PartnerLibraryDemoModeImpl.getInstance(context);
-        } else {
-            return PartnerLibraryImpl.getInstance(context);
-        }
+        return PartnerLibraryFactory.getPartnerLibraryInstance(context);
     }
     /**
      * This method binds to the PartnerEnabler service.

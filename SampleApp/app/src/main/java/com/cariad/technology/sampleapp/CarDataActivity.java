@@ -21,7 +21,6 @@ import com.volkswagenag.partnerlibrary.TurnSignalListener;
 import com.volkswagenag.partnerlibrary.VehicleLightState;
 import com.volkswagenag.partnerlibrary.VehicleSignalIndicator;
 
-
 public class CarDataActivity extends AppCompatActivity implements MileageListener, FogLightStateListener, SteeringAngleListener, TurnSignalListener, AdapterView.OnItemSelectedListener {
 
     private final String TAG = CarDataActivity.this.getClass().getSimpleName();

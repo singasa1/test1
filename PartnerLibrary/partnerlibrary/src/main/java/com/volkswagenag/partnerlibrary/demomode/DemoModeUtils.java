@@ -35,9 +35,10 @@ public class DemoModeUtils {
 
     /**
      * Read JSONObject from the file specified by fileName. The should be located in the context's
-     * external Directory /sdcard/Android/data/{app package}/files/
+     * external Directory /sdcard/Android/data/{app-package-name}/files/
+     * Note: app-package-name is the package name of the app this library will be included in.
      * @param context
-     * @param fileName fileName of the file present in /sdcard/Android/data/{app package}/files/
+     * @param fileName fileName of the file present in /sdcard/Android/data/{app-package-name}/files/
      * @return JSONObject of the contents obtained from the file
      * @throws IOException
      * @throws JSONException
