@@ -20,6 +20,7 @@ import com.volkswagenag.partnerlibrary.TurnSignalListener;
 import com.volkswagenag.partnerlibrary.VehicleLightState;
 import com.volkswagenag.partnerlibrary.VehicleSignalIndicator;
 
+
 public class CarDataActivity extends AppCompatActivity implements MileageListener, FogLightStateListener, SteeringAngleListener, TurnSignalListener, AdapterView.OnItemSelectedListener {
 
     private final String TAG = CarDataActivity.this.getClass().getSimpleName();
@@ -119,7 +120,7 @@ public class CarDataActivity extends AppCompatActivity implements MileageListene
         Log.d(TAG,"Current Mileage Value: " + val);
         runOnUiThread (new Thread(new Runnable() {
             public void run() {
-                mTextViewListenerUpdateMileage.setText("Odomometer value: " + val);
+                mListenerUpdateTextView.setText("Odomometer value: " + val);
             }
         }));
     }

@@ -20,7 +20,6 @@ package technology.cariad.partnerenablerservice;
 
 // Declare any non-default types here with import statements
 import technology.cariad.partnerenablerservice.ICarDataChangeListener;
-import technology.cariad.partnerverifierlibrary.ISignatureVerifier;
 
 /**
  * Interface used to interact with the PartnerEnablerService.  Mostly this is used by the
@@ -49,11 +48,6 @@ interface IPartnerEnabler {
      * This method initializes the required components in the PartnerEnablerService.
     */
     void initialize() = 0;
-
-    /**
-     * This method returns the PartnerVerifier Service Connection Binder Handler
-    */
-    ISignatureVerifier getPartnerVerifierService() = 1;
 
     /**
      * This method releases/destroy the components created in the PartnerEnablerService.
