@@ -76,7 +76,6 @@ public interface PartnerLibrary {
      */
     void release();
 
-
     /**
      * This method initializes the PartnerEnabler service components
      */
@@ -103,4 +102,5 @@ public interface PartnerLibrary {
      * @return {@link CarDataManager}
      */
     CarDataManager getCarDataManager();
+
 }
