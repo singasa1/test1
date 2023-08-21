@@ -7,21 +7,30 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.volkswagenag.partnerlibrary.PartnerLibrary;
 import com.volkswagenag.partnerlibrary.CarDataManager;
 import com.volkswagenag.partnerlibrary.MileageListener;
+import com.volkswagenag.partnerlibrary.FogLightStateListener;
+import com.volkswagenag.partnerlibrary.SteeringAngleListener;
+import com.volkswagenag.partnerlibrary.TurnSignalListener;
+import com.volkswagenag.partnerlibrary.VehicleLightState;
+import com.volkswagenag.partnerlibrary.VehicleSignalIndicator;
 
-public class CarDataActivity extends AppCompatActivity implements MileageListener, AdapterView.OnItemSelectedListener {
+public class CarDataActivity extends AppCompatActivity implements MileageListener, FogLightStateListener, SteeringAngleListener, TurnSignalListener, AdapterView.OnItemSelectedListener {
 
     private final String TAG = CarDataActivity.this.getClass().getSimpleName();
 
     private Spinner mCarDataGetListSpinner;
     private TextView mResultTextView;
-    private TextView mListenerUpdateTextView;
+    private TextView mTextViewListenerUpdateMileage;
+    private TextView mTextViewListenerUpdateFogLights;
+    private TextView mTextViewListenerUpdateSteeringAngle;
+    private TextView mTextViewListenerUpdateTurnSignalIndicator;
+
 
     private CarDataManager mCarDataManager;
 
@@ -47,14 +56,20 @@ public class CarDataActivity extends AppCompatActivity implements MileageListene
     @Override
     public void onResume() {
         super.onResume();
-        mCarDataManager = PartnerLibraryManager.getInstance(this).getCarDataManager();
+        mCarDataManager = PartnerLibrary.getInstance(this).getCarDataManager();
         mCarDataManager.registerMileageListener(CarDataActivity.this);
+        mCarDataManager.registerTurnSignalListener(CarDataActivity.this);
+        mCarDataManager.registerFogLightStateListener(CarDataActivity.this);
+        mCarDataManager.registerSteeringAngleListener(CarDataActivity.this);
     }
 
     private void initializeViews() {
         mCarDataGetListSpinner = (Spinner) findViewById(R.id.spinner_car_data_api_calls);
         mResultTextView = (TextView)findViewById(R.id.text_result);
-        mListenerUpdateTextView = (TextView) findViewById(R.id.text_listener_update);
+        mTextViewListenerUpdateMileage = (TextView) findViewById(R.id.text_listener_update_mileage);
+        mTextViewListenerUpdateFogLights = (TextView) findViewById(R.id.text_listener_update_fog_lights);
+        mTextViewListenerUpdateSteeringAngle = (TextView) findViewById(R.id.text_listener_update_steering_angle);
+        mTextViewListenerUpdateTurnSignalIndicator = (TextView) findViewById(R.id.text_listener_update_turn_signal_indicator);
 
         mCarDataGetListSpinner.setOnItemSelectedListener(this);
         ArrayAdapter aa = new ArrayAdapter(this, android.R.layout.simple_spinner_item, mCarDataAPIMethods);
@@ -104,10 +119,36 @@ public class CarDataActivity extends AppCompatActivity implements MileageListene
         Log.d(TAG,"Current Mileage Value: " + val);
         runOnUiThread (new Thread(new Runnable() {
             public void run() {
-                mListenerUpdateTextView.setText("Odomometer value: " + val);
+                mTextViewListenerUpdateMileage.setText("Odomometer value: " + val);
             }
         }));
     }
 
 
+    @Override
+    public void onFogLightsChanged(VehicleLightState vehicleLightState) {
+        runOnUiThread (new Thread(new Runnable() {
+            public void run() {
+                mTextViewListenerUpdateFogLights.setText("Fog lights value: " + vehicleLightState);
+            }
+        }));
+    }
+
+    @Override
+    public void onSteeringAngleChanged(float v) {
+        runOnUiThread (new Thread(new Runnable() {
+            public void run() {
+                mTextViewListenerUpdateSteeringAngle.setText("Steering angle value: " + v);
+            }
+        }));
+    }
+
+    @Override
+    public void onTurnSignalStateChanged(VehicleSignalIndicator vehicleSignalIndicator) {
+        runOnUiThread (new Thread(new Runnable() {
+            public void run() {
+                mTextViewListenerUpdateTurnSignalIndicator.setText("Turn Signal Indicator value: " + vehicleSignalIndicator);
+            }
+        }));
+    }
 }
