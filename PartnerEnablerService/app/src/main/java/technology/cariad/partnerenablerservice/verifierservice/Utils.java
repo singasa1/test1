@@ -48,7 +48,7 @@ import java.util.List;
 
 public class Utils {
     private static final String TAG = Utils.class.getSimpleName();
-    private static final String CARIAD_VWAE_RESTRICTED_NAMESPACE = "technology.cariad.vwae.restricted.";
+    private static final String CARIAD_VWAE_RESTRICTED_NAMESPACE = "com.volkswagenag.restricted.";
 
     /**
      * This method verifies the app digital signature.

@@ -28,9 +28,12 @@ import static technology.cariad.partnerenablerservice.IPartnerEnabler.VEHICLE_SI
 import android.os.RemoteException;
 import android.util.Log;
 
+import androidx.annotation.RequiresPermission;
+
 import com.volkswagenag.partnerlibrary.CarDataManager;
 import com.volkswagenag.partnerlibrary.FogLightStateListener;
 import com.volkswagenag.partnerlibrary.MileageListener;
+import com.volkswagenag.partnerlibrary.PartnerLibrary;
 import com.volkswagenag.partnerlibrary.SteeringAngleListener;
 import com.volkswagenag.partnerlibrary.TurnSignalListener;
 import com.volkswagenag.partnerlibrary.VehicleLightState;
@@ -100,6 +103,7 @@ public class CarDataManagerImpl implements CarDataManager {
      * @param mileageListerer MileageListener object from client/app.
      * if client doesn't have permission to access odometer value, it doesn't add this listener
      */
+    @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_CAR_MILEAGE_INFO)
     public void registerMileageListener(MileageListener mileageListener) {
         // Add this client to listeners only if it has permission to access the odometer value by calling getCurrentMileage
         if (getCurrentMileage() != -1) {
@@ -121,6 +125,7 @@ public class CarDataManagerImpl implements CarDataManager {
      * -1 - if permission to access the odometer api is denied
      *  0 - if there is no odometer value/vhal property available.
      */
+    @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_CAR_MILEAGE_INFO)
     public float getCurrentMileage() {
         float mileage = 0.0f;
         try {
@@ -142,6 +147,7 @@ public class CarDataManagerImpl implements CarDataManager {
      * @param turnSignalListener TurnSignalListener object from client/app.
      * if client doesn't have permission to access the turn signal indicator value, it doesn't add this listener
      */
+    @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_TURN_SIGNAL_INDICATOR)
     public void registerTurnSignalListener(TurnSignalListener turnSignalListener) {
         // Add this client to listeners only if it has permission to access the turn signal indicator value by calling getTurnSignalIndicator
         if (getTurnSignalIndicator() != VehicleSignalIndicator.PERMISSION_DENIED) {
@@ -162,6 +168,7 @@ public class CarDataManagerImpl implements CarDataManager {
      * @return VehicleSignalIndicator - return current signal indicator value(PermissionDenied/None/Right/Left).
      *
      */
+    @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_TURN_SIGNAL_INDICATOR)
     public VehicleSignalIndicator getTurnSignalIndicator() {
         VehicleSignalIndicator indicator = VehicleSignalIndicator.NONE;
         try {
@@ -184,6 +191,7 @@ public class CarDataManagerImpl implements CarDataManager {
      * @param lightStateListener FogLightStateListener object from client/app.
      * if client doesn't have permission to access the fog light state value, it doesn't add this listener
      */
+    @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_FOG_LIGHTS)
     public void registerFogLightStateListener(FogLightStateListener lightStateListener) {
         // Add this client to listeners only if it has permission to access the fog light state value by calling getFogLightState
         if (getFogLightsState() != VehicleLightState.PERMISSION_DENIED) {
@@ -203,6 +211,7 @@ public class CarDataManagerImpl implements CarDataManager {
      * This method gets the current fog lights state from PartnerEnablerService
      * @return VehicleLightState - return current fog light state value(PermissionDenied/Off/On/DayTimeRunning).
      */
+    @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_FOG_LIGHTS)
     public VehicleLightState getFogLightsState() {
         VehicleLightState lightState = VehicleLightState.OFF;
         try {
@@ -225,6 +234,7 @@ public class CarDataManagerImpl implements CarDataManager {
      * @param steeringAngleListener SteeringAngleListener object from client/app.
      * if client doesn't have permission to access the fog light state value, it doesn't add this listener
      */
+    @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_STEERING_ANGLE_INFO)
     public void registerSteeringAngleListener(SteeringAngleListener steeringAngleListener) {
         // Add this client to listeners only if it has permission to access the steering angle value by calling getSteeringAngle
         if (getSteeringAngle() != -1) {
@@ -247,6 +257,7 @@ public class CarDataManagerImpl implements CarDataManager {
      * positive value - right
      * negative value - left
      */
+    @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_STEERING_ANGLE_INFO)
     public float getSteeringAngle() {
         float steeringAngle = 0;
         try {
@@ -268,6 +279,7 @@ public class CarDataManagerImpl implements CarDataManager {
      *  @return int - return car VIN no
      *  -1 - if permission to access the vin no . else return valid vin no,
      */
+    @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_CAR_INFO_VIN)
     public String getVehicleIdentityNumber() {
         String vinNo = null;
         try {

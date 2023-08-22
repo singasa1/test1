@@ -21,9 +21,12 @@ package com.volkswagenag.partnerlibrary.impl;
 import android.os.RemoteException;
 import android.util.Log;
 
+import androidx.annotation.RequiresPermission;
+
 import com.volkswagenag.partnerlibrary.NavigationManager;
 import com.volkswagenag.partnerlibrary.NavStateListener;
 import com.volkswagenag.partnerlibrary.ActiveRouteUpdateListener;
+import com.volkswagenag.partnerlibrary.PartnerLibrary;
 
 import java.util.HashSet;
 
@@ -84,6 +87,7 @@ public class NavigationManagerImpl implements NavigationManager {
      * This method is to add the listener to get Navigation Core App status.
      * @param navStateListener NavStateListener object from client/app.
      */
+    @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE)
     public void registerNavStateListener(NavStateListener navStateListener ) {
         // Add this client to listeners only if it has permission to access the navigation app state
         // TODO: Need to do Real permission check based implementation
@@ -103,6 +107,7 @@ public class NavigationManagerImpl implements NavigationManager {
      * @return Returns true - if Navigation Application state is fully operable.
      *         Returns false - if Navigation Application state is Loading, NavDB Error, NoLicense, etc,.
      */
+    @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE)
     public boolean isNavStarted() {
         return true;
         // TODO: Add real implementation
@@ -112,6 +117,7 @@ public class NavigationManagerImpl implements NavigationManager {
      * This method is to add the listener to get the active guided route from Navigation App.
      * @param activeRouteUpdateListener ActiveRouteUpdateListener object from client/app.
      */
+    @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE)
     public void registerActiveRouteUpdateListener(ActiveRouteUpdateListener activeRouteUpdateListener, int updateFrequency) {
         // Add this client to listeners only if it has permission to access the navigation simplified route
         // TODO: Need to do Real permission check based implementation
@@ -132,6 +138,7 @@ public class NavigationManagerImpl implements NavigationManager {
      *         Returns a JSON string with the current route encoded using flexible polyline encoding.
      *         ex: {"version": 1, "route": "<route encoded as polyline>"}
      */
+    @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE)
     public String getActiveRoute() {
         return null;
         // TODO: Real implementation need to be added to hook up with PartnerEnablerService.

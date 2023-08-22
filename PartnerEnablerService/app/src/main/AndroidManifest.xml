@@ -4,38 +4,77 @@
     package="technology.cariad.partnerenablerservice">
 
     <!-- Used for runtime permissions related to reading the navigation route information. -->
-    <permission-group android:name="technology.cariad.vwae.restricted.permission-group.NAV_INFO"
+    <permission-group android:name="com.volkswagenag.restricted.permission-group.NAV_INFO"
         android:description="@string/nav_info_permission_desc"
         android:label="@string/nav_info_permission_label"/>
     <!-- Used for runtime permissions related to reading the Phone State information. -->
-    <permission-group android:name="technology.cariad.vwae.restricted.permission-group.PHONE_INFO"
+    <permission-group android:name="com.volkswagenag.restricted.permission-group.PHONE_INFO"
         android:description="@string/phone_info_permission_desc"
         android:label="@string/phone_info_permission_label"/>
     <!-- Used for runtime permissions related to reading the vehicle information. -->
-    <permission-group android:name="technology.cariad.vwae.restricted.permission-group.CAR_INFO"
+    <permission-group android:name="com.volkswagenag.restricted.permission-group.CAR_INFO"
         android:description="@string/car_info_permission_desc"
         android:label="@string/car_info_permission_label"/>
 
-    <permission android:name="technology.cariad.vwae.restricted.permission.CAR_MILEAGE"
-        android:permissionGroup="technology.cariad.vwae.restricted.permission-group.CAR_INFO"
+    <permission android:name="com.volkswagenag.restricted.permission.READ_INFO_VIN"
+        android:permissionGroup="com.volkswagenag.restricted.permission-group.CAR_INFO"
+        android:protectionLevel="normal"
+        android:label="@string/car_permission_label_info_vin"
+        android:description="@string/car_permission_desc_info_vin"/>
+
+    <permission android:name="com.volkswagenag.restricted.permission.READ_CAR_MILEAGE"
+        android:permissionGroup="com.volkswagenag.restricted.permission-group.CAR_INFO"
         android:protectionLevel="normal"
         android:label="@string/car_permission_label_odometer"
         android:description="@string/car_permission_desc_odometer"/>
+
+    <permission android:name="com.volkswagenag.restricted.permission.READ_SIGNAL_INDICATOR"
+        android:permissionGroup="com.volkswagenag.restricted.permission-group.CAR_INFO"
+        android:protectionLevel="normal"
+        android:label="@string/car_permission_label_signal_indicator"
+        android:description="@string/car_permission_desc_signal_indicator"/>
+
+    <permission android:name="com.volkswagenag.restricted.permission.READ_FOG_LIGHTS"
+        android:permissionGroup="com.volkswagenag.restricted.permission-group.CAR_INFO"
+        android:protectionLevel="normal"
+        android:label="@string/car_permission_label_fog_lights"
+        android:description="@string/car_permission_desc_fog_lights"/>
+
+    <permission android:name="com.volkswagenag.restricted.permission.READ_STEERING_ANGLE"
+        android:permissionGroup="com.volkswagenag.restricted.permission-group.CAR_INFO"
+        android:protectionLevel="normal"
+        android:label="@string/car_permission_label_steering_angle"
+        android:description="@string/car_permission_desc_steering_angle"/>
+
     <!-- permission defined for accessing navigation info-->
-    <permission android:name="technology.cariad.vwae.restricted.permission.NAV_ACTIVE_ROUTE"
-        android:permissionGroup="technology.cariad.vwae.restricted.permission-group.NAV_INFO"
+    <permission android:name="com.volkswagenag.restricted.permission.READ_NAV_ACTIVE_ROUTE"
+        android:permissionGroup="com.volkswagenag.restricted.permission-group.NAV_INFO"
         android:protectionLevel="normal"
         android:label="@string/nav_permission_label_route"
         android:description="@string/nav_permission_desc_route"/>
-    <!-- permission defined for accessing navigation info-->
-    <permission android:name="technology.cariad.vwae.restricted.permission.READ_PRIVILEGED_PHONE_STATE"
-        android:permissionGroup="technology.cariad.vwae.restricted.permission-group.PHONE_INFO"
+
+    <!-- permission defined for accessing privileged phone info-->
+    <permission android:name="com.volkswagenag.restricted.permission.READ_PRIVILEGED_PHONE_STATE"
+        android:permissionGroup="com.volkswagenag.restricted.permission-group.PHONE_INFO"
         android:protectionLevel="normal"
         android:label="@string/phone_permission_label"
         android:description="@string/phone_permission_desc"/>
+
     <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
+
     <!-- Permission to read the Odometer -->
     <uses-permission android:name="android.car.permission.CAR_MILEAGE" />
+    <!-- permission to read the Car Steering Angle-->
+    <uses-permission android:name="android.car.permission.READ_CAR_STEERING"/>
+    <!-- Permission to read the Fog Lights and Turn Signal State -->
+    <uses-permission android:name="android.car.permission.CAR_EXTERIOR_LIGHTS" />
+    <!-- Permission to read/check the VIN-->
+    <uses-permission android:name="android.car.permission.CAR_IDENTIFICATION" />
+    <!-- Permission to read the Navigation Apis getActiveSimpleRoute -->
+    <uses-permission android:name="com.volkswagenag.nav.NAV_CORE_USER" />
+    <!-- Permission to read phone status-->
+    <uses-permission android:name="android.permission.READ_PRIVILEGED_PHONE_STATE" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"

@@ -21,7 +21,7 @@ package com.volkswagenag.partnerlibrary;
 
 public interface ActiveRouteUpdateListener {
     /**
-     * Callback to update active route
+     * Callback to update the active route
      */
     public abstract void onActiveRouteChange(String activeRoute);
 }
