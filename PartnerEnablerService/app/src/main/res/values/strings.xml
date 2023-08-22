@@ -6,17 +6,31 @@
     <string name="car_info_permission_label">Car information</string>
     <!-- Permission text: can access your car's information [CHAR LIMIT=NONE] -->
     <string name="car_info_permission_desc">access your car\u2023s information</string>
+
     <!-- Permission text: can access active route information from navigation app/service [CHAR LIMIT=NONE] -->
     <string name="nav_info_permission_label">Navigation information</string>
     <!-- Permission text: can access Navigation information [CHAR LIMIT=NONE] -->
     <string name="nav_info_permission_desc">access Active Route Information from Navigation App</string>
+
     <!-- Permission text: can access phone state information from Telephony [CHAR LIMIT=NONE] -->
     <string name="phone_info_permission_label">Phone State information</string>
     <!-- Permission text: can access Phone State information [CHAR LIMIT=NONE] -->
     <string name="phone_info_permission_desc">access Phone State Information from Telephony framework</string>
 
+    <string name="car_permission_label_info_vin">Car Vehicle Identification Number</string>
+    <string name="car_permission_desc_info_vin">Permission to read the Car Vehicle Identification Number</string>
+
     <string name="car_permission_label_odometer">Car Odometer Value</string>
     <string name="car_permission_desc_odometer">Permission to read the Car Odometer/Mileage information</string>
+
+    <string name="car_permission_label_signal_indicator">Car Turn Signal Indicator Value</string>
+    <string name="car_permission_desc_signal_indicator">Permission to read the Car Turn Signal Indicator information</string>
+
+    <string name="car_permission_label_fog_lights">Car Fog Lights Value</string>
+    <string name="car_permission_desc_fog_lights">Permission to read the Car Fog Lights information</string>
+
+    <string name="car_permission_label_steering_angle">Car Steering Angle Value</string>
+    <string name="car_permission_desc_steering_angle">Permission to read the Car Steering Angle information</string>
 
     <string name="nav_permission_label_route">Navigation Route</string>
     <string name="nav_permission_desc_route">Permission to read the Navigation ActiveRoute information</string>
