@@ -21,7 +21,7 @@ package com.volkswagenag.partnerlibrary;
 
 public interface ActiveRouteUpdateListener {
     /**
-     * Callback to trigger once Navigation App state changes
+     * Callback to update the active route
      */
-    public abstract void onActiveRouteChange(String activeRoute, String encodingType);
+    public abstract void onActiveRouteChange(String activeRoute);
 }

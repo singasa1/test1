@@ -37,7 +37,7 @@ import androidx.annotation.GuardedBy;
 public class PartnerEnablerImpl extends IPartnerEnabler.Stub {
 
     private static final String TAG = "PartnerEnablerService:" + PartnerEnablerImpl.class.getSimpleName();
-    private static final String VWAE_CAR_MILEAGE_PERMISSION = "technology.cariad.vwae.restricted.permission.CAR_MILEAGE";
+    private static final String VWAE_CAR_MILEAGE_PERMISSION = "com.volkswagenag.restricted.permission.READ_CAR_MILEAGE";
 
     private static final int PROPERTY_UPDATE_RATE_HZ = 5000;
 

@@ -33,6 +33,48 @@ import com.volkswagenag.partnerlibrary.impl.PartnerLibraryFactory;
  */
 public interface PartnerLibrary {
     /**
+     * Permission necessary to get the car current odomoter/mileage value through {@link CarDataManager}.
+     */
+    public static final String PERMISSION_RECEIVE_CAR_INFO_VIN =
+            "com.volkswagenag.restricted.permission.READ_INFO_VIN";
+
+    /**
+     * Permission necessary to get the car current odomoter/mileage value through {@link CarDataManager}.
+     */
+    public static final String PERMISSION_RECEIVE_CAR_MILEAGE_INFO =
+            "com.volkswagenag.restricted.permission.CAR_MILEAGE";
+
+    /**
+     * Permission necessary to get the car current turn signal indicator value through {@link CarDataManager}.
+     */
+    public static final String PERMISSION_RECEIVE_TURN_SIGNAL_INDICATOR =
+            "com.volkswagenag.restricted.permission.READ_SIGNAL_INDICATOR";
+
+    /**
+     * Permission necessary to get the car fog lights info through {@link CarDataManager}.
+     */
+    public static final String PERMISSION_RECEIVE_FOG_LIGHTS =
+            "com.volkswagenag.restricted.permission.READ_FOG_LIGHTS";
+
+    /**
+     * Permission necessary to get the car current steering angle value through {@link CarDataManager}.
+     */
+    public static final String PERMISSION_RECEIVE_STEERING_ANGLE_INFO =
+            "com.volkswagenag.restricted.permission.READ_STEERING_ANGLE";
+
+    /**
+     * Permission necessary to get the car active route value through {@link NavigationManager}.
+     */
+    public static final String PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE =
+            "com.volkswagenag.restricted.permission.READ_NAV_ACTIVE_ROUTE";
+
+    /**
+     * Permission necessary to get the phone state.
+     */
+    public static final String PERMISSION_RECEIVE_PHONE_STATE =
+            "com.volkswagenag.restricted.permission.READ_PRIVILEGED_PHONE_STATE";
+
+    /**
      * Returns the Singleton instance of PartnerLibrary to access Partner APIs
      * @param context Application context
      * @return {@link PartnerLibrary} instance
