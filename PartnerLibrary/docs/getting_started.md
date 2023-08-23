@@ -86,7 +86,7 @@ Download Partner Library ver. X.Y (TODO: Add download URL)
 
 Downlaod sample application (TODO: Add download URL)
 
-![Alt text](images/PartberLibraryInitialization.png)
+![Alt text](images/PartnerLibraryInitialization.png)
 
 
 #### Sample App Initialization code snippet:
