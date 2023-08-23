@@ -30,7 +30,8 @@ public class DemoModeUtils {
 
     private static final String TAG = DemoModeUtils.class.getSimpleName();
 
-    private static final String DEMO_MODE_PROPERTY = "com.volkswagenag.parterapi.demomode";
+    private static final String DEMO_MODE_PROPERTY = "volkswagenag.parterapi.demomode";
+    private static final String PERSIST_DEMO_MODE_PROPERTY = "persist.volkswagenag.parterapi.demomode";
     private static final String GET_PROP_LOCATION = "/system/bin/getprop";
 
     /**
@@ -59,14 +60,24 @@ public class DemoModeUtils {
 
     /**
      * Returns the property {@link DemoModeUtils#DEMO_MODE_PROPERTY} value in boolean.
-     * @return boolean value of property {@link DemoModeUtils#DEMO_MODE_PROPERTY}
+     * @return boolean true if {@link DemoModeUtils#DEMO_MODE_PROPERTY} or
+     *                      {@link DemoModeUtils#PERSIST_DEMO_MODE_PROPERTY} are enabled
+     *                 false otherwise
      */
     public static boolean isDemoModeEnabled() {
         try {
             //TODO: Try to find if the app can access os.SystemProperties directly to read the property.
-            Process proc = Runtime.getRuntime().exec(new String[]{GET_PROP_LOCATION, DEMO_MODE_PROPERTY});
-            BufferedReader reader = new BufferedReader(new InputStreamReader(proc.getInputStream()));
-            return Boolean.parseBoolean(reader.readLine());
+            Process getDemoModeProp = Runtime.getRuntime().exec(new String[]{GET_PROP_LOCATION, DEMO_MODE_PROPERTY});
+            BufferedReader reader = new BufferedReader(new InputStreamReader(getDemoModeProp.getInputStream()));
+            boolean demoModeProp = Boolean.parseBoolean(reader.readLine());
+            Log.d(TAG, "property " + DEMO_MODE_PROPERTY + " value: " + demoModeProp);
+
+            getDemoModeProp = Runtime.getRuntime().exec(new String[]{GET_PROP_LOCATION, PERSIST_DEMO_MODE_PROPERTY});
+            reader = new BufferedReader(new InputStreamReader(getDemoModeProp.getInputStream()));
+            boolean persistDemoModeProp = Boolean.parseBoolean(reader.readLine());
+            Log.d(TAG, "property " + PERSIST_DEMO_MODE_PROPERTY + " value: " + persistDemoModeProp);
+
+            return demoModeProp || persistDemoModeProp;
         } catch (IOException e) {
             Log.d(TAG, "Failure reading demo mode property: " + DEMO_MODE_PROPERTY);
             e.printStackTrace();
