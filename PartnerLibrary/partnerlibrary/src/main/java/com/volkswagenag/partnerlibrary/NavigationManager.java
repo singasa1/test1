@@ -50,7 +50,7 @@ public interface NavigationManager {
      * This method is to add the listener to get the active guided route from Navigation App.
      * @param activeRouteUpdateListener ActiveRouteUpdateListener object from client/app.
      */
-    void registerActiveRouteUpdateListener(ActiveRouteUpdateListener activeRouteUpdateListener, int updateFrequency);
+    void registerActiveRouteUpdateListener(ActiveRouteUpdateListener activeRouteUpdateListener);
 
     /**
      * This method is to remove the callback that is registered to get the active route from Navigation App.

@@ -24,8 +24,9 @@ import com.volkswagenag.partnerlibrary.ILibStateChangeListener;
 public class MainActivity extends AppCompatActivity {
     private final String TAG = MainActivity.this.getClass().getSimpleName();
 
-    Button mStartServiceButton;
-    Button mCarDataButton;
+    private Button mStartServiceButton;
+    private Button mCarDataButton;
+    private Button mNavigationButton;
     private TextView mServiceStatusTextView;
     private ProgressBar mServiceStateProgressBar;
 
@@ -47,15 +48,18 @@ public class MainActivity extends AppCompatActivity {
                     mIsServiceConnected = true;
                     mServiceStatusTextView.setText(R.string.service_state_ready);
                     mCarDataButton.setVisibility(View.VISIBLE);
+                    mNavigationButton.setVisibility(View.VISIBLE);
 
                     mPartnerLibrary.start();
                 } catch (Exception e) {
                     mCarDataButton.setVisibility(View.INVISIBLE);
+                    mNavigationButton.setVisibility(View.INVISIBLE);
                     mServiceStatusTextView.setText(e.getMessage());
                     e.printStackTrace();
                 }
             } else {
                 mCarDataButton.setVisibility(View.INVISIBLE);
+                mNavigationButton.setVisibility(View.INVISIBLE);
                 mPartnerLibrary.stop();
                 mServiceStatusTextView.setText(R.string.service_state_error);
             }
@@ -86,6 +90,7 @@ public class MainActivity extends AppCompatActivity {
     private void initializeViews() {
         mStartServiceButton = (Button) findViewById(R.id.button_service_status);
         mCarDataButton = (Button) findViewById(R.id.button_cardata);
+        mNavigationButton = (Button) findViewById(R.id.button_navigation);
         mServiceStatusTextView = (TextView) findViewById(R.id.text_service_state);
         mServiceStateProgressBar = (ProgressBar) findViewById(R.id.progressbar_service_state);
 
@@ -118,6 +123,18 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(MainActivity.this, "Start and Connect to Service to use CarData", Toast.LENGTH_LONG).show();
                 }
 
+            }
+        });
+
+        mNavigationButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mIsServiceConnected) {
+                    Log.d(TAG, "Going to Navigation Activity");
+                    goTo(NavigationActivity.class);
+                } else {
+                    Toast.makeText(MainActivity.this, "Start and Connect to Service to use Navigation", Toast.LENGTH_LONG).show();
+                }
             }
         });
     }

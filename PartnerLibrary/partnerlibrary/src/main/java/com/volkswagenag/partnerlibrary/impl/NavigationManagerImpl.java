@@ -118,7 +118,7 @@ public class NavigationManagerImpl implements NavigationManager {
      * @param activeRouteUpdateListener ActiveRouteUpdateListener object from client/app.
      */
     @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE)
-    public void registerActiveRouteUpdateListener(ActiveRouteUpdateListener activeRouteUpdateListener, int updateFrequency) {
+    public void registerActiveRouteUpdateListener(ActiveRouteUpdateListener activeRouteUpdateListener) {
         // Add this client to listeners only if it has permission to access the navigation simplified route
         // TODO: Need to do Real permission check based implementation
         mActiveRouteListener.add(activeRouteUpdateListener);
