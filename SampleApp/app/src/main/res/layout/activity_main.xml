@@ -45,6 +45,17 @@
         android:layout_height="wrap_content"
         android:visibility="invisible"/>
 
+    <Button
+        android:id="@+id/button_navigation"
+        android:text="@string/navigation"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="20dp"
+        android:gravity="center"
+        android:textSize="17sp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"/>
+
 
 
 </LinearLayout>

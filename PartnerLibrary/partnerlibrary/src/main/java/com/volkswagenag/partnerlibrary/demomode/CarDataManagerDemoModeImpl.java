@@ -25,7 +25,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class CarDataManagerDemoModeImpl implements CarDataManager {
 
-    private static final String TAG = PartnerLibraryDemoModeImpl.class.getSimpleName();
+    private static final String TAG = CarDataManagerDemoModeImpl.class.getSimpleName();
     private static final String CAR_DATA_FILE_NAME = "car_data.json";
 
     private final Context mContext;
@@ -35,22 +35,25 @@ public class CarDataManagerDemoModeImpl implements CarDataManager {
     private final HashSet<FogLightStateListener> mFogLightStateListener = new HashSet<FogLightStateListener>();
     private final HashSet<SteeringAngleListener> mSteeringAngleListener = new HashSet<SteeringAngleListener>();
     private final ScheduledExecutorService mSchedulerService;
-    //cache
-    private AtomicInteger mIndex = new AtomicInteger(0);
-    private int mMaxValueOfIndex;
-    private int mChangeFrequency;
-    private List<Integer> mMileageList;
-    private List<VehicleSignalIndicator> mTurnSignalIndicatorList;
-    private List<VehicleLightState> mFogLightsStateList;
-    private List<Integer> mSteeringAngleList;
+
     private final Runnable runnable = new Runnable() {
         @Override
         public void run() {
             updateIndexAndUpdateListenersIfNeeded();
         }
     };
-    private String mVehicleIdentityNumber;
+
     private ScheduledFuture<?> mChangeValuesAtFixedRateFuture;
+
+    //cache
+    private AtomicInteger mIndex = new AtomicInteger(0);
+    private int mMaxValueOfIndex;
+    private int mChangeFrequencySecs;
+    private List<Integer> mMileageList;
+    private List<VehicleSignalIndicator> mTurnSignalIndicatorList;
+    private List<VehicleLightState> mFogLightsStateList;
+    private List<Integer> mSteeringAngleList;
+    private String mVehicleIdentityNumber;
 
     public CarDataManagerDemoModeImpl(Context context) {
         mContext = context;
@@ -67,17 +70,17 @@ public class CarDataManagerDemoModeImpl implements CarDataManager {
     }
 
     /**
-     * Starts freqeuncy scheduler runnable, that runs every {@link mChangeFrequency} seconds and
+     * Starts freqeuncy scheduler runnable, that runs every {@link mChangeFrequencySecs} seconds and
      * updates values and triggers listeners if necessary.
      */
     public void startScheduler() {
         mIndex.set(0);
         mChangeValuesAtFixedRateFuture =
-                mSchedulerService.scheduleAtFixedRate(runnable, mChangeFrequency, mChangeFrequency, TimeUnit.SECONDS);
+                mSchedulerService.scheduleAtFixedRate(runnable, mChangeFrequencySecs, mChangeFrequencySecs, TimeUnit.SECONDS);
     }
 
     /**
-     * Stops the future that runs every {@link mChangeFrequency} seconds to update values.
+     * Stops the future that runs every {@link mChangeFrequencySecs} seconds to update values.
      */
     public void stopScheduler() {
         mChangeValuesAtFixedRateFuture.cancel(true);
@@ -193,7 +196,7 @@ public class CarDataManagerDemoModeImpl implements CarDataManager {
     private void initializeCache() throws JSONException, IOException {
         JSONObject carDataJSON = DemoModeUtils.readFromFile(mContext, CAR_DATA_FILE_NAME);
 
-        mChangeFrequency = carDataJSON.getInt("change_frequency_secs");
+        mChangeFrequencySecs = carDataJSON.getInt("change_frequency_secs");
 
         mMileageList = DemoModeUtils.getIntegerList(carDataJSON.getJSONArray("mileage_list"));
         mMaxValueOfIndex = mMileageList.size();
@@ -218,7 +221,7 @@ public class CarDataManagerDemoModeImpl implements CarDataManager {
     private void logCache() {
         Log.d(TAG, "Index: " + mIndex.get() + " \n"
                 + "MaxValueOfIndex: " + mMaxValueOfIndex + "\n"
-                + "Change Frequency: " + mChangeFrequency + "\n"
+                + "Change Frequency: " + mChangeFrequencySecs + "\n"
                 + "Mileage List: " + mMileageList + "\n"
                 + "TurnSignalIndicator List: " + mTurnSignalIndicatorList + "\n"
                 + "FogLightsState List: " + mFogLightsStateList + "\n"

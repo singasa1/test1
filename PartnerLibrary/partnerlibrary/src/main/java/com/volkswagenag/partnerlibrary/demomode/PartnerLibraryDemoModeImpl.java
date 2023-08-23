@@ -21,6 +21,7 @@ public class PartnerLibraryDemoModeImpl implements PartnerLibrary {
 
     private Context mContext;
     private CarDataManagerDemoModeImpl mCarDataManagerDemoMode;
+    private NavigationManagerDemoModeImpl mNavigationManagerDemoMode;
     private List<ILibStateChangeListener> mClientListeners = new ArrayList<>();
 
    public static PartnerLibraryDemoModeImpl getInstance(Context context) {
@@ -38,6 +39,7 @@ public class PartnerLibraryDemoModeImpl implements PartnerLibrary {
     public void initialize() {
         Log.d(TAG, "initialize");
         mCarDataManagerDemoMode = new CarDataManagerDemoModeImpl(mContext);
+        mNavigationManagerDemoMode = new NavigationManagerDemoModeImpl(mContext);
 
         if (!mClientListeners.isEmpty()) {
             for (ILibStateChangeListener listener : mClientListeners) {
@@ -69,12 +71,14 @@ public class PartnerLibraryDemoModeImpl implements PartnerLibrary {
     public void start() {
         Log.d(TAG, "start");
         mCarDataManagerDemoMode.startScheduler();
+        mNavigationManagerDemoMode.startScheduler();
     }
 
     @Override
     public void stop() {
         Log.d(TAG, "stop");
         mCarDataManagerDemoMode.stopScheduler();
+        mNavigationManagerDemoMode.stopScheduler();
     }
 
     @Override
@@ -98,6 +102,6 @@ public class PartnerLibraryDemoModeImpl implements PartnerLibrary {
 
     @Override
     public NavigationManager getNavigationManager() {
-        return null;
+        return mNavigationManagerDemoMode;
     }
 }
