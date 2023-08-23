@@ -13,7 +13,7 @@ import android.widget.Toast;
 
 import com.volkswagenag.partnerlibrary.PartnerLibrary;
 import com.volkswagenag.partnerlibrary.CarDataManager;
-import com.volkswagenag.partnerlibrary.NavigationManager;
+import com.volkswagenag.partnerlibrary.Response;
 import com.volkswagenag.partnerlibrary.MileageListener;
 import com.volkswagenag.partnerlibrary.FogLightStateListener;
 import com.volkswagenag.partnerlibrary.SteeringAngleListener;
@@ -35,10 +35,6 @@ public class CarDataActivity extends AppCompatActivity implements MileageListene
 
     private CarDataManager mCarDataManager;
 
-    private NavigationManager mNavigationManager;
-
-    private int mSelectedPosition;
-
     // NOTE: Donot change the order - only add new ones at the end.
     // {@link CarDataActivity#onItemSelected} should be changed if the order in this array is changed.
     private String[] mCarDataAPIMethods = {
@@ -46,8 +42,7 @@ public class CarDataActivity extends AppCompatActivity implements MileageListene
             "getTurnSignalIndicator",
             "getFogLightsState",
             "getSteeringAngle",
-            "isNavAppStarted",
-            "getCurrentRoute"
+            "getVehicleIdentityNumber"
     };
 
     @Override
@@ -61,12 +56,32 @@ public class CarDataActivity extends AppCompatActivity implements MileageListene
     @Override
     public void onResume() {
         super.onResume();
-        mCarDataManager = PartnerLibrary.getInstance(this).getCarDataManager();
-        mNavigationManager = PartnerLibrary.getInstance(this).getNavigationManager();
-        mCarDataManager.registerMileageListener(CarDataActivity.this);
-        mCarDataManager.registerTurnSignalListener(CarDataActivity.this);
-        mCarDataManager.registerFogLightStateListener(CarDataActivity.this);
-        mCarDataManager.registerSteeringAngleListener(CarDataActivity.this);
+        Response<CarDataManager> carDataManagerResponse = PartnerLibrary.getInstance(this).getCarDataManager();
+        if (carDataManagerResponse.error != Response.Error.NONE) {
+            logAndShowError("Error obtaining NavigationManager from PartnerLibrary: ", carDataManagerResponse.error);
+            return;
+        }
+        mCarDataManager = carDataManagerResponse.value;
+
+        Response.Error error = mCarDataManager.registerMileageListener(CarDataActivity.this);
+        if (error != Response.Error.NONE) {
+            logAndShowError("registerMileageListener failed with ", error);
+        }
+
+        error = mCarDataManager.registerTurnSignalListener(CarDataActivity.this);
+        if (error != Response.Error.NONE) {
+            logAndShowError("registerMileageListener failed with ", error);
+        }
+
+        error = mCarDataManager.registerFogLightStateListener(CarDataActivity.this);
+        if (error != Response.Error.NONE) {
+            logAndShowError("registerMileageListener failed with ", error);
+        }
+
+        error = mCarDataManager.registerSteeringAngleListener(CarDataActivity.this);
+        if (error != Response.Error.NONE) {
+            logAndShowError("registerMileageListener failed with ", error);
+        }
     }
 
     private void initializeViews() {
@@ -92,22 +107,44 @@ public class CarDataActivity extends AppCompatActivity implements MileageListene
         try {
             switch (position) {
                 case 0: // getCurrentMileage
-                    mResultTextView.setText("Current Mileage: " + mCarDataManager.getCurrentMileage());
+                    Response<Float> floatResponse = mCarDataManager.getCurrentMileage();
+                    if (floatResponse.error == Response.Error.NONE) {
+                        mResultTextView.setText("Current Mileage: " + floatResponse.value);
+                    } else {
+                        logAndShowError("getCurrentMileage call failed with: ", floatResponse.error);
+                    }
                     break;
                 case 1: // getTurnSignalIndicator
-                    mResultTextView.setText("Turn signal indicator: " + mCarDataManager.getTurnSignalIndicator());
+                    Response<VehicleSignalIndicator> vehicleSignalIndicatorResponse = mCarDataManager.getTurnSignalIndicator();
+                    if (vehicleSignalIndicatorResponse.error == Response.Error.NONE) {
+                        mResultTextView.setText("Turn signal indicator: " + vehicleSignalIndicatorResponse.value);
+                    } else {
+                        logAndShowError("getTurnSignalIndicator call failed with: ", vehicleSignalIndicatorResponse.error);
+                    }
                     break;
                 case 2: // getFogLightsState
-                    mResultTextView.setText("Fog Lights state: " + mCarDataManager.getFogLightsState());
+                    Response<VehicleLightState> vehicleLightStateResponse = mCarDataManager.getFogLightsState();
+                    if (vehicleLightStateResponse.error == Response.Error.NONE) {
+                        mResultTextView.setText("Fog Lights state: " + vehicleLightStateResponse.value);
+                    } else {
+                        logAndShowError("getFogLightsState call failed with: ", vehicleLightStateResponse.error);
+                    }
                     break;
-                case 3:
-                    mResultTextView.setText("Steering Angle: " + mCarDataManager.getSteeringAngle());
+                case 3: // getSteeringAngle
+                    floatResponse = mCarDataManager.getSteeringAngle();
+                    if (floatResponse.error == Response.Error.NONE) {
+                        mResultTextView.setText("Steering Angle: " + floatResponse.value);
+                    } else {
+                        logAndShowError("getSteeringAngle call failed with: ", floatResponse.error);
+                    }
                     break;
                 case 4:
-                    mResultTextView.setText("Navigation Application State: " + mNavigationManager.isNavStarted());
-                    break;
-                case 5:
-                    mResultTextView.setText("Current Route: " + mNavigationManager.getActiveRoute());
+                    Response<String> stringResponse = mCarDataManager.getVehicleIdentityNumber();
+                    if (stringResponse.error == Response.Error.NONE) {
+                         mResultTextView.setText("VIN number: " + stringResponse.value);
+                    } else {
+                        logAndShowError("getVehicleIdentityNumber call failed with: ", stringResponse.error);
+                    }
                     break;
                 default:
                     Toast.makeText(CarDataActivity.this, "Cannot process, please select again", Toast.LENGTH_LONG).show();
@@ -126,12 +163,10 @@ public class CarDataActivity extends AppCompatActivity implements MileageListene
 
     @Override
     public void onMileageValueChanged(float i) {
-        float val = mCarDataManager.getCurrentMileage();
-
-        Log.d(TAG,"Current Mileage Value: " + val);
+        Log.d(TAG,"Current Mileage Value: " + i);
         runOnUiThread (new Thread(new Runnable() {
             public void run() {
-                mTextViewListenerUpdateMileage.setText("Odomometer value: " + val);
+                mTextViewListenerUpdateMileage.setText("Odomometer value: " + i);
             }
         }));
     }
@@ -162,5 +197,10 @@ public class CarDataActivity extends AppCompatActivity implements MileageListene
                 mTextViewListenerUpdateTurnSignalIndicator.setText("Turn Signal Indicator value: " + vehicleSignalIndicator);
             }
         }));
+    }
+
+    private void logAndShowError(String message, Response.Error error) {
+        Log.e(TAG, message + error.toString());
+        Toast.makeText(CarDataActivity.this, message + error.toString(), Toast.LENGTH_LONG).show();
     }
 }

@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.volkswagenag.partnerlibrary.ILibStateChangeListener;
+import com.volkswagenag.partnerlibrary.Response;
 
 
 public class PartnerLibraryDemoModeImpl implements PartnerLibrary {
@@ -36,7 +37,7 @@ public class PartnerLibraryDemoModeImpl implements PartnerLibrary {
     }
 
     @Override
-    public void initialize() {
+    public Response.Error initialize() {
         Log.d(TAG, "initialize");
         mCarDataManagerDemoMode = new CarDataManagerDemoModeImpl(mContext);
         mNavigationManagerDemoMode = new NavigationManagerDemoModeImpl(mContext);
@@ -50,10 +51,11 @@ public class PartnerLibraryDemoModeImpl implements PartnerLibrary {
                 }
             }
         }
+        return Response.Error.NONE;
     }
 
     @Override
-    public void release() {
+    public Response.Error release() {
         Log.d(TAG, "release");
 
         if (!mClientListeners.isEmpty()) {
@@ -65,20 +67,24 @@ public class PartnerLibraryDemoModeImpl implements PartnerLibrary {
                 }
             }
         }
+        return Response.Error.NONE;
     }
 
     @Override
-    public void start() {
+    public Response.Error start() {
         Log.d(TAG, "start");
         mCarDataManagerDemoMode.startScheduler();
         mNavigationManagerDemoMode.startScheduler();
+        return Response.Error.NONE;
     }
 
     @Override
-    public void stop() {
+    public Response.Error stop() {
         Log.d(TAG, "stop");
         mCarDataManagerDemoMode.stopScheduler();
         mNavigationManagerDemoMode.stopScheduler();
+        return Response.Error.NONE;
+
     }
 
     @Override
@@ -95,13 +101,14 @@ public class PartnerLibraryDemoModeImpl implements PartnerLibrary {
     }
 
     @Override
-    public CarDataManager getCarDataManager() {
+    public Response<CarDataManager> getCarDataManager() {
         Log.d(TAG, "getCarDataManager");
-        return mCarDataManagerDemoMode;
-    }
+        return new Response<>(Response.Error.NONE, mCarDataManagerDemoMode);
+   }
 
     @Override
-    public NavigationManager getNavigationManager() {
-        return mNavigationManagerDemoMode;
+    public Response<NavigationManager> getNavigationManager() {
+        Log.d(TAG, "getNavigationManager");
+        return new Response<>(Response.Error.NONE, mNavigationManagerDemoMode);
     }
 }

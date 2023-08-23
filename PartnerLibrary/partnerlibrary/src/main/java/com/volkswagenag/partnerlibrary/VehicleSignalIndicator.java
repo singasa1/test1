@@ -20,7 +20,6 @@
 package com.volkswagenag.partnerlibrary;
 
 public enum VehicleSignalIndicator {
-    PERMISSION_DENIED,
     NONE,
     RIGHT,
     LEFT,

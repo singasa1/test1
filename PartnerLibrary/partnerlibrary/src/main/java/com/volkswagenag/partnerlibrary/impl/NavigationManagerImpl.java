@@ -27,6 +27,7 @@ import com.volkswagenag.partnerlibrary.NavigationManager;
 import com.volkswagenag.partnerlibrary.NavStateListener;
 import com.volkswagenag.partnerlibrary.ActiveRouteUpdateListener;
 import com.volkswagenag.partnerlibrary.PartnerLibrary;
+import com.volkswagenag.partnerlibrary.Response;
 
 import java.util.HashSet;
 
@@ -87,19 +88,23 @@ public class NavigationManagerImpl implements NavigationManager {
      * This method is to add the listener to get Navigation Core App status.
      * @param navStateListener NavStateListener object from client/app.
      */
+    @Override
     @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE)
-    public void registerNavStateListener(NavStateListener navStateListener ) {
+    public Response.Error registerNavStateListener(NavStateListener navStateListener ) {
         // Add this client to listeners only if it has permission to access the navigation app state
-        // TODO: Need to do Real permission check based implementation
+        // TODO: Need to do Real permission check based implementation and error communication
         mNavStateListener.add(navStateListener);
+        return Response.Error.NONE;
     }
 
     /**
      * This method is to remove the listener.
      */
-    public void unregisterNavStateListener(NavStateListener navStateListener) {
+    @Override
+    public Response.Error unregisterNavStateListener(NavStateListener navStateListener) {
         mNavStateListener.remove(navStateListener);
         removeNavStateListener();
+        return Response.Error.NONE;
     }
 
     /**
@@ -107,9 +112,10 @@ public class NavigationManagerImpl implements NavigationManager {
      * @return Returns true - if Navigation Application state is fully operable.
      *         Returns false - if Navigation Application state is Loading, NavDB Error, NoLicense, etc,.
      */
+    @Override
     @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE)
-    public boolean isNavStarted() {
-        return true;
+    public Response<Boolean> isNavStarted() {
+        return new Response<>(Response.Error.NONE, new Boolean(true));
         // TODO: Add real implementation
     }
 
@@ -117,19 +123,23 @@ public class NavigationManagerImpl implements NavigationManager {
      * This method is to add the listener to get the active guided route from Navigation App.
      * @param activeRouteUpdateListener ActiveRouteUpdateListener object from client/app.
      */
+    @Override
     @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE)
-    public void registerActiveRouteUpdateListener(ActiveRouteUpdateListener activeRouteUpdateListener) {
+    public Response.Error registerActiveRouteUpdateListener(ActiveRouteUpdateListener activeRouteUpdateListener) {
         // Add this client to listeners only if it has permission to access the navigation simplified route
-        // TODO: Need to do Real permission check based implementation
+        // TODO: Need to do Real permission check based implementation and error communication
         mActiveRouteListener.add(activeRouteUpdateListener);
+        return Response.Error.NONE;
     }
 
     /**
      * This method is to remove the callback that is registered to get the active route from Navigation App.
      * @param activeRouteUpdateListener ActiveRouteUpdateListener object from client/app.
      */
-    public void unregisterActiveRouteUpdateListener(ActiveRouteUpdateListener activeRouteUpdateListener) {
+    @Override
+    public Response.Error unregisterActiveRouteUpdateListener(ActiveRouteUpdateListener activeRouteUpdateListener) {
         mActiveRouteListener.remove(activeRouteUpdateListener);
+        return Response.Error.NONE;
     }
 
     /**
@@ -138,9 +148,10 @@ public class NavigationManagerImpl implements NavigationManager {
      *         Returns a JSON string with the current route encoded using flexible polyline encoding.
      *         ex: {"version": 1, "route": "<route encoded as polyline>"}
      */
+    @Override
     @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE)
-    public String getActiveRoute() {
-        return null;
+    public Response<String> getActiveRoute() {
+        return new Response<>(Response.Error.NONE, null);
         // TODO: Real implementation need to be added to hook up with PartnerEnablerService.
     }
 }

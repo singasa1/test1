@@ -6,6 +6,7 @@ import android.util.Log;
 import com.volkswagenag.partnerlibrary.ActiveRouteUpdateListener;
 import com.volkswagenag.partnerlibrary.NavStateListener;
 import com.volkswagenag.partnerlibrary.NavigationManager;
+import com.volkswagenag.partnerlibrary.Response;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -76,33 +77,40 @@ public class NavigationManagerDemoModeImpl implements NavigationManager {
     }
 
     @Override
-    public void registerNavStateListener(NavStateListener listener) {
+    public Response.Error registerNavStateListener(NavStateListener listener) {
         mNavigationStateListeners.add(listener);
+        return Response.Error.NONE;
     }
 
     @Override
-    public void unregisterNavStateListener(NavStateListener listener) {
+    public Response.Error unregisterNavStateListener(NavStateListener listener) {
         mNavigationStateListeners.remove(listener);
+        return Response.Error.NONE;
     }
 
     @Override
-    public boolean isNavStarted() {
-        return mIsNavStartedList.get(mIndex.get() % mIsNavStartedList.size());
+    public Response<Boolean> isNavStarted() {
+        return new Response<>(
+                Response.Error.NONE,
+                new Boolean(mIsNavStartedList.get(mIndex.get() % mIsNavStartedList.size())));
     }
 
     @Override
-    public void registerActiveRouteUpdateListener(ActiveRouteUpdateListener activeRouteUpdateListener) {
+    public Response.Error registerActiveRouteUpdateListener(ActiveRouteUpdateListener activeRouteUpdateListener) {
         mActiveRouteUpdateListeners.add(activeRouteUpdateListener);
+        return Response.Error.NONE;
     }
 
     @Override
-    public void unregisterActiveRouteUpdateListener(ActiveRouteUpdateListener activeRouteUpdateListener) {
+    public Response.Error unregisterActiveRouteUpdateListener(ActiveRouteUpdateListener activeRouteUpdateListener) {
         mActiveRouteUpdateListeners.remove(activeRouteUpdateListener);
+        return Response.Error.NONE;
     }
 
     @Override
-    public String getActiveRoute() {
-        return mActiveRoutesList.get(mIndex.get() % mActiveRoutesList.size());
+    public Response<String> getActiveRoute() {
+        return new Response<>(Response.Error.NONE,
+                mActiveRoutesList.get(mIndex.get() % mActiveRoutesList.size()));
     }
 
     private void updateIndexAndUpdateListenersIfNeeded() {

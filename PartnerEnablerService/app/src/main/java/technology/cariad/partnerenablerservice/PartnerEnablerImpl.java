@@ -132,10 +132,7 @@ public class PartnerEnablerImpl extends IPartnerEnabler.Stub {
         Log.d(TAG, "Calling app is: " + packageName);
         try {
             if (!mPartnerAccessManager.isAccessAllowed(packageName)) {
-//                throw new SecurityException(
-//                        "The app " + packageName +
-//                                " doesn't have the permission to access Partner API's");
-                Log.d(TAG,
+                throw new SecurityException(
                         "The app " + packageName +
                                 " doesn't have the permission to access Partner API's");
             }
