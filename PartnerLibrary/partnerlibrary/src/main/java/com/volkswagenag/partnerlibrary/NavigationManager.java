@@ -44,7 +44,7 @@ public interface NavigationManager {
      * @return Returns true - if Navigation Application state is fully operable.
      *         Returns false - if Navigation Application state is Loading, NavDB Error, NoLicense, etc,.
      */
-    boolean isNavStarted();
+    Response<Boolean> isNavStarted();
 
     /**
      * This method is to add the listener to get the active guided route from Navigation App.
@@ -64,5 +64,5 @@ public interface NavigationManager {
      *         Returns a JSON string with the current route encoded using flexible polyline encoding.
      *         ex: {"version": 1, "route": "<route encoded as polyline>"}
      */
-    String getActiveRoute();
+    Response<String> getActiveRoute();
 }

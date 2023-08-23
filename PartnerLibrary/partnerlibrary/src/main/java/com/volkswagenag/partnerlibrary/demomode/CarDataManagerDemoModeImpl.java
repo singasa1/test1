@@ -6,6 +6,7 @@ import android.util.Log;
 import com.volkswagenag.partnerlibrary.CarDataManager;
 import com.volkswagenag.partnerlibrary.FogLightStateListener;
 import com.volkswagenag.partnerlibrary.MileageListener;
+import com.volkswagenag.partnerlibrary.Response;
 import com.volkswagenag.partnerlibrary.SteeringAngleListener;
 import com.volkswagenag.partnerlibrary.TurnSignalListener;
 import com.volkswagenag.partnerlibrary.VehicleLightState;
@@ -227,5 +228,9 @@ public class CarDataManagerDemoModeImpl implements CarDataManager {
                 + "FogLightsState List: " + mFogLightsStateList + "\n"
                 + "SteeringAngle List: " + mSteeringAngleList + "\n"
                 + "VIN: " + mVehicleIdentityNumber + "\n");
+    }
+
+    Response <T>getResponse(Response.Error error, T value) {
+
     }
 }

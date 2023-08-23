@@ -47,7 +47,7 @@ public interface CarDataManager {
      * -1 - if permission to access the odometer api is denied
      *  0 - if there is no odometer value/vhal property available.
      */
-    float getCurrentMileage();
+    Response<Float> getCurrentMileage();
 
     /**
      * This method is to add the listener to get Vehicle Turn Signal State value.
@@ -66,14 +66,14 @@ public interface CarDataManager {
      * @return VehicleSignalIndicator - return current signal indicator value(PermissionDenied/None/Right/Left).
      *
      */
-    VehicleSignalIndicator getTurnSignalIndicator();
+    Response<VehicleSignalIndicator> getTurnSignalIndicator();
 
     /**
      * This method is to add the listener to get Fog Lights State value.
      * @param lightStateListener FogLightStateListener object from client/app.
      * if client doesn't have permission to access the fog light state value, it doesn't add this listener
      */
-    void registerFogLightStateListener(FogLightStateListener lightStateListener);
+    Response<FogLightStateListener> registerFogLightStateListener(FogLightStateListener lightStateListener);
 
     /**
      * This method is to remove the listener.
@@ -84,7 +84,7 @@ public interface CarDataManager {
      * This method gets the current fog lights state from PartnerEnablerService
      * @return VehicleLightState - return current fog light state value(PermissionDenied/Off/On/DayTimeRunning).
      */
-    VehicleLightState getFogLightsState();
+    Response<VehicleLightState> getFogLightsState();
 
     /**
      * This method is to add the listener to get steering angle value.
@@ -105,12 +105,12 @@ public interface CarDataManager {
      * positive value - right
      * negative value - left
      */
-    float getSteeringAngle();
+    Response<Float> getSteeringAngle();
 
     /**
      * This method returns the Car VIN Number.
      *  @return int - return car VIN no
      *  -1 - if permission to access the vin no . else return valid vin no,
      */
-    String getVehicleIdentityNumber();
+    Response<String> getVehicleIdentityNumber();
 }
