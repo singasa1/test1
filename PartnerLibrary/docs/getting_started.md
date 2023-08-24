@@ -154,9 +154,82 @@ Downlaod sample application (TODO: Add download URL)
 
 The end-to-end flow is best tested on a Cariad emulator and/or Cariad test-bench. As these are not available to Partners at this point, we have implemented a functionality called 'demo-mode' which allows testing using any Android emulator. 
 
-Steps to enable demo mode: (TODO: Add steps )
-1. .....
-2. .....
-3. .....
-4. .....
+### Demo mode
+Demo mode is a state in the PartnerLibrary that can be enabled using an adb property. When the demo mode is enabled, the PartnerLibrary reads data from json files in the external file directory of the application that it is being included in to simulate mock data over time.
+
+#### Steps to enable demo mode:
+
+1. Push car_data.json and navigation_data.json files to '/sdcard/Android/data/{your-app-package-name}/files/'. Make sure to change {your-package-name} to your applications package name.
+```
+$ adb root
+$ adb push /json-file-location/car_data.json /sdcard/Android/data/{your-app-package-name}/files/
+$ adb push /json-file-location/navigation_data.json /sdcard/Android/data/{your-app-package-name}/files/
+```
+
+2. Use below commands to set the demo mode property
+```
+$ adb root
+$ adb shell setprop persist.volkswagenag.parterapi.demomode true OR
+$ adb shell setprop volkswagenag.parterapi.demomode true
+$ adb shell stop
+$ adb shell start
+```
+Note: Feel free to use or not use persist depending on the test requirements. Using persist helps with keeping the demo mode on in between reboots.
+
+3. Start your app to run the PartnerLibrary in Demo mode.
+
+
+#### File and Schema definitions:
+The following are the files and JSON schema for the currently supported APIs:
+Note: filenames should exactly be the same.
+**1. CarDataManager:**
+
+**Filename:** car_data.json
+
+**Schema:**
+```
+{
+ "change_frequency_secs": Integer,
+ "mileage_list": Integer array
+ "turn_signal_indicator_list": Array of VehicleSignalIndicator enum ,
+ "fog_lights_state_list": Array of VehicleLightState enum,
+ "steering_angle_list": Float array,
+ "vehicle_identity_number": String
+}
+```
+
+**Example:**
+```
+{
+ "change_frequency_secs": 10,
+ "mileage_list":[5,5,5,10,10,10,20,20,20,40],
+ "turn_signal_indicator_list":["PERMISSION_DENIED","NONE","RIGHT","RIGHT","RIGHT","NONE","NONE","NONE","LEFT","LEFT"],
+ "fog_lights_state_list":["DAYTIME_RUNNING"],
+ "steering_angle_list":[-80,-40,-10,0,0,0,0, 20,50,90],
+ "vehicle_identity_number": "1FMZU77E22UC18440"
+}
+```
+
+**2. NavigationManager:**
+
+**Filename:** navigation_data.json
+
+**Schema:**
+```
+{
+ "change_frequency_secs": Integer,
+ "nav_started": Boolean array,
+ "active_route": String Array
+}
+```
+Note: The String and booleans in `active_route` and `nav_started` are mapped one on one. i.e, if the value in `nav_started[i]` is false the value in `active_route[i]` is ignored.
+
+**Example:**
+```
+{
+ "change_frequency_secs": 30,
+ "nav_started": ["false", "true", "false", "false", "true"],
+ "active_route": ["", "kclcF...@sC@YIOKI", "", "", "wblcF~...SZSF_@?"]
+}
+```
 
