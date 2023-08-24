@@ -128,8 +128,10 @@ Note: Feel free to use or not use persist depending on the test requirements. Us
 #### File and Schema definitions:
 The following are the files and JSON schema for the currently supported APIs:
 Note: filenames should exactly be the same.
-##### CarDataManager:
+**1. CarDataManager:**
+
 **Filename:** car_data.json
+
 **Schema:**
 ```
 {
@@ -154,8 +156,10 @@ Note: filenames should exactly be the same.
 }
 ```
 
-##### NavigationManager:
+**2. NavigationManager:**
+
 **Filename:** navigation_data.json
+
 **Schema:**
 ```
 {
