@@ -59,11 +59,11 @@ The specific way to add the Partner token in the AndroidManifest.xml is as below
     <uses-sdk android:minSdkVersion="14" android:targetSdkVersion="15"/>
     
     <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="technology.cariad.vwae.restricted.permission.CAR_MILEAGE"/>
-    <uses-permission android:name="technology.cariad.vwae.permission.restricted.A"/>
-    <uses-permission android:name="technology.cariad.vwae.permission.restricted.D"/>
-    <uses-permission android:name="technology.cariad.vwae.permission.restricted.F"/>
-    <uses-permission android:name="technology.cariad.vwae.permission.restricted.Z"/>
+    <uses-permission android:name="com.volkswagenag.restricted.permission.CAR_MILEAGE"/>
+    <uses-permission android:name="com.volkswagenag.permission.restricted.A"/>
+    <uses-permission android:name="com.volkswagenag.permission.restricted.D"/>
+    <uses-permission android:name="com.volkswagenag.permission.restricted.F"/>
+    <uses-permission android:name="com.volkswagenag.permission.restricted.Z"/>
 	 
     <application android:icon="@drawable/ic_launcher" android:label="@string/app_name">
     <activity android:label="@string/app_name" android:launchMode="singleTop"
@@ -86,7 +86,61 @@ Download Partner Library ver. X.Y (TODO: Add download URL)
 
 Downlaod sample application (TODO: Add download URL)
 
-(TODO: Add diagram for library initialization calls or code snippet reference from sample app. 
+![Alt text](images/PartnerLibraryInitialization.png)
+
+
+#### Sample App Initialization code snippet:
+**onCreate**
+```
+        mPartnerLibrary = PartnerLibrary.getInstance(this);
+```
+
+**initializePartnerLibrary**
+```
+    private void initializePartnerLibrary() {
+        Log.d(TAG, "initialize");
+        mPartnerLibrary.addListener(mLibStateChangeListener);
+        mPartnerLibrary.initialize();
+    }
+```
+
+**ILibStateChangeListener onStateChanged**
+```
+  class LibStateListener implements ILibStateChangeListener {
+
+        @Override
+        public void onStateChanged(boolean ready) throws RemoteException {
+            Log.d(TAG,"LibState status: " + ready);
+            ...
+            if (ready) {
+                try {
+                    ...
+                    mPartnerLibrary.start();
+                } catch (Exception e) {
+                    mCarDataButton.setVisibility(View.INVISIBLE);
+                    mServiceStatusTextView.setText(e.getMessage());
+                    e.printStackTrace();
+                }
+            } else {
+                ...
+                mPartnerLibrary.stop();
+            }
+        }
+```
+
+**CarDataActivity getCarDataManager**
+```
+ @Override
+    public void onResume() {
+        super.onResume();
+        mCarDataManager = PartnerLibrary.getInstance(this).getCarDataManager();
+        mNavigationManager = PartnerLibrary.getInstance(this).getNavigationManager();
+        mCarDataManager.registerMileageListener(CarDataActivity.this);
+        mCarDataManager.registerTurnSignalListener(CarDataActivity.this);
+        mCarDataManager.registerFogLightStateListener(CarDataActivity.this);
+        mCarDataManager.registerSteeringAngleListener(CarDataActivity.this);
+    }
+```
 
 ### To summarize the above steps, here is a checklist of pre-requisites you need to use the Partner API library
 
