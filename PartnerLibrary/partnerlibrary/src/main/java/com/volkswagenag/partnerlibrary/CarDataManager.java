@@ -34,16 +34,16 @@ public interface CarDataManager {
      * @param mileageListerer MileageListener object from client/app.
      * if client doesn't have permission to access odometer value, it doesn't add this listener
      *
-     * @return {@link Response.Error}
+     * @return {@link Response.Status}
      */
-    Response.Error registerMileageListener(MileageListener mileageListener);
+    Response.Status registerMileageListener(MileageListener mileageListener);
 
     /**
      * This method is to remove the listener.
      *
-     * @return {@link Response.Error}
+     * @return {@link Response.Status}
      */
-    Response.Error unregisterMileageListener(MileageListener mileageListener);
+    Response.Status unregisterMileageListener(MileageListener mileageListener);
 
     /**
      * This method gets the Car current Odometer value from PartnerEnablerService
@@ -57,16 +57,16 @@ public interface CarDataManager {
      * @param turnSignalListener TurnSignalListener object from client/app.
      * if client doesn't have permission to access the turn signal indicator value, it doesn't add this listener
      *
-     * @return {@link Response.Error}
+     * @return {@link Response.Status}
      */
-    Response.Error registerTurnSignalListener(TurnSignalListener turnSignalListener);
+    Response.Status registerTurnSignalListener(TurnSignalListener turnSignalListener);
 
     /**
      * This method is to remove the listener.
      *
-     * @return {@link Response.Error}
+     * @return {@link Response.Status}
      */
-    Response.Error unregisterTurnSignalListener(TurnSignalListener turnSignalListener);
+    Response.Status unregisterTurnSignalListener(TurnSignalListener turnSignalListener);
 
     /**
      * This method gets the current turn signal indicator value from PartnerEnablerService
@@ -80,16 +80,16 @@ public interface CarDataManager {
      * @param lightStateListener FogLightStateListener object from client/app.
      * if client doesn't have permission to access the fog light state value, it doesn't add this listener
      *
-     * @return {@link Response.Error}
+     * @return {@link Response.Status}
      */
-    Response.Error registerFogLightStateListener(FogLightStateListener lightStateListener);
+    Response.Status registerFogLightStateListener(FogLightStateListener lightStateListener);
 
     /**
      * This method is to remove the listener.
      *
-     * @return {@link Response.Error}
+     * @return {@link Response.Status}
      */
-    Response.Error unregisterFogLightStateListener(FogLightStateListener lightStateListener);
+    Response.Status unregisterFogLightStateListener(FogLightStateListener lightStateListener);
 
     /**
      * This method gets the current fog lights state from PartnerEnablerService
@@ -103,16 +103,16 @@ public interface CarDataManager {
      * @param steeringAngleListener SteeringAngleListener object from client/app.
      * if client doesn't have permission to access the fog light state value, it doesn't add this listener.
      *
-     * @return {@link Response.Error}
+     * @return {@link Response.Status}
      */
-    Response.Error registerSteeringAngleListener(SteeringAngleListener steeringAngleListener);
+    Response.Status registerSteeringAngleListener(SteeringAngleListener steeringAngleListener);
 
     /**
      * This method is to remove the listener.
      *
-     * @return {@link Response.Error}
+     * @return {@link Response.Status}
      */
-    Response.Error unregisterSteeringAngleListener(SteeringAngleListener steeringAngleListener);
+    Response.Status unregisterSteeringAngleListener(SteeringAngleListener steeringAngleListener);
 
     /**
      * This method returns the Car steering angle in degrees. positive - right; negative - left.

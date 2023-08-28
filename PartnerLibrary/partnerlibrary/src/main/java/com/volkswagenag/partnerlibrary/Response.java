@@ -8,11 +8,11 @@ public class Response<T> {
     /**
      * Errors that happen during API call
      */
-    public enum Error {
+    public enum Status {
         /**
          * Success
          */
-        NONE,
+        SUCCESS,
         /**
          * Partner application failed validation and is denied permission to access the APIs
          */
@@ -38,15 +38,15 @@ public class Response<T> {
          */
         INTERNAL_FAILURE,
     };
-    public Error error;
+    public Status status;
     public T value;
 
-    public Response(Error error) {
-        this.error = error;
+    public Response(Status status) {
+        this.status = status;
     }
 
-    public Response(Error error, T value) {
-        this.error = error;
+    public Response(Status status, T value) {
+        this.status = status;
         this.value = value;
     }
 }

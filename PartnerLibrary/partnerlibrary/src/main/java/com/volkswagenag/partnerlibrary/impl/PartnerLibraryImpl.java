@@ -117,32 +117,32 @@ public class PartnerLibraryImpl implements PartnerLibrary {
     }
 
     @Override
-    public Response.Error initialize() {
+    public Response.Status initialize() {
         Log.d(TAG,"initialize required services");
         // bind to the enabler service.
-        return initService() ? Response.Error.NONE : Response.Error.SERVICE_CONNECTION_FAILURE;
+        return initService() ? Response.Status.SUCCESS : Response.Status.SERVICE_CONNECTION_FAILURE;
     }
 
     @Override
-    public Response.Error release() {
+    public Response.Status release() {
         Log.d(TAG,"release");
         // unbind service
         releaseService();
-        return Response.Error.NONE;
+        return Response.Status.SUCCESS;
     }
 
     @Override
-    public Response.Error start() {
+    public Response.Status start() {
         Log.d(TAG,"start");
-        Response.Error ret = Response.Error.NONE;
+        Response.Status ret = Response.Status.SUCCESS;
         if (mIsPartnerEnablerServiceConnected) {
             try {
                 mService.initialize();
             } catch (SecurityException e) {
-                ret = Response.Error.PERMISSION_DENIED;
+                ret = Response.Status.PERMISSION_DENIED;
                 e.printStackTrace();
             } catch (RemoteException e) {
-                ret = Response.Error.SERVICE_COMMUNICATION_FAILURE;
+                ret = Response.Status.SERVICE_COMMUNICATION_FAILURE;
                 e.printStackTrace();
             }
         }
@@ -150,17 +150,17 @@ public class PartnerLibraryImpl implements PartnerLibrary {
     }
 
     @Override
-    public Response.Error stop() {
+    public Response.Status stop() {
         Log.d(TAG,"stop");
-        Response.Error ret = Response.Error.NONE;
+        Response.Status ret = Response.Status.SUCCESS;
         if (mIsPartnerEnablerServiceConnected) {
             try {
                 mService.release();
             } catch (SecurityException e) {
-                ret = Response.Error.PERMISSION_DENIED;
+                ret = Response.Status.PERMISSION_DENIED;
                 e.printStackTrace();
             } catch (RemoteException e) {
-                ret = Response.Error.SERVICE_COMMUNICATION_FAILURE;
+                ret = Response.Status.SERVICE_COMMUNICATION_FAILURE;
                 e.printStackTrace();
             }
         }
@@ -179,9 +179,9 @@ public class PartnerLibraryImpl implements PartnerLibrary {
 
     @Override
     public Response<CarDataManager> getCarDataManager() {
-        Response<CarDataManager> response = new Response<>(Response.Error.NONE);
+        Response<CarDataManager> response = new Response<>(Response.Status.SUCCESS);
         if (!mIsPartnerEnablerServiceConnected) {
-            response.error = Response.Error.SERVICE_CONNECTION_FAILURE;
+            response.status = Response.Status.SERVICE_CONNECTION_FAILURE;
             return response;
         }
         response.value = mCarDataManager;
@@ -190,9 +190,9 @@ public class PartnerLibraryImpl implements PartnerLibrary {
 
     @Override
     public Response<NavigationManager> getNavigationManager() {
-        Response<NavigationManager> response = new Response<>(Response.Error.NONE);
+        Response<NavigationManager> response = new Response<>(Response.Status.SUCCESS);
         if (!mIsPartnerEnablerServiceConnected) {
-            response.error = Response.Error.SERVICE_CONNECTION_FAILURE;
+            response.status = Response.Status.SERVICE_CONNECTION_FAILURE;
             return response;
         }
         response.value = mNavigationManager;

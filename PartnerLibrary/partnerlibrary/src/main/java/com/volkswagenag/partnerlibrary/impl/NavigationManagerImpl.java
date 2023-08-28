@@ -18,7 +18,6 @@
  */
 package com.volkswagenag.partnerlibrary.impl;
 
-import android.os.RemoteException;
 import android.util.Log;
 
 import androidx.annotation.RequiresPermission;
@@ -90,21 +89,21 @@ public class NavigationManagerImpl implements NavigationManager {
      */
     @Override
     @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE)
-    public Response.Error registerNavStateListener(NavStateListener navStateListener ) {
+    public Response.Status registerNavStateListener(NavStateListener navStateListener ) {
         // Add this client to listeners only if it has permission to access the navigation app state
         // TODO: Need to do Real permission check based implementation and error communication
         mNavStateListener.add(navStateListener);
-        return Response.Error.NONE;
+        return Response.Status.SUCCESS;
     }
 
     /**
      * This method is to remove the listener.
      */
     @Override
-    public Response.Error unregisterNavStateListener(NavStateListener navStateListener) {
+    public Response.Status unregisterNavStateListener(NavStateListener navStateListener) {
         mNavStateListener.remove(navStateListener);
         removeNavStateListener();
-        return Response.Error.NONE;
+        return Response.Status.SUCCESS;
     }
 
     /**
@@ -115,7 +114,7 @@ public class NavigationManagerImpl implements NavigationManager {
     @Override
     @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE)
     public Response<Boolean> isNavStarted() {
-        return new Response<>(Response.Error.NONE, new Boolean(true));
+        return new Response<>(Response.Status.SUCCESS, new Boolean(true));
         // TODO: Add real implementation
     }
 
@@ -125,11 +124,11 @@ public class NavigationManagerImpl implements NavigationManager {
      */
     @Override
     @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE)
-    public Response.Error registerActiveRouteUpdateListener(ActiveRouteUpdateListener activeRouteUpdateListener) {
+    public Response.Status registerActiveRouteUpdateListener(ActiveRouteUpdateListener activeRouteUpdateListener) {
         // Add this client to listeners only if it has permission to access the navigation simplified route
         // TODO: Need to do Real permission check based implementation and error communication
         mActiveRouteListener.add(activeRouteUpdateListener);
-        return Response.Error.NONE;
+        return Response.Status.SUCCESS;
     }
 
     /**
@@ -137,9 +136,9 @@ public class NavigationManagerImpl implements NavigationManager {
      * @param activeRouteUpdateListener ActiveRouteUpdateListener object from client/app.
      */
     @Override
-    public Response.Error unregisterActiveRouteUpdateListener(ActiveRouteUpdateListener activeRouteUpdateListener) {
+    public Response.Status unregisterActiveRouteUpdateListener(ActiveRouteUpdateListener activeRouteUpdateListener) {
         mActiveRouteListener.remove(activeRouteUpdateListener);
-        return Response.Error.NONE;
+        return Response.Status.SUCCESS;
     }
 
     /**
@@ -151,7 +150,7 @@ public class NavigationManagerImpl implements NavigationManager {
     @Override
     @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE)
     public Response<String> getActiveRoute() {
-        return new Response<>(Response.Error.NONE, null);
+        return new Response<>(Response.Status.SUCCESS, null);
         // TODO: Real implementation need to be added to hook up with PartnerEnablerService.
     }
 }

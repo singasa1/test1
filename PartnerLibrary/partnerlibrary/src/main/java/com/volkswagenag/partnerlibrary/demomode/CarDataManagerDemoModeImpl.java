@@ -56,17 +56,10 @@ public class CarDataManagerDemoModeImpl implements CarDataManager {
     private List<Integer> mSteeringAngleList;
     private String mVehicleIdentityNumber;
 
-    public CarDataManagerDemoModeImpl(Context context) {
+    public CarDataManagerDemoModeImpl(Context context) throws JSONException, IOException{
         mContext = context;
         mSchedulerService = Executors.newScheduledThreadPool(1);
-
-        try {
-            initializeCache();
-        } catch (JSONException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        initializeCache();
         logCache();
     }
 
@@ -88,79 +81,79 @@ public class CarDataManagerDemoModeImpl implements CarDataManager {
     }
 
     @Override
-    public Response.Error registerMileageListener(MileageListener mileageListener) {
+    public Response.Status registerMileageListener(MileageListener mileageListener) {
         mMileageListeners.add(mileageListener);
-        return Response.Error.NONE;
+        return Response.Status.SUCCESS;
     }
 
     @Override
-    public Response.Error unregisterMileageListener(MileageListener mileageListener) {
+    public Response.Status unregisterMileageListener(MileageListener mileageListener) {
         mMileageListeners.remove(mileageListener);
-        return Response.Error.NONE;
+        return Response.Status.SUCCESS;
     }
 
     @Override
     public Response<Float> getCurrentMileage() {
-        return new Response<>(Response.Error.NONE, mMileageList.get(mIndex.get() % mMileageList.size()).floatValue());
+        return new Response<>(Response.Status.SUCCESS, mMileageList.get(mIndex.get() % mMileageList.size()).floatValue());
     }
 
     @Override
-    public Response.Error registerTurnSignalListener(TurnSignalListener turnSignalListener) {
+    public Response.Status registerTurnSignalListener(TurnSignalListener turnSignalListener) {
         mTurnSignalListener.add(turnSignalListener);
-        return Response.Error.NONE;
+        return Response.Status.SUCCESS;
     }
 
     @Override
-    public Response.Error unregisterTurnSignalListener(TurnSignalListener turnSignalListener) {
+    public Response.Status unregisterTurnSignalListener(TurnSignalListener turnSignalListener) {
         mTurnSignalListener.remove(turnSignalListener);
-        return Response.Error.NONE;
+        return Response.Status.SUCCESS;
     }
 
     @Override
     public Response<VehicleSignalIndicator> getTurnSignalIndicator() {
-        return new Response<>(Response.Error.NONE,
+        return new Response<>(Response.Status.SUCCESS,
                 mTurnSignalIndicatorList.get(mIndex.get() % mTurnSignalIndicatorList.size()));
     }
 
     @Override
-    public Response.Error registerFogLightStateListener(FogLightStateListener lightStateListener) {
+    public Response.Status registerFogLightStateListener(FogLightStateListener lightStateListener) {
         mFogLightStateListener.add(lightStateListener);
-        return Response.Error.NONE;
+        return Response.Status.SUCCESS;
     }
 
     @Override
-    public Response.Error unregisterFogLightStateListener(FogLightStateListener lightStateListener) {
+    public Response.Status unregisterFogLightStateListener(FogLightStateListener lightStateListener) {
         mFogLightStateListener.remove(lightStateListener);
-        return Response.Error.NONE;
+        return Response.Status.SUCCESS;
     }
 
     @Override
     public Response<VehicleLightState> getFogLightsState() {
-        return new Response<>(Response.Error.NONE,
+        return new Response<>(Response.Status.SUCCESS,
                 mFogLightsStateList.get(mIndex.get() % mFogLightsStateList.size()));
     }
 
     @Override
-    public Response.Error registerSteeringAngleListener(SteeringAngleListener steeringAngleListener) {
+    public Response.Status registerSteeringAngleListener(SteeringAngleListener steeringAngleListener) {
         mSteeringAngleListener.add(steeringAngleListener);
-        return Response.Error.NONE;
+        return Response.Status.SUCCESS;
     }
 
     @Override
-    public Response.Error unregisterSteeringAngleListener(SteeringAngleListener steeringAngleListener) {
+    public Response.Status unregisterSteeringAngleListener(SteeringAngleListener steeringAngleListener) {
         mSteeringAngleListener.remove(steeringAngleListener);
-        return Response.Error.NONE;
+        return Response.Status.SUCCESS;
     }
 
     @Override
     public Response<Float> getSteeringAngle() {
-        return new Response<>(Response.Error.NONE,
+        return new Response<>(Response.Status.SUCCESS,
                 mSteeringAngleList.get(mIndex.get() % mSteeringAngleList.size()).floatValue());
     }
 
     @Override
     public Response<String> getVehicleIdentityNumber() {
-        return new Response<>(Response.Error.NONE, mVehicleIdentityNumber);
+        return new Response<>(Response.Status.SUCCESS, mVehicleIdentityNumber);
     }
 
     /**

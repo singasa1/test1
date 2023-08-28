@@ -57,30 +57,30 @@ public class CarDataActivity extends AppCompatActivity implements MileageListene
     public void onResume() {
         super.onResume();
         Response<CarDataManager> carDataManagerResponse = PartnerLibrary.getInstance(this).getCarDataManager();
-        if (carDataManagerResponse.error != Response.Error.NONE) {
-            logAndShowError("Error obtaining NavigationManager from PartnerLibrary: ", carDataManagerResponse.error);
+        if (carDataManagerResponse.status != Response.Status.SUCCESS) {
+            logAndShowError("Error obtaining NavigationManager from PartnerLibrary: ", carDataManagerResponse.status);
             return;
         }
         mCarDataManager = carDataManagerResponse.value;
 
-        Response.Error error = mCarDataManager.registerMileageListener(CarDataActivity.this);
-        if (error != Response.Error.NONE) {
-            logAndShowError("registerMileageListener failed with ", error);
+        Response.Status status = mCarDataManager.registerMileageListener(CarDataActivity.this);
+        if (status != Response.Status.SUCCESS) {
+            logAndShowError("registerMileageListener failed with ", status);
         }
 
-        error = mCarDataManager.registerTurnSignalListener(CarDataActivity.this);
-        if (error != Response.Error.NONE) {
-            logAndShowError("registerMileageListener failed with ", error);
+        status = mCarDataManager.registerTurnSignalListener(CarDataActivity.this);
+        if (status != Response.Status.SUCCESS) {
+            logAndShowError("registerMileageListener failed with ", status);
         }
 
-        error = mCarDataManager.registerFogLightStateListener(CarDataActivity.this);
-        if (error != Response.Error.NONE) {
-            logAndShowError("registerMileageListener failed with ", error);
+        status = mCarDataManager.registerFogLightStateListener(CarDataActivity.this);
+        if (status != Response.Status.SUCCESS) {
+            logAndShowError("registerMileageListener failed with ", status);
         }
 
-        error = mCarDataManager.registerSteeringAngleListener(CarDataActivity.this);
-        if (error != Response.Error.NONE) {
-            logAndShowError("registerMileageListener failed with ", error);
+        status = mCarDataManager.registerSteeringAngleListener(CarDataActivity.this);
+        if (status != Response.Status.SUCCESS) {
+            logAndShowError("registerMileageListener failed with ", status);
         }
     }
 
@@ -108,42 +108,42 @@ public class CarDataActivity extends AppCompatActivity implements MileageListene
             switch (position) {
                 case 0: // getCurrentMileage
                     Response<Float> floatResponse = mCarDataManager.getCurrentMileage();
-                    if (floatResponse.error == Response.Error.NONE) {
+                    if (floatResponse.status == Response.Status.SUCCESS) {
                         mResultTextView.setText("Current Mileage: " + floatResponse.value);
                     } else {
-                        logAndShowError("getCurrentMileage call failed with: ", floatResponse.error);
+                        logAndShowError("getCurrentMileage call failed with: ", floatResponse.status);
                     }
                     break;
                 case 1: // getTurnSignalIndicator
                     Response<VehicleSignalIndicator> vehicleSignalIndicatorResponse = mCarDataManager.getTurnSignalIndicator();
-                    if (vehicleSignalIndicatorResponse.error == Response.Error.NONE) {
+                    if (vehicleSignalIndicatorResponse.status == Response.Status.SUCCESS) {
                         mResultTextView.setText("Turn signal indicator: " + vehicleSignalIndicatorResponse.value);
                     } else {
-                        logAndShowError("getTurnSignalIndicator call failed with: ", vehicleSignalIndicatorResponse.error);
+                        logAndShowError("getTurnSignalIndicator call failed with: ", vehicleSignalIndicatorResponse.status);
                     }
                     break;
                 case 2: // getFogLightsState
                     Response<VehicleLightState> vehicleLightStateResponse = mCarDataManager.getFogLightsState();
-                    if (vehicleLightStateResponse.error == Response.Error.NONE) {
+                    if (vehicleLightStateResponse.status == Response.Status.SUCCESS) {
                         mResultTextView.setText("Fog Lights state: " + vehicleLightStateResponse.value);
                     } else {
-                        logAndShowError("getFogLightsState call failed with: ", vehicleLightStateResponse.error);
+                        logAndShowError("getFogLightsState call failed with: ", vehicleLightStateResponse.status);
                     }
                     break;
                 case 3: // getSteeringAngle
                     floatResponse = mCarDataManager.getSteeringAngle();
-                    if (floatResponse.error == Response.Error.NONE) {
+                    if (floatResponse.status == Response.Status.SUCCESS) {
                         mResultTextView.setText("Steering Angle: " + floatResponse.value);
                     } else {
-                        logAndShowError("getSteeringAngle call failed with: ", floatResponse.error);
+                        logAndShowError("getSteeringAngle call failed with: ", floatResponse.status);
                     }
                     break;
                 case 4:
                     Response<String> stringResponse = mCarDataManager.getVehicleIdentityNumber();
-                    if (stringResponse.error == Response.Error.NONE) {
+                    if (stringResponse.status == Response.Status.SUCCESS) {
                          mResultTextView.setText("VIN number: " + stringResponse.value);
                     } else {
-                        logAndShowError("getVehicleIdentityNumber call failed with: ", stringResponse.error);
+                        logAndShowError("getVehicleIdentityNumber call failed with: ", stringResponse.status);
                     }
                     break;
                 default:
@@ -199,8 +199,8 @@ public class CarDataActivity extends AppCompatActivity implements MileageListene
         }));
     }
 
-    private void logAndShowError(String message, Response.Error error) {
-        Log.e(TAG, message + error.toString());
-        Toast.makeText(CarDataActivity.this, message + error.toString(), Toast.LENGTH_LONG).show();
+    private void logAndShowError(String message, Response.Status status) {
+        Log.e(TAG, message + status.toString());
+        Toast.makeText(CarDataActivity.this, message + status.toString(), Toast.LENGTH_LONG).show();
     }
 }

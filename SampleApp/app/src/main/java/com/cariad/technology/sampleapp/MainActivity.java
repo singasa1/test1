@@ -49,10 +49,10 @@ public class MainActivity extends AppCompatActivity {
                     mCarDataButton.setVisibility(View.VISIBLE);
                     mNavigationButton.setVisibility(View.VISIBLE);
 
-                    Response.Error error = mPartnerLibrary.start();
-                    if (error != Response.Error.NONE) {
-                        Log.e(TAG, "Failure in starting the service " + error.toString());
-                        showToast("Failure in starting the service: " + error.toString());
+                    Response.Status status = mPartnerLibrary.start();
+                    if (status != Response.Status.SUCCESS) {
+                        Log.e(TAG, "Failure in starting the service " + status.toString());
+                        showToast("Failure in starting the service: " + status.toString());
                     }
                 } catch (Exception e) {
                     mCarDataButton.setVisibility(View.INVISIBLE);
@@ -63,10 +63,10 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 mCarDataButton.setVisibility(View.INVISIBLE);
                 mNavigationButton.setVisibility(View.INVISIBLE);
-                Response.Error error = mPartnerLibrary.stop();
-                if (error != Response.Error.NONE) {
-                    Log.e(TAG, "Failure in stopping the service " + error.toString());
-                    showToast("Failure in stopping the service: " + error.toString());
+                Response.Status status = mPartnerLibrary.stop();
+                if (status != Response.Status.SUCCESS) {
+                    Log.e(TAG, "Failure in stopping the service " + status.toString());
+                    showToast("Failure in stopping the service: " + status.toString());
                 }
                 mServiceStatusTextView.setText(R.string.service_state_error);
             }
@@ -154,7 +154,7 @@ public class MainActivity extends AppCompatActivity {
     private void initializePartnerLibrary() {
         Log.d(TAG, "initialize");
         mPartnerLibrary.addListener(mLibStateChangeListener);
-        if (mPartnerLibrary.initialize() != Response.Error.NONE) {
+        if (mPartnerLibrary.initialize() != Response.Status.SUCCESS) {
             Log.e(TAG, "Failure in service initialization");
             showToast("Failure in service initialization!");
         }
@@ -164,10 +164,10 @@ public class MainActivity extends AppCompatActivity {
         if (mPartnerLibrary != null) {
             try {
                 mIsServiceConnected = false;
-                Response.Error error = mPartnerLibrary.stop();
-                if (error != Response.Error.NONE) {
-                    Log.e(TAG, "Failure in stopping the service " + error.toString());
-                    showToast("Failure in stopping the service: " + error.toString());
+                Response.Status status = mPartnerLibrary.stop();
+                if (status != Response.Status.SUCCESS) {
+                    Log.e(TAG, "Failure in stopping the service " + status.toString());
+                    showToast("Failure in stopping the service: " + status.toString());
                 }
                 mPartnerLibrary.release();
             } catch (Exception e) {

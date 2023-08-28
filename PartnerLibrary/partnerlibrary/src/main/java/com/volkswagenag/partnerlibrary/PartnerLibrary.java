@@ -85,30 +85,30 @@ public interface PartnerLibrary {
     /**
      * This method binds to the PartnerEnabler service.
      *
-     * @return {@link Response.Error}
+     * @return {@link Response.Status}
      */
-    Response.Error initialize();
+    Response.Status initialize();
 
     /**
      * This method unbinds the PartnerEnabler service
      *
-     * @return {@link Response.Error}
+     * @return {@link Response.Status}
      */
-    Response.Error release();
+    Response.Status release();
 
     /**
      * This method initializes the PartnerEnabler service components
      *
-     * @return {@link Response.Error}
+     * @return {@link Response.Status}
      */
-    Response.Error start();
+    Response.Status start();
 
     /**
      * This method uninitializes the PartnerEnabler service components
      *
-     * @return {@link Response.Error}
+     * @return {@link Response.Status}
      */
-    Response.Error stop();
+    Response.Status stop();
 
     /**
      * This method is to add the listener to get PartnerEnablerServiceConnection status.

@@ -47,20 +47,20 @@ public class NavigationActivity extends AppCompatActivity implements ActiveRoute
     public void onResume() {
         super.onResume();
         Response<NavigationManager> navigationManagerResponse = PartnerLibrary.getInstance(this).getNavigationManager();
-        if (navigationManagerResponse.error != Response.Error.NONE) {
-            logAndShowError("Error obtaining NavigationManager from PartnerLibrary: ", navigationManagerResponse.error);
+        if (navigationManagerResponse.status != Response.Status.SUCCESS) {
+            logAndShowError("Error obtaining NavigationManager from PartnerLibrary: ", navigationManagerResponse.status);
             return;
         }
         mNavigationManager = navigationManagerResponse.value;
 
-        Response.Error error = mNavigationManager.registerActiveRouteUpdateListener(NavigationActivity.this);
-        if (error != Response.Error.NONE) {
-            logAndShowError("registerActiveRouteUpdateListener failed with ", error);
+        Response.Status status = mNavigationManager.registerActiveRouteUpdateListener(NavigationActivity.this);
+        if (status != Response.Status.SUCCESS) {
+            logAndShowError("registerActiveRouteUpdateListener failed with ", status);
         }
 
-        error =  mNavigationManager.registerNavStateListener(NavigationActivity.this);
-        if (error != Response.Error.NONE) {
-            logAndShowError("registerNavStateListener failed with ", error);
+        status =  mNavigationManager.registerNavStateListener(NavigationActivity.this);
+        if (status != Response.Status.SUCCESS) {
+            logAndShowError("registerNavStateListener failed with ", status);
         }
     }
 
@@ -86,18 +86,18 @@ public class NavigationActivity extends AppCompatActivity implements ActiveRoute
             switch (position) {
                 case 0:
                     Response<Boolean> booleanResponse = mNavigationManager.isNavStarted();
-                    if (booleanResponse.error == Response.Error.NONE) {
+                    if (booleanResponse.status == Response.Status.SUCCESS) {
                         mResultTextView.setText("Navigation Application State: " + booleanResponse.value);
                     } else {
-                        logAndShowError("isNavStarted call failed with: ", booleanResponse.error);
+                        logAndShowError("isNavStarted call failed with: ", booleanResponse.status);
                     }
                     break;
                 case 1:
                     Response<String> stringResponse = mNavigationManager.getActiveRoute();
-                    if (stringResponse.error == Response.Error.NONE) {
+                    if (stringResponse.status == Response.Status.SUCCESS) {
                         mResultTextView.setText("Current Route: " + stringResponse.value);
                     } else {
-                        logAndShowError("getActiveRoute call failed with: ", stringResponse.error);
+                        logAndShowError("getActiveRoute call failed with: ", stringResponse.status);
                     }
                     break;
                 default:
@@ -134,8 +134,8 @@ public class NavigationActivity extends AppCompatActivity implements ActiveRoute
         }));
     }
 
-    private void logAndShowError(String message, Response.Error error) {
-            Log.e(TAG, message + error.toString());
-            Toast.makeText(NavigationActivity.this, message + error.toString(), Toast.LENGTH_LONG).show();
+    private void logAndShowError(String message, Response.Status status) {
+            Log.e(TAG, message + status.toString());
+            Toast.makeText(NavigationActivity.this, message + status.toString(), Toast.LENGTH_LONG).show();
     }
 }

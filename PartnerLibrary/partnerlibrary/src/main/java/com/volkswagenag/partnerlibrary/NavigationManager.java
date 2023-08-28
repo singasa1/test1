@@ -32,12 +32,12 @@ public interface NavigationManager {
      * This method is to add the listener to get Navigation Core App status.
      * @param listener NavStateListener object from client/app.
      */
-    Response.Error registerNavStateListener(NavStateListener listener );
+    Response.Status registerNavStateListener(NavStateListener listener );
 
     /**
      * This method is to remove the navigation state listener.
      */
-    Response.Error unregisterNavStateListener(NavStateListener listener);
+    Response.Status unregisterNavStateListener(NavStateListener listener);
 
     /**
      * This method is to get the Navigation Application state.
@@ -50,13 +50,13 @@ public interface NavigationManager {
      * This method is to add the listener to get the active guided route from Navigation App.
      * @param activeRouteUpdateListener ActiveRouteUpdateListener object from client/app.
      */
-    Response.Error registerActiveRouteUpdateListener(ActiveRouteUpdateListener activeRouteUpdateListener);
+    Response.Status registerActiveRouteUpdateListener(ActiveRouteUpdateListener activeRouteUpdateListener);
 
     /**
      * This method is to remove the callback that is registered to get the active route from Navigation App.
      * @param activeRouteUpdateListener ActiveRouteUpdateListener object from client/app.
      */
-    Response.Error unregisterActiveRouteUpdateListener(ActiveRouteUpdateListener activeRouteUpdateListener);
+    Response.Status unregisterActiveRouteUpdateListener(ActiveRouteUpdateListener activeRouteUpdateListener);
 
     /**
      * This method is to get the route guidance of the current active route from Navigation Application.
