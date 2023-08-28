@@ -34,6 +34,7 @@ import com.volkswagenag.partnerlibrary.CarDataManager;
 import com.volkswagenag.partnerlibrary.FogLightStateListener;
 import com.volkswagenag.partnerlibrary.MileageListener;
 import com.volkswagenag.partnerlibrary.PartnerLibrary;
+import com.volkswagenag.partnerlibrary.Response;
 import com.volkswagenag.partnerlibrary.SteeringAngleListener;
 import com.volkswagenag.partnerlibrary.TurnSignalListener;
 import com.volkswagenag.partnerlibrary.VehicleLightState;
@@ -103,20 +104,25 @@ public class CarDataManagerImpl implements CarDataManager {
      * @param mileageListerer MileageListener object from client/app.
      * if client doesn't have permission to access odometer value, it doesn't add this listener
      */
+    @Override
     @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_CAR_MILEAGE_INFO)
-    public void registerMileageListener(MileageListener mileageListener) {
+    public Response.Status registerMileageListener(MileageListener mileageListener) {
         // Add this client to listeners only if it has permission to access the odometer value by calling getCurrentMileage
-        if (getCurrentMileage() != -1) {
+        Response.Status status = getCurrentMileage().status;
+        if (status == Response.Status.SUCCESS) {
             mMileageListeners.add(mileageListener);
         }
+        return status;
     }
 
     /**
      * This method is to remove the listener.
      */
-    public void unregisterMileageListener(MileageListener mileageListener) {
+    @Override
+    public Response.Status unregisterMileageListener(MileageListener mileageListener) {
         mMileageListeners.remove(mileageListener);
         removeCarDataListener();
+        return Response.Status.SUCCESS;
     }
 
     /**
@@ -125,177 +131,163 @@ public class CarDataManagerImpl implements CarDataManager {
      * -1 - if permission to access the odometer api is denied
      *  0 - if there is no odometer value/vhal property available.
      */
+    @Override
     @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_CAR_MILEAGE_INFO)
-    public float getCurrentMileage() {
-        float mileage = 0.0f;
+    public Response<Float> getCurrentMileage() {
+        Response<Float> response = new Response<>(Response.Status.VALUE_NOT_AVAILABLE, 0.0f);
         try {
-            mileage = mService.getCurrentMileage(); // TODO: Do we need to return some value if there is a permission failure or just throwing security exception is good enough
-        } catch (RemoteException e) {
+            response.value = mService.getCurrentMileage();
+            response.status = Response.Status.SUCCESS;
+        } catch (IllegalStateException e) {
             e.printStackTrace();
-        } catch (RuntimeException e) {
+            response.status = Response.Status.INTERNAL_FAILURE;
+        } catch (SecurityException e) {
             e.printStackTrace();
-            if (e instanceof SecurityException) {
-                Log.d(TAG, e.getMessage());
-                mileage = -1;
-            }
+            Log.d(TAG, e.getMessage());
+            response.status = Response.Status.PERMISSION_DENIED;
+        } catch (RuntimeException | RemoteException e) {
+            e.printStackTrace();
+            response.status = Response.Status.SERVICE_COMMUNICATION_FAILURE;
         }
-        return mileage;
+        return response;
     }
 
-    /**
-     * This method is to add the listener to get Vehicle Turn Signal State value.
-     * @param turnSignalListener TurnSignalListener object from client/app.
-     * if client doesn't have permission to access the turn signal indicator value, it doesn't add this listener
-     */
+    @Override
     @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_TURN_SIGNAL_INDICATOR)
-    public void registerTurnSignalListener(TurnSignalListener turnSignalListener) {
+    public Response.Status registerTurnSignalListener(TurnSignalListener turnSignalListener) {
         // Add this client to listeners only if it has permission to access the turn signal indicator value by calling getTurnSignalIndicator
-        if (getTurnSignalIndicator() != VehicleSignalIndicator.PERMISSION_DENIED) {
+        Response.Status status = getTurnSignalIndicator().status;
+        if (status == Response.Status.SUCCESS) {
             mTurnSignalListener.add(turnSignalListener);
         }
+        return status;
     }
 
-    /**
-     * This method is to remove the listener.
-     */
-    public void unregisterTurnSignalListener(TurnSignalListener turnSignalListener) {
+    @Override
+    public Response.Status unregisterTurnSignalListener(TurnSignalListener turnSignalListener) {
         mTurnSignalListener.remove(turnSignalListener);
         removeCarDataListener();
+        return Response.Status.SUCCESS;
     }
 
-    /**
-     * This method gets the current turn signal indicator value from PartnerEnablerService
-     * @return VehicleSignalIndicator - return current signal indicator value(PermissionDenied/None/Right/Left).
-     *
-     */
+    @Override
     @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_TURN_SIGNAL_INDICATOR)
-    public VehicleSignalIndicator getTurnSignalIndicator() {
-        VehicleSignalIndicator indicator = VehicleSignalIndicator.NONE;
+    public Response<VehicleSignalIndicator> getTurnSignalIndicator() {
+        Response<VehicleSignalIndicator> response = new Response<>(Response.Status.VALUE_NOT_AVAILABLE, VehicleSignalIndicator.NONE);
         try {
-            int retVal = mService.getTurnSignalIndicator();
-            indicator = convertTurnSignalIndicator(retVal);
-        } catch (RemoteException e) {
+            response.value = convertTurnSignalIndicator(mService.getTurnSignalIndicator());
+            response.status = Response.Status.SUCCESS;
+        } catch (IllegalStateException e) {
             e.printStackTrace();
-        } catch (RuntimeException e) {
+            response.status = Response.Status.INTERNAL_FAILURE;
+        } catch (SecurityException e) {
             e.printStackTrace();
-            if (e instanceof SecurityException) {
-                Log.d(TAG, e.getMessage());
-                indicator = VehicleSignalIndicator.PERMISSION_DENIED;
-            }
+            Log.d(TAG, e.getMessage());
+            response.status = Response.Status.PERMISSION_DENIED;
+        } catch (RuntimeException | RemoteException e) {
+            e.printStackTrace();
+            response.status = Response.Status.SERVICE_COMMUNICATION_FAILURE;
         }
-        return indicator;
+        return response;
     }
 
-    /**
-     * This method is to add the listener to get Fog Lights State value.
-     * @param lightStateListener FogLightStateListener object from client/app.
-     * if client doesn't have permission to access the fog light state value, it doesn't add this listener
-     */
+    @Override
     @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_FOG_LIGHTS)
-    public void registerFogLightStateListener(FogLightStateListener lightStateListener) {
+    public Response.Status registerFogLightStateListener(FogLightStateListener lightStateListener) {
+        Response.Status status = getFogLightsState().status;
         // Add this client to listeners only if it has permission to access the fog light state value by calling getFogLightState
-        if (getFogLightsState() != VehicleLightState.PERMISSION_DENIED) {
+        if (status == Response.Status.SUCCESS) {
             mFogLightStateListener.add(lightStateListener);
         }
+        return status;
     }
 
-    /**
-     * This method is to remove the listener.
-     */
-    public void unregisterFogLightStateListener(FogLightStateListener lightStateListener) {
+    @Override
+    public Response.Status unregisterFogLightStateListener(FogLightStateListener lightStateListener) {
         mFogLightStateListener.remove(lightStateListener);
         removeCarDataListener();
+        return Response.Status.SUCCESS;
     }
 
-    /**
-     * This method gets the current fog lights state from PartnerEnablerService
-     * @return VehicleLightState - return current fog light state value(PermissionDenied/Off/On/DayTimeRunning).
-     */
+    @Override
     @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_FOG_LIGHTS)
-    public VehicleLightState getFogLightsState() {
-        VehicleLightState lightState = VehicleLightState.OFF;
+    public Response<VehicleLightState> getFogLightsState() {
+        Response<VehicleLightState> response = new Response<>(Response.Status.VALUE_NOT_AVAILABLE, VehicleLightState.OFF);
         try {
-            int retVal = mService.getFogLightsState();
-            lightState = convertToVehicleLightState(retVal);
-        } catch (RemoteException e) {
+            response.value = convertToVehicleLightState(mService.getFogLightsState());
+            response.status = Response.Status.SUCCESS;
+        } catch (IllegalStateException e) {
             e.printStackTrace();
-        } catch (RuntimeException e) {
+            response.status = Response.Status.INTERNAL_FAILURE;
+        } catch (SecurityException e) {
             e.printStackTrace();
-            if (e instanceof SecurityException) {
-                Log.d(TAG, e.getMessage());
-                lightState = VehicleLightState.PERMISSION_DENIED;
-            }
+            Log.d(TAG, e.getMessage());
+            response.status = Response.Status.PERMISSION_DENIED;
+        } catch (RuntimeException | RemoteException e) {
+            e.printStackTrace();
+            response.status = Response.Status.SERVICE_COMMUNICATION_FAILURE;
         }
-        return lightState;
+        return response;
     }
 
-    /**
-     * This method is to add the listener to get steering angle value.
-     * @param steeringAngleListener SteeringAngleListener object from client/app.
-     * if client doesn't have permission to access the fog light state value, it doesn't add this listener
-     */
+    @Override
     @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_STEERING_ANGLE_INFO)
-    public void registerSteeringAngleListener(SteeringAngleListener steeringAngleListener) {
+    public Response.Status registerSteeringAngleListener(SteeringAngleListener steeringAngleListener) {
+        Response.Status status = getSteeringAngle().status;
         // Add this client to listeners only if it has permission to access the steering angle value by calling getSteeringAngle
-        if (getSteeringAngle() != -1) {
+        if (status == Response.Status.SUCCESS) {
             mSteeringAngleListener.add(steeringAngleListener);
         }
+        return status;
     }
-
-    /**
-     * This method is to remove the listener.
-     */
-    public void unregisterSteeringAngleListener(SteeringAngleListener steeringAngleListener) {
+    @Override
+    public Response.Status unregisterSteeringAngleListener(SteeringAngleListener steeringAngleListener) {
         mSteeringAngleListener.remove(steeringAngleListener);
         removeCarDataListener();
+        return Response.Status.SUCCESS;
     }
 
-    /**
-     * This method returns the Car steering angle in degrees. positive - right; negative - left.
-     *  @return float - return current steering angle value in degrees.
-     * -1 - if permission to access the steering angle api is denied
-     * positive value - right
-     * negative value - left
-     */
+    @Override
     @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_STEERING_ANGLE_INFO)
-    public float getSteeringAngle() {
-        float steeringAngle = 0;
+    public Response<Float> getSteeringAngle() {
+        Response<Float> response = new Response<>(Response.Status.VALUE_NOT_AVAILABLE, 0.0f);
         try {
-            steeringAngle = mService.getSteeringAngle(); // TODO: Do we need to return some value if there is a permission failure or just throwing security exception is good enough
-        } catch (RemoteException e) {
+            response.value = mService.getSteeringAngle();
+            response.status = Response.Status.SUCCESS;
+        } catch (IllegalStateException e) {
             e.printStackTrace();
-        } catch (RuntimeException e) {
+            response.status = Response.Status.INTERNAL_FAILURE;
+        } catch (SecurityException e) {
             e.printStackTrace();
-            if (e instanceof SecurityException) {
-                Log.d(TAG, e.getMessage());
-                steeringAngle = -1;
-            }
+            Log.d(TAG, e.getMessage());
+            response.status = Response.Status.PERMISSION_DENIED;
+        } catch (RuntimeException | RemoteException e) {
+            e.printStackTrace();
+            response.status = Response.Status.SERVICE_COMMUNICATION_FAILURE;
         }
-        return steeringAngle;
+        return response;
     }
 
-    /**
-     * This method returns the Car VIN Number.
-     *  @return int - return car VIN no
-     *  -1 - if permission to access the vin no . else return valid vin no,
-     */
+    @Override
     @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_CAR_INFO_VIN)
-    public String getVehicleIdentityNumber() {
-        String vinNo = null;
+    public Response<String> getVehicleIdentityNumber() {
+        Response<String> response = new Response<>(Response.Status.VALUE_NOT_AVAILABLE, null);
         try {
-            vinNo = mService.getVehicleIdentityNumber();
-        } catch (RemoteException e) {
+            response.value = mService.getVehicleIdentityNumber();
+            response.status = Response.Status.SUCCESS;
+        } catch (IllegalStateException e) {
             e.printStackTrace();
-        } catch (RuntimeException e) {
+            response.status = Response.Status.INTERNAL_FAILURE;
+        } catch (SecurityException e) {
             e.printStackTrace();
-            if (e instanceof SecurityException) {
-                Log.d(TAG, e.getMessage());
-                Integer ret = -1;
-                vinNo = ret.toString();
-            }
+            Log.d(TAG, e.getMessage());
+            response.status = Response.Status.PERMISSION_DENIED;
+        } catch (RuntimeException | RemoteException e) {
+            e.printStackTrace();
+            response.status = Response.Status.SERVICE_COMMUNICATION_FAILURE;
         }
-        Log.d(TAG,"VinNo: " + Integer.parseInt(vinNo));
-        return vinNo;
+        Log.d(TAG,"VinNo: " + response.value);
+        return response;
     }
 
     private VehicleLightState convertToVehicleLightState(int lightState) {

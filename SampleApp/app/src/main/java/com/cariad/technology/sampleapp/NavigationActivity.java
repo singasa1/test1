@@ -15,6 +15,7 @@ import com.volkswagenag.partnerlibrary.PartnerLibrary;
 import com.volkswagenag.partnerlibrary.NavigationManager;
 import com.volkswagenag.partnerlibrary.ActiveRouteUpdateListener;
 import com.volkswagenag.partnerlibrary.NavStateListener;
+import com.volkswagenag.partnerlibrary.Response;
 
 public class NavigationActivity extends AppCompatActivity implements ActiveRouteUpdateListener, NavStateListener, AdapterView.OnItemSelectedListener {
 
@@ -45,9 +46,22 @@ public class NavigationActivity extends AppCompatActivity implements ActiveRoute
     @Override
     public void onResume() {
         super.onResume();
-        mNavigationManager = PartnerLibrary.getInstance(this).getNavigationManager();
-        mNavigationManager.registerActiveRouteUpdateListener(NavigationActivity.this);
-        mNavigationManager.registerNavStateListener(NavigationActivity.this);
+        Response<NavigationManager> navigationManagerResponse = PartnerLibrary.getInstance(this).getNavigationManager();
+        if (navigationManagerResponse.status != Response.Status.SUCCESS) {
+            logAndShowError("Error obtaining NavigationManager from PartnerLibrary: ", navigationManagerResponse.status);
+            return;
+        }
+        mNavigationManager = navigationManagerResponse.value;
+
+        Response.Status status = mNavigationManager.registerActiveRouteUpdateListener(NavigationActivity.this);
+        if (status != Response.Status.SUCCESS) {
+            logAndShowError("registerActiveRouteUpdateListener failed with ", status);
+        }
+
+        status =  mNavigationManager.registerNavStateListener(NavigationActivity.this);
+        if (status != Response.Status.SUCCESS) {
+            logAndShowError("registerNavStateListener failed with ", status);
+        }
     }
 
     private void initializeViews() {
@@ -71,10 +85,20 @@ public class NavigationActivity extends AppCompatActivity implements ActiveRoute
         try {
             switch (position) {
                 case 0:
-                    mResultTextView.setText("Navigation Application State: " + mNavigationManager.isNavStarted());
+                    Response<Boolean> booleanResponse = mNavigationManager.isNavStarted();
+                    if (booleanResponse.status == Response.Status.SUCCESS) {
+                        mResultTextView.setText("Navigation Application State: " + booleanResponse.value);
+                    } else {
+                        logAndShowError("isNavStarted call failed with: ", booleanResponse.status);
+                    }
                     break;
                 case 1:
-                    mResultTextView.setText("Current Route: " + mNavigationManager.getActiveRoute());
+                    Response<String> stringResponse = mNavigationManager.getActiveRoute();
+                    if (stringResponse.status == Response.Status.SUCCESS) {
+                        mResultTextView.setText("Current Route: " + stringResponse.value);
+                    } else {
+                        logAndShowError("getActiveRoute call failed with: ", stringResponse.status);
+                    }
                     break;
                 default:
                     Toast.makeText(NavigationActivity.this, "Cannot process, please select again", Toast.LENGTH_LONG).show();
@@ -108,5 +132,10 @@ public class NavigationActivity extends AppCompatActivity implements ActiveRoute
                 mTextViewListenerUpdateNavStarted.setText("Navigation app started: " + status);
             }
         }));
+    }
+
+    private void logAndShowError(String message, Response.Status status) {
+            Log.e(TAG, message + status.toString());
+            Toast.makeText(NavigationActivity.this, message + status.toString(), Toast.LENGTH_LONG).show();
     }
 }

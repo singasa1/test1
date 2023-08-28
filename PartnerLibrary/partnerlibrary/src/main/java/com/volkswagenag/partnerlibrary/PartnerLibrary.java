@@ -84,23 +84,31 @@ public interface PartnerLibrary {
     }
     /**
      * This method binds to the PartnerEnabler service.
+     *
+     * @return {@link Response.Status}
      */
-    void initialize();
+    Response.Status initialize();
 
     /**
      * This method unbinds the PartnerEnabler service
+     *
+     * @return {@link Response.Status}
      */
-    void release();
+    Response.Status release();
 
     /**
      * This method initializes the PartnerEnabler service components
+     *
+     * @return {@link Response.Status}
      */
-    void start();
+    Response.Status start();
 
     /**
      * This method uninitializes the PartnerEnabler service components
+     *
+     * @return {@link Response.Status}
      */
-    void stop();
+    Response.Status stop();
 
     /**
      * This method is to add the listener to get PartnerEnablerServiceConnection status.
@@ -117,12 +125,12 @@ public interface PartnerLibrary {
      * Get {@link CarDataManager} instance to get car related data/information
      * @return {@link CarDataManager}
      */
-    CarDataManager getCarDataManager();
+    Response<CarDataManager> getCarDataManager();
 
     /**
      * Get {@link NavigationManager} instance to get current route
      * @return {@link NavigationManager}
      */
-    NavigationManager getNavigationManager();
+    Response<NavigationManager> getNavigationManager();
 
 }

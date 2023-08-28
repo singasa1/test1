@@ -6,6 +6,7 @@ import android.util.Log;
 import com.volkswagenag.partnerlibrary.ActiveRouteUpdateListener;
 import com.volkswagenag.partnerlibrary.NavStateListener;
 import com.volkswagenag.partnerlibrary.NavigationManager;
+import com.volkswagenag.partnerlibrary.Response;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -44,17 +45,10 @@ public class NavigationManagerDemoModeImpl implements NavigationManager {
     private List<Boolean> mIsNavStartedList;
     private List<String> mActiveRoutesList;
 
-    public NavigationManagerDemoModeImpl(Context context) {
+    public NavigationManagerDemoModeImpl(Context context) throws JSONException, IOException {
         mContext = context;
         mSchedulerService = Executors.newScheduledThreadPool(1);
-
-        try {
-            initializeCache();
-        } catch (JSONException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        initializeCache();
         logCache();
     }
 
@@ -76,33 +70,40 @@ public class NavigationManagerDemoModeImpl implements NavigationManager {
     }
 
     @Override
-    public void registerNavStateListener(NavStateListener listener) {
+    public Response.Status registerNavStateListener(NavStateListener listener) {
         mNavigationStateListeners.add(listener);
+        return Response.Status.SUCCESS;
     }
 
     @Override
-    public void unregisterNavStateListener(NavStateListener listener) {
+    public Response.Status unregisterNavStateListener(NavStateListener listener) {
         mNavigationStateListeners.remove(listener);
+        return Response.Status.SUCCESS;
     }
 
     @Override
-    public boolean isNavStarted() {
-        return mIsNavStartedList.get(mIndex.get() % mIsNavStartedList.size());
+    public Response<Boolean> isNavStarted() {
+        return new Response<>(
+                Response.Status.SUCCESS,
+                new Boolean(mIsNavStartedList.get(mIndex.get() % mIsNavStartedList.size())));
     }
 
     @Override
-    public void registerActiveRouteUpdateListener(ActiveRouteUpdateListener activeRouteUpdateListener) {
+    public Response.Status registerActiveRouteUpdateListener(ActiveRouteUpdateListener activeRouteUpdateListener) {
         mActiveRouteUpdateListeners.add(activeRouteUpdateListener);
+        return Response.Status.SUCCESS;
     }
 
     @Override
-    public void unregisterActiveRouteUpdateListener(ActiveRouteUpdateListener activeRouteUpdateListener) {
+    public Response.Status unregisterActiveRouteUpdateListener(ActiveRouteUpdateListener activeRouteUpdateListener) {
         mActiveRouteUpdateListeners.remove(activeRouteUpdateListener);
+        return Response.Status.SUCCESS;
     }
 
     @Override
-    public String getActiveRoute() {
-        return mActiveRoutesList.get(mIndex.get() % mActiveRoutesList.size());
+    public Response<String> getActiveRoute() {
+        return new Response<>(Response.Status.SUCCESS,
+                mActiveRoutesList.get(mIndex.get() % mActiveRoutesList.size()));
     }
 
     private void updateIndexAndUpdateListenersIfNeeded() {

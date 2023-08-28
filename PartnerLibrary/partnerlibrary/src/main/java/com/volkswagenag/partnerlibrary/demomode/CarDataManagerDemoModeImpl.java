@@ -6,6 +6,7 @@ import android.util.Log;
 import com.volkswagenag.partnerlibrary.CarDataManager;
 import com.volkswagenag.partnerlibrary.FogLightStateListener;
 import com.volkswagenag.partnerlibrary.MileageListener;
+import com.volkswagenag.partnerlibrary.Response;
 import com.volkswagenag.partnerlibrary.SteeringAngleListener;
 import com.volkswagenag.partnerlibrary.TurnSignalListener;
 import com.volkswagenag.partnerlibrary.VehicleLightState;
@@ -55,17 +56,10 @@ public class CarDataManagerDemoModeImpl implements CarDataManager {
     private List<Integer> mSteeringAngleList;
     private String mVehicleIdentityNumber;
 
-    public CarDataManagerDemoModeImpl(Context context) {
+    public CarDataManagerDemoModeImpl(Context context) throws JSONException, IOException{
         mContext = context;
         mSchedulerService = Executors.newScheduledThreadPool(1);
-
-        try {
-            initializeCache();
-        } catch (JSONException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        initializeCache();
         logCache();
     }
 
@@ -87,68 +81,79 @@ public class CarDataManagerDemoModeImpl implements CarDataManager {
     }
 
     @Override
-    public void registerMileageListener(MileageListener mileageListener) {
+    public Response.Status registerMileageListener(MileageListener mileageListener) {
         mMileageListeners.add(mileageListener);
+        return Response.Status.SUCCESS;
     }
 
     @Override
-    public void unregisterMileageListener(MileageListener mileageListener) {
+    public Response.Status unregisterMileageListener(MileageListener mileageListener) {
         mMileageListeners.remove(mileageListener);
+        return Response.Status.SUCCESS;
     }
 
     @Override
-    public float getCurrentMileage() {
-        return mMileageList.get(mIndex.get() % mMileageList.size());
+    public Response<Float> getCurrentMileage() {
+        return new Response<>(Response.Status.SUCCESS, mMileageList.get(mIndex.get() % mMileageList.size()).floatValue());
     }
 
     @Override
-    public void registerTurnSignalListener(TurnSignalListener turnSignalListener) {
+    public Response.Status registerTurnSignalListener(TurnSignalListener turnSignalListener) {
         mTurnSignalListener.add(turnSignalListener);
+        return Response.Status.SUCCESS;
     }
 
     @Override
-    public void unregisterTurnSignalListener(TurnSignalListener turnSignalListener) {
+    public Response.Status unregisterTurnSignalListener(TurnSignalListener turnSignalListener) {
         mTurnSignalListener.remove(turnSignalListener);
+        return Response.Status.SUCCESS;
     }
 
     @Override
-    public VehicleSignalIndicator getTurnSignalIndicator() {
-        return mTurnSignalIndicatorList.get(mIndex.get() % mTurnSignalIndicatorList.size());
+    public Response<VehicleSignalIndicator> getTurnSignalIndicator() {
+        return new Response<>(Response.Status.SUCCESS,
+                mTurnSignalIndicatorList.get(mIndex.get() % mTurnSignalIndicatorList.size()));
     }
 
     @Override
-    public void registerFogLightStateListener(FogLightStateListener lightStateListener) {
+    public Response.Status registerFogLightStateListener(FogLightStateListener lightStateListener) {
         mFogLightStateListener.add(lightStateListener);
+        return Response.Status.SUCCESS;
     }
 
     @Override
-    public void unregisterFogLightStateListener(FogLightStateListener lightStateListener) {
+    public Response.Status unregisterFogLightStateListener(FogLightStateListener lightStateListener) {
         mFogLightStateListener.remove(lightStateListener);
+        return Response.Status.SUCCESS;
     }
 
     @Override
-    public VehicleLightState getFogLightsState() {
-        return mFogLightsStateList.get(mIndex.get() % mFogLightsStateList.size());
+    public Response<VehicleLightState> getFogLightsState() {
+        return new Response<>(Response.Status.SUCCESS,
+                mFogLightsStateList.get(mIndex.get() % mFogLightsStateList.size()));
     }
 
     @Override
-    public void registerSteeringAngleListener(SteeringAngleListener steeringAngleListener) {
+    public Response.Status registerSteeringAngleListener(SteeringAngleListener steeringAngleListener) {
         mSteeringAngleListener.add(steeringAngleListener);
+        return Response.Status.SUCCESS;
     }
 
     @Override
-    public void unregisterSteeringAngleListener(SteeringAngleListener steeringAngleListener) {
+    public Response.Status unregisterSteeringAngleListener(SteeringAngleListener steeringAngleListener) {
         mSteeringAngleListener.remove(steeringAngleListener);
+        return Response.Status.SUCCESS;
     }
 
     @Override
-    public float getSteeringAngle() {
-        return mSteeringAngleList.get(mIndex.get() % mSteeringAngleList.size());
+    public Response<Float> getSteeringAngle() {
+        return new Response<>(Response.Status.SUCCESS,
+                mSteeringAngleList.get(mIndex.get() % mSteeringAngleList.size()).floatValue());
     }
 
     @Override
-    public String getVehicleIdentityNumber() {
-        return mVehicleIdentityNumber;
+    public Response<String> getVehicleIdentityNumber() {
+        return new Response<>(Response.Status.SUCCESS, mVehicleIdentityNumber);
     }
 
     /**

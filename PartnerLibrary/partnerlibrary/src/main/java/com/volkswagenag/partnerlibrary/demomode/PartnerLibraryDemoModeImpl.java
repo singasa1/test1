@@ -8,10 +8,14 @@ import com.volkswagenag.partnerlibrary.CarDataManager;
 import com.volkswagenag.partnerlibrary.NavigationManager;
 import com.volkswagenag.partnerlibrary.PartnerLibrary;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.volkswagenag.partnerlibrary.ILibStateChangeListener;
+import com.volkswagenag.partnerlibrary.Response;
+
+import org.json.JSONException;
 
 
 public class PartnerLibraryDemoModeImpl implements PartnerLibrary {
@@ -36,10 +40,14 @@ public class PartnerLibraryDemoModeImpl implements PartnerLibrary {
     }
 
     @Override
-    public void initialize() {
+    public Response.Status initialize() {
         Log.d(TAG, "initialize");
-        mCarDataManagerDemoMode = new CarDataManagerDemoModeImpl(mContext);
-        mNavigationManagerDemoMode = new NavigationManagerDemoModeImpl(mContext);
+        try {
+            mCarDataManagerDemoMode = new CarDataManagerDemoModeImpl(mContext);
+            mNavigationManagerDemoMode = new NavigationManagerDemoModeImpl(mContext);
+        } catch (JSONException | IOException e) {
+            return Response.Status.INITIALIZATION_FAILURE;
+        }
 
         if (!mClientListeners.isEmpty()) {
             for (ILibStateChangeListener listener : mClientListeners) {
@@ -50,10 +58,11 @@ public class PartnerLibraryDemoModeImpl implements PartnerLibrary {
                 }
             }
         }
+        return Response.Status.SUCCESS;
     }
 
     @Override
-    public void release() {
+    public Response.Status release() {
         Log.d(TAG, "release");
 
         if (!mClientListeners.isEmpty()) {
@@ -65,20 +74,24 @@ public class PartnerLibraryDemoModeImpl implements PartnerLibrary {
                 }
             }
         }
+        return Response.Status.SUCCESS;
     }
 
     @Override
-    public void start() {
+    public Response.Status start() {
         Log.d(TAG, "start");
         mCarDataManagerDemoMode.startScheduler();
         mNavigationManagerDemoMode.startScheduler();
+        return Response.Status.SUCCESS;
     }
 
     @Override
-    public void stop() {
+    public Response.Status stop() {
         Log.d(TAG, "stop");
         mCarDataManagerDemoMode.stopScheduler();
         mNavigationManagerDemoMode.stopScheduler();
+        return Response.Status.SUCCESS;
+
     }
 
     @Override
@@ -95,13 +108,14 @@ public class PartnerLibraryDemoModeImpl implements PartnerLibrary {
     }
 
     @Override
-    public CarDataManager getCarDataManager() {
+    public Response<CarDataManager> getCarDataManager() {
         Log.d(TAG, "getCarDataManager");
-        return mCarDataManagerDemoMode;
-    }
+        return new Response<>(Response.Status.SUCCESS, mCarDataManagerDemoMode);
+   }
 
     @Override
-    public NavigationManager getNavigationManager() {
-        return mNavigationManagerDemoMode;
+    public Response<NavigationManager> getNavigationManager() {
+        Log.d(TAG, "getNavigationManager");
+        return new Response<>(Response.Status.SUCCESS, mNavigationManagerDemoMode);
     }
 }

@@ -33,84 +33,100 @@ public interface CarDataManager {
      * This method is to add the listener to get Odometer/Mileage value.
      * @param mileageListerer MileageListener object from client/app.
      * if client doesn't have permission to access odometer value, it doesn't add this listener
+     *
+     * @return {@link Response.Status}
      */
-    void registerMileageListener(MileageListener mileageListener);
+    Response.Status registerMileageListener(MileageListener mileageListener);
 
     /**
      * This method is to remove the listener.
+     *
+     * @return {@link Response.Status}
      */
-    void unregisterMileageListener(MileageListener mileageListener);
+    Response.Status unregisterMileageListener(MileageListener mileageListener);
 
     /**
      * This method gets the Car current Odometer value from PartnerEnablerService
-     * @return float - return current odometer value in Kilometer
-     * -1 - if permission to access the odometer api is denied
-     *  0 - if there is no odometer value/vhal property available.
+     *
+     * @return {@link Response<Float>} - with value corresponding to current odometer value in Kilometer.
      */
-    float getCurrentMileage();
+    Response<Float> getCurrentMileage();
 
     /**
      * This method is to add the listener to get Vehicle Turn Signal State value.
      * @param turnSignalListener TurnSignalListener object from client/app.
      * if client doesn't have permission to access the turn signal indicator value, it doesn't add this listener
+     *
+     * @return {@link Response.Status}
      */
-    void registerTurnSignalListener(TurnSignalListener turnSignalListener);
+    Response.Status registerTurnSignalListener(TurnSignalListener turnSignalListener);
 
     /**
      * This method is to remove the listener.
+     *
+     * @return {@link Response.Status}
      */
-    void unregisterTurnSignalListener(TurnSignalListener turnSignalListener);
+    Response.Status unregisterTurnSignalListener(TurnSignalListener turnSignalListener);
 
     /**
      * This method gets the current turn signal indicator value from PartnerEnablerService
-     * @return VehicleSignalIndicator - return current signal indicator value(PermissionDenied/None/Right/Left).
+     * @return {@link Response<VehicleSignalIndicator>} with value corresponding to current signal indicator value.
      *
      */
-    VehicleSignalIndicator getTurnSignalIndicator();
+    Response<VehicleSignalIndicator> getTurnSignalIndicator();
 
     /**
      * This method is to add the listener to get Fog Lights State value.
      * @param lightStateListener FogLightStateListener object from client/app.
      * if client doesn't have permission to access the fog light state value, it doesn't add this listener
+     *
+     * @return {@link Response.Status}
      */
-    void registerFogLightStateListener(FogLightStateListener lightStateListener);
+    Response.Status registerFogLightStateListener(FogLightStateListener lightStateListener);
 
     /**
      * This method is to remove the listener.
+     *
+     * @return {@link Response.Status}
      */
-    void unregisterFogLightStateListener(FogLightStateListener lightStateListener);
+    Response.Status unregisterFogLightStateListener(FogLightStateListener lightStateListener);
 
     /**
      * This method gets the current fog lights state from PartnerEnablerService
-     * @return VehicleLightState - return current fog light state value(PermissionDenied/Off/On/DayTimeRunning).
+     *
+     * @return {@link Response<VehicleLightState>} - with value corresponding to current fog light state value.
      */
-    VehicleLightState getFogLightsState();
+    Response<VehicleLightState> getFogLightsState();
 
     /**
      * This method is to add the listener to get steering angle value.
      * @param steeringAngleListener SteeringAngleListener object from client/app.
-     * if client doesn't have permission to access the fog light state value, it doesn't add this listener
+     * if client doesn't have permission to access the fog light state value, it doesn't add this listener.
+     *
+     * @return {@link Response.Status}
      */
-    void registerSteeringAngleListener(SteeringAngleListener steeringAngleListener);
+    Response.Status registerSteeringAngleListener(SteeringAngleListener steeringAngleListener);
 
     /**
      * This method is to remove the listener.
+     *
+     * @return {@link Response.Status}
      */
-    void unregisterSteeringAngleListener(SteeringAngleListener steeringAngleListener);
+    Response.Status unregisterSteeringAngleListener(SteeringAngleListener steeringAngleListener);
 
     /**
      * This method returns the Car steering angle in degrees. positive - right; negative - left.
-     *  @return float - return current steering angle value in degrees.
-     * -1 - if permission to access the steering angle api is denied
+     *
+     * @return {@link Response<Float>} - with value corresponding to current steering angle value in degrees.
      * positive value - right
      * negative value - left
      */
-    float getSteeringAngle();
+    Response<Float> getSteeringAngle();
 
     /**
      * This method returns the Car VIN Number.
-     *  @return int - return car VIN no
-     *  -1 - if permission to access the vin no . else return valid vin no,
+     *
+     *  @return {@link Response<String>} - with value corresponding to car VIN no
      */
-    String getVehicleIdentityNumber();
+    Response<String> getVehicleIdentityNumber();
 }

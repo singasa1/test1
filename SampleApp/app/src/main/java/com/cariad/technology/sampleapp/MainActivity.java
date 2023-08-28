@@ -16,9 +16,8 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.volkswagenag.partnerlibrary.MileageListener;
 import com.volkswagenag.partnerlibrary.PartnerLibrary;
-import com.volkswagenag.partnerlibrary.CarDataManager;
+import com.volkswagenag.partnerlibrary.Response;
 import com.volkswagenag.partnerlibrary.ILibStateChangeListener;
 
 public class MainActivity extends AppCompatActivity {
@@ -50,7 +49,11 @@ public class MainActivity extends AppCompatActivity {
                     mCarDataButton.setVisibility(View.VISIBLE);
                     mNavigationButton.setVisibility(View.VISIBLE);
 
-                    mPartnerLibrary.start();
+                    Response.Status status = mPartnerLibrary.start();
+                    if (status != Response.Status.SUCCESS) {
+                        Log.e(TAG, "Failure in starting the service " + status.toString());
+                        showToast("Failure in starting the service: " + status.toString());
+                    }
                 } catch (Exception e) {
                     mCarDataButton.setVisibility(View.INVISIBLE);
                     mNavigationButton.setVisibility(View.INVISIBLE);
@@ -60,7 +63,11 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 mCarDataButton.setVisibility(View.INVISIBLE);
                 mNavigationButton.setVisibility(View.INVISIBLE);
-                mPartnerLibrary.stop();
+                Response.Status status = mPartnerLibrary.stop();
+                if (status != Response.Status.SUCCESS) {
+                    Log.e(TAG, "Failure in stopping the service " + status.toString());
+                    showToast("Failure in stopping the service: " + status.toString());
+                }
                 mServiceStatusTextView.setText(R.string.service_state_error);
             }
         }
@@ -120,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
                     Log.d(TAG, "Going to CarData Activity");
                     goTo(CarDataActivity.class);
                 } else {
-                    Toast.makeText(MainActivity.this, "Start and Connect to Service to use CarData", Toast.LENGTH_LONG).show();
+                    showToast("Start and Connect to Service to use CarData");
                 }
 
             }
@@ -133,7 +140,7 @@ public class MainActivity extends AppCompatActivity {
                     Log.d(TAG, "Going to Navigation Activity");
                     goTo(NavigationActivity.class);
                 } else {
-                    Toast.makeText(MainActivity.this, "Start and Connect to Service to use Navigation", Toast.LENGTH_LONG).show();
+                    showToast("Start and Connect to Service to use Navigation");
                 }
             }
         });
@@ -147,27 +154,30 @@ public class MainActivity extends AppCompatActivity {
     private void initializePartnerLibrary() {
         Log.d(TAG, "initialize");
         mPartnerLibrary.addListener(mLibStateChangeListener);
-//        if (mLibHandle.isPartnerEnablerServiceReady()) {
-//        Log.d(TAG,"PartnerenablerService is installed");
-        mPartnerLibrary.initialize();
-//        } else {
-//            Log.d(TAG,"PartnerenablerService is not installed, either we can continue without PES for now or ask library to show popup to install the latest version of PES");
-//            btn.setVisibility(View.INVISIBLE);
-//            mLibHandle.requestUserToInstallDependency();
-//        }
-
+        if (mPartnerLibrary.initialize() != Response.Status.SUCCESS) {
+            Log.e(TAG, "Failure in service initialization");
+            showToast("Failure in service initialization!");
+        }
     }
 
     private void deinitializePartnerLibrary() {
         if (mPartnerLibrary != null) {
             try {
                 mIsServiceConnected = false;
-                mPartnerLibrary.stop();
+                Response.Status status = mPartnerLibrary.stop();
+                if (status != Response.Status.SUCCESS) {
+                    Log.e(TAG, "Failure in stopping the service " + status.toString());
+                    showToast("Failure in stopping the service: " + status.toString());
+                }
                 mPartnerLibrary.release();
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         }
+    }
+
+    private void showToast(String message) {
+        Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
     }
 
     @Override

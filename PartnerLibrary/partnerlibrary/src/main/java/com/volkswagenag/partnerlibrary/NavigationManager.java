@@ -32,31 +32,31 @@ public interface NavigationManager {
      * This method is to add the listener to get Navigation Core App status.
      * @param listener NavStateListener object from client/app.
      */
-    void registerNavStateListener(NavStateListener listener );
+    Response.Status registerNavStateListener(NavStateListener listener );
 
     /**
      * This method is to remove the navigation state listener.
      */
-    void unregisterNavStateListener(NavStateListener listener);
+    Response.Status unregisterNavStateListener(NavStateListener listener);
 
     /**
      * This method is to get the Navigation Application state.
      * @return Returns true - if Navigation Application state is fully operable.
      *         Returns false - if Navigation Application state is Loading, NavDB Error, NoLicense, etc,.
      */
-    boolean isNavStarted();
+    Response<Boolean> isNavStarted();
 
     /**
      * This method is to add the listener to get the active guided route from Navigation App.
      * @param activeRouteUpdateListener ActiveRouteUpdateListener object from client/app.
      */
-    void registerActiveRouteUpdateListener(ActiveRouteUpdateListener activeRouteUpdateListener);
+    Response.Status registerActiveRouteUpdateListener(ActiveRouteUpdateListener activeRouteUpdateListener);
 
     /**
      * This method is to remove the callback that is registered to get the active route from Navigation App.
      * @param activeRouteUpdateListener ActiveRouteUpdateListener object from client/app.
      */
-    void unregisterActiveRouteUpdateListener(ActiveRouteUpdateListener activeRouteUpdateListener);
+    Response.Status unregisterActiveRouteUpdateListener(ActiveRouteUpdateListener activeRouteUpdateListener);
 
     /**
      * This method is to get the route guidance of the current active route from Navigation Application.
@@ -64,5 +64,5 @@ public interface NavigationManager {
      *         Returns a JSON string with the current route encoded using flexible polyline encoding.
      *         ex: {"version": 1, "route": "<route encoded as polyline>"}
      */
-    String getActiveRoute();
+    Response<String> getActiveRoute();
 }

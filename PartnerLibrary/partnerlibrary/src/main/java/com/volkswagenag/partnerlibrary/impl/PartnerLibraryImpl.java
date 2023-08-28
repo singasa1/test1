@@ -26,14 +26,13 @@ import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
 
-import androidx.annotation.NonNull;
-
 import com.volkswagenag.partnerlibrary.CarDataManager;
 import com.volkswagenag.partnerlibrary.NavigationManager;
 import com.volkswagenag.partnerlibrary.PartnerLibrary;
 
 import technology.cariad.partnerenablerservice.IPartnerEnabler;
 import com.volkswagenag.partnerlibrary.ILibStateChangeListener;
+import com.volkswagenag.partnerlibrary.Response;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -117,89 +116,104 @@ public class PartnerLibraryImpl implements PartnerLibrary {
         mContext = context;
     }
 
-    /**
-     * This method binds to the PartnerEnabler service.
-     */
-    public void initialize() {
+    @Override
+    public Response.Status initialize() {
         Log.d(TAG,"initialize required services");
         // bind to the enabler service.
-        initService();
+        return initService() ? Response.Status.SUCCESS : Response.Status.SERVICE_CONNECTION_FAILURE;
     }
 
-    /**
-     * This method unbinds the PartnerEnabler service
-     */
-    public void release() {
+    @Override
+    public Response.Status release() {
         Log.d(TAG,"release");
         // unbind service
         releaseService();
-
+        return Response.Status.SUCCESS;
     }
 
-    /**
-     * This method initializes the PartnerEnabler service components
-     */
-    public void start() {
+    @Override
+    public Response.Status start() {
         Log.d(TAG,"start");
+        Response.Status ret = Response.Status.SUCCESS;
         if (mIsPartnerEnablerServiceConnected) {
             try {
                 mService.initialize();
+            } catch (SecurityException e) {
+                ret = Response.Status.PERMISSION_DENIED;
+                e.printStackTrace();
             } catch (RemoteException e) {
+                ret = Response.Status.SERVICE_COMMUNICATION_FAILURE;
                 e.printStackTrace();
             }
         }
+        return ret;
     }
 
-    /**
-     * This method uninitializes the PartnerEnabler service components
-     */
-    public void stop() {
+    @Override
+    public Response.Status stop() {
         Log.d(TAG,"stop");
+        Response.Status ret = Response.Status.SUCCESS;
         if (mIsPartnerEnablerServiceConnected) {
             try {
                 mService.release();
+            } catch (SecurityException e) {
+                ret = Response.Status.PERMISSION_DENIED;
+                e.printStackTrace();
             } catch (RemoteException e) {
+                ret = Response.Status.SERVICE_COMMUNICATION_FAILURE;
                 e.printStackTrace();
             }
         }
+        return ret;
     }
 
-    /**
-     * This method is to add the listener to get PartnerEnablerServiceConnection status.
-     * @param listener ILibStateChangeListener object from client/app.
-     */
+    @Override
     public void addListener(ILibStateChangeListener listener) {
         mClientListeners.add(listener);
     }
 
-    /**
-     * This method is to remove the listener.
-     */
+    @Override
     public void removeListener(ILibStateChangeListener listener) {
         mClientListeners.remove(listener);
     }
 
-    public CarDataManager getCarDataManager() {
-        return mCarDataManager;
+    @Override
+    public Response<CarDataManager> getCarDataManager() {
+        Response<CarDataManager> response = new Response<>(Response.Status.SUCCESS);
+        if (!mIsPartnerEnablerServiceConnected) {
+            response.status = Response.Status.SERVICE_CONNECTION_FAILURE;
+            return response;
+        }
+        response.value = mCarDataManager;
+        return response;
     }
 
-    public NavigationManager getNavigationManager() {
-        return mNavigationManager;
+    @Override
+    public Response<NavigationManager> getNavigationManager() {
+        Response<NavigationManager> response = new Response<>(Response.Status.SUCCESS);
+        if (!mIsPartnerEnablerServiceConnected) {
+            response.status = Response.Status.SERVICE_CONNECTION_FAILURE;
+            return response;
+        }
+        response.value = mNavigationManager;
+        return response;
     }
 
     /** Binds the user activity to the service. */
-    private void initService() {
+    private boolean initService() {
         Log.d(TAG,"initService trying to bindService");
         mServiceConnection = new PartnerEnablerServiceConnection();
         Intent i = new Intent(partnerApiServiceName).setPackage(partnerApiServicePackageName);
         boolean ret = mContext.bindService(i, mServiceConnection, Context.BIND_AUTO_CREATE);
         Log.d(TAG, "initService() bound with " + ret);
+        return ret;
     }
 
     /** Unbinds the user activity from the service. */
     private void releaseService() {
         mContext.unbindService(mServiceConnection);
         mServiceConnection = null;
+        mIsPartnerEnablerServiceConnected = false;
         Log.d(TAG, "releaseService() unbound.");
     }
 }
