@@ -50,10 +50,10 @@ public class CarDataManagerDemoModeImpl implements CarDataManager {
     private AtomicInteger mIndex = new AtomicInteger(0);
     private int mMaxValueOfIndex;
     private int mChangeFrequencySecs;
-    private List<Integer> mMileageList;
+    private List<Float> mMileageList;
     private List<VehicleSignalIndicator> mTurnSignalIndicatorList;
     private List<VehicleLightState> mFogLightsStateList;
-    private List<Integer> mSteeringAngleList;
+    private List<Float> mSteeringAngleList;
     private String mVehicleIdentityNumber;
 
     public CarDataManagerDemoModeImpl(Context context) throws JSONException, IOException{
@@ -203,7 +203,7 @@ public class CarDataManagerDemoModeImpl implements CarDataManager {
 
         mChangeFrequencySecs = carDataJSON.getInt("change_frequency_secs");
 
-        mMileageList = DemoModeUtils.getIntegerList(carDataJSON.getJSONArray("mileage_list"));
+        mMileageList = DemoModeUtils.getFloatList(carDataJSON.getJSONArray("mileage_list"));
         mMaxValueOfIndex = mMileageList.size();
 
         mTurnSignalIndicatorList = DemoModeUtils.getConvertedList(
@@ -217,7 +217,7 @@ public class CarDataManagerDemoModeImpl implements CarDataManager {
         mMaxValueOfIndex = Integer.max(mMaxValueOfIndex, mFogLightsStateList.size());
 
         mSteeringAngleList =
-                DemoModeUtils.getIntegerList(carDataJSON.getJSONArray("steering_angle_list"));
+                DemoModeUtils.getFloatList(carDataJSON.getJSONArray("steering_angle_list"));
         mMaxValueOfIndex = Integer.max(mMaxValueOfIndex, mSteeringAngleList.size());
 
         mVehicleIdentityNumber = carDataJSON.getString("vehicle_identity_number");
