@@ -190,7 +190,7 @@ Note: filenames should exactly be the same.
 ```
 {
  "change_frequency_secs": Integer,
- "mileage_list": Integer array
+ "mileage_list": Float array
  "turn_signal_indicator_list": Array of VehicleSignalIndicator enum ,
  "fog_lights_state_list": Array of VehicleLightState enum,
  "steering_angle_list": Float array,
@@ -202,10 +202,10 @@ Note: filenames should exactly be the same.
 ```
 {
  "change_frequency_secs": 10,
- "mileage_list":[5,5,5,10,10,10,20,20,20,40],
- "turn_signal_indicator_list":["PERMISSION_DENIED","NONE","RIGHT","RIGHT","RIGHT","NONE","NONE","NONE","LEFT","LEFT"],
+ "mileage_list":[5.0,5.0,5.5,10,10.5,10.5,20.6,20.7,20.9,40.0],
+ "turn_signal_indicator_list":["NONE","NONE","RIGHT","RIGHT","RIGHT","NONE","NONE","NONE","LEFT","LEFT"],
  "fog_lights_state_list":["DAYTIME_RUNNING"],
- "steering_angle_list":[-80,-40,-10,0,0,0,0, 20,50,90],
+ "steering_angle_list":[-80.0,-44.5,-10.3,0,0,0,0,20.2,50.8,90.0],
  "vehicle_identity_number": "1FMZU77E22UC18440"
 }
 ```
