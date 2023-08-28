@@ -91,10 +91,10 @@ public class DemoModeUtils {
      * @return
      * @throws JSONException
      */
-    public static List<Integer> getIntegerList(JSONArray jsonArray) throws JSONException {
-        List<Integer> list = new ArrayList<>();
+    public static List<Float> getFloatList(JSONArray jsonArray) throws JSONException {
+        List<Float> list = new ArrayList<>();
         for (int i = 0; i < jsonArray.length(); i++) {
-            list.add(jsonArray.getInt(i));
+            list.add((float) jsonArray.getDouble(i));
         }
         return list;
     }

@@ -1,0 +1,8 @@
+{
+ "change_frequency_secs": 10,
+ "mileage_list":[5.0,5.0,5.5,10,10.5,10.5,20.6,20.7,20.9,40.0],
+ "turn_signal_indicator_list":["NONE","NONE","RIGHT","RIGHT","RIGHT","NONE","NONE","NONE","LEFT","LEFT"],
+ "fog_lights_state_list":["DAYTIME_RUNNING"],
+ "steering_angle_list":[-80.0,-44.5,-10.3,0,0,0,0,20.2,50.8,90.0],
+ "vehicle_identity_number": "1FMZU77E22UC18440"
+}
