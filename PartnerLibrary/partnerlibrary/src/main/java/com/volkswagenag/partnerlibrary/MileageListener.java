@@ -19,6 +19,14 @@
 
 package com.volkswagenag.partnerlibrary;
 
+/**
+ * Listener interface for Mileage value changes.
+ */
 public interface MileageListener {
+    /**
+     * Callback called when mileage value changes.
+     *
+     * @param mileageValue
+     */
     public abstract void onMileageValueChanged(float mileageValue);
 }

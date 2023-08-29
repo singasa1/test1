@@ -18,10 +18,13 @@
  */
 package com.volkswagenag.partnerlibrary;
 
+import androidx.annotation.RequiresPermission;
+
 /**
- * <h1>Partner Library</h1>
- * Partner Library provides wrapper apis for different app developers.
- * It has signature verification apis and other apis for getting the Active Route, Interior/Exterior Light status.
+ * <h1>CarDataManager</h1>
+ * Car Data Manager provides wrapper apis for Vehicle data like mileage, steering angle etc.
+ * Note: {@link PartnerLibrary#initialize()} must be called, to bind to the PartnerEnablerService,
+ * before calling any methods in this interface.
  *
  * @author Sathya Singaravelu
  * @version 1.0
@@ -30,103 +33,117 @@ package com.volkswagenag.partnerlibrary;
 public interface CarDataManager {
 
     /**
-     * This method is to add the listener to get Odometer/Mileage value.
-     * @param mileageListerer MileageListener object from client/app.
-     * if client doesn't have permission to access odometer value, it doesn't add this listener
+     * Returns the current Odometer value.
+     * <p>Requires Permission: {@link PartnerLibrary#PERMISSION_RECEIVE_CAR_MILEAGE_INFO}</p>
      *
+     * @return {@link Response<Float>} - with value corresponding to current odometer value in Kilometer.
+     */
+    @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_CAR_MILEAGE_INFO)
+    Response<Float> getCurrentMileage();
+
+    /**
+     * Add the {@link MileageListener} listener, which is called when Odometer/Mileage value changes.
+     * <p>Requires Permission: {@link PartnerLibrary#PERMISSION_RECEIVE_CAR_MILEAGE_INFO}</p>
+     *
+     * @param mileageListerer MileageListener object from client/app.
      * @return {@link Response.Status}
      */
+    @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_CAR_MILEAGE_INFO)
     Response.Status registerMileageListener(MileageListener mileageListener);
 
     /**
-     * This method is to remove the listener.
+     * Remove the registered {@link MileageListener} listener.
      *
      * @return {@link Response.Status}
      */
     Response.Status unregisterMileageListener(MileageListener mileageListener);
 
     /**
-     * This method gets the Car current Odometer value from PartnerEnablerService
+     * Returns the current turn signal indicator value.
+     * <p>Requires Permission: {@link PartnerLibrary#PERMISSION_RECEIVE_TURN_SIGNAL_INDICATOR}</p>
      *
-     * @return {@link Response<Float>} - with value corresponding to current odometer value in Kilometer.
+     * @return {@link Response<VehicleSignalIndicator>} with value corresponding to current signal indicator value.
      */
-    Response<Float> getCurrentMileage();
+    @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_TURN_SIGNAL_INDICATOR)
+    Response<VehicleSignalIndicator> getTurnSignalIndicator();
 
     /**
-     * This method is to add the listener to get Vehicle Turn Signal State value.
-     * @param turnSignalListener TurnSignalListener object from client/app.
-     * if client doesn't have permission to access the turn signal indicator value, it doesn't add this listener
+     * Add the {@link TurnSignalListener} listener, which is called when Vehicle Turn Signal State value changes.
+     * <p>Requires Permission: {@link PartnerLibrary#PERMISSION_RECEIVE_TURN_SIGNAL_INDICATOR}</p>
      *
+     * @param turnSignalListener TurnSignalListener object from client/app.
      * @return {@link Response.Status}
      */
+    @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_TURN_SIGNAL_INDICATOR)
     Response.Status registerTurnSignalListener(TurnSignalListener turnSignalListener);
 
     /**
-     * This method is to remove the listener.
+     * Remove the registered {@link TurnSignalListener} listener.
      *
      * @return {@link Response.Status}
      */
     Response.Status unregisterTurnSignalListener(TurnSignalListener turnSignalListener);
 
     /**
-     * This method gets the current turn signal indicator value from PartnerEnablerService
-     * @return {@link Response<VehicleSignalIndicator>} with value corresponding to current signal indicator value.
+     * Returns the current fog lights state value.
+     * <p>Requires Permission: {@link PartnerLibrary#PERMISSION_RECEIVE_FOG_LIGHTS}</p>
      *
+     * @return {@link Response<VehicleLightState>} - with value corresponding to current fog light state value.
      */
-    Response<VehicleSignalIndicator> getTurnSignalIndicator();
+    @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_FOG_LIGHTS)
+    Response<VehicleLightState> getFogLightsState();
 
     /**
-     * This method is to add the listener to get Fog Lights State value.
-     * @param lightStateListener FogLightStateListener object from client/app.
-     * if client doesn't have permission to access the fog light state value, it doesn't add this listener
+     * Add the {@link FogLightStateListener} listener, which is called when Fog Lights State value changes.
+     * <p>Requires Permission: {@link PartnerLibrary#PERMISSION_RECEIVE_FOG_LIGHTS}</p>
      *
+     * @param lightStateListener FogLightStateListener object from client/app.
      * @return {@link Response.Status}
      */
+    @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_FOG_LIGHTS)
     Response.Status registerFogLightStateListener(FogLightStateListener lightStateListener);
 
     /**
-     * This method is to remove the listener.
+     * Remove the registered {@link FogLightStateListener} listener.
      *
      * @return {@link Response.Status}
      */
     Response.Status unregisterFogLightStateListener(FogLightStateListener lightStateListener);
 
     /**
-     * This method gets the current fog lights state from PartnerEnablerService
+     * Returns the Car steering angle in degrees. positive - right; negative - left.
+     * <p>Requires Permission: {@link PartnerLibrary#PERMISSION_RECEIVE_STEERING_ANGLE_INFO}</p>
      *
-     * @return {@link Response<VehicleLightState>} - with value corresponding to current fog light state value.
+     * @return {@link Response<Float>} - with value corresponding to current steering angle value in degrees.
+     * positive value - right
+     * negative value - left
      */
-    Response<VehicleLightState> getFogLightsState();
+    @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_STEERING_ANGLE_INFO)
+    Response<Float> getSteeringAngle();
 
     /**
-     * This method is to add the listener to get steering angle value.
-     * @param steeringAngleListener SteeringAngleListener object from client/app.
-     * if client doesn't have permission to access the fog light state value, it doesn't add this listener.
+     * Add the {@link SteeringAngleListener} listener, which is called when steering angle value changes.
+     * <p>Requires Permission: {@link PartnerLibrary#PERMISSION_RECEIVE_STEERING_ANGLE_INFO}</p>
      *
+     * @param steeringAngleListener SteeringAngleListener object from client/app.
      * @return {@link Response.Status}
      */
+    @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_STEERING_ANGLE_INFO)
     Response.Status registerSteeringAngleListener(SteeringAngleListener steeringAngleListener);
 
     /**
-     * This method is to remove the listener.
+     * Remove the registered {@link SteeringAngleListener} listener.
      *
      * @return {@link Response.Status}
      */
     Response.Status unregisterSteeringAngleListener(SteeringAngleListener steeringAngleListener);
 
     /**
-     * This method returns the Car steering angle in degrees. positive - right; negative - left.
-     *
-     * @return {@link Response<Float>} - with value corresponding to current steering angle value in degrees.
-     * positive value - right
-     * negative value - left
-     */
-    Response<Float> getSteeringAngle();
-
-    /**
-     * This method returns the Car VIN Number.
+     * Returns the Car VIN Number.
+     * <p>Requires Permission: {@link PartnerLibrary#PERMISSION_RECEIVE_CAR_INFO_VIN}</p>
      *
      *  @return {@link Response<String>} - with value corresponding to car VIN no
      */
+    @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_CAR_INFO_VIN)
     Response<String> getVehicleIdentityNumber();
 }

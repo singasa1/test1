@@ -19,8 +19,20 @@
 
 package com.volkswagenag.partnerlibrary;
 
+/**
+ * Vehicle Lights state representation.
+ */
 public enum VehicleLightState {
+    /**
+     * Lights are turned off.
+     */
     OFF,
+    /**
+     * Lights are turned on.
+     */
     ON,
+    /**
+     * Lights are set to Daytime running.
+     */
     DAYTIME_RUNNING,
 }

@@ -96,11 +96,27 @@ public class CarDataManagerImpl implements CarDataManager {
         return retVal;
     }
 
-    /**
-     * This method is to add the listener to get Odometer/Mileage value.
-     * @param mileageListerer MileageListener object from client/app.
-     * if client doesn't have permission to access odometer value, it doesn't add this listener
-     */
+    @Override
+    @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_CAR_MILEAGE_INFO)
+    public Response<Float> getCurrentMileage() {
+        Response<Float> response = new Response<>(Response.Status.VALUE_NOT_AVAILABLE, 0.0f);
+        try {
+            response.value = mService.getCurrentMileage();
+            response.status = Response.Status.SUCCESS;
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
+            response.status = Response.Status.INTERNAL_FAILURE;
+        } catch (SecurityException e) {
+            e.printStackTrace();
+            Log.d(TAG, e.getMessage());
+            response.status = Response.Status.PERMISSION_DENIED;
+        } catch (RuntimeException | RemoteException e) {
+            e.printStackTrace();
+            response.status = Response.Status.SERVICE_COMMUNICATION_FAILURE;
+        }
+        return response;
+    }
+
     @Override
     @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_CAR_MILEAGE_INFO)
     public Response.Status registerMileageListener(MileageListener mileageListener) {
@@ -112,9 +128,6 @@ public class CarDataManagerImpl implements CarDataManager {
         return status;
     }
 
-    /**
-     * This method is to remove the listener.
-     */
     @Override
     public Response.Status unregisterMileageListener(MileageListener mileageListener) {
         mMileageListeners.remove(mileageListener);
@@ -122,18 +135,12 @@ public class CarDataManagerImpl implements CarDataManager {
         return Response.Status.SUCCESS;
     }
 
-    /**
-     * This method gets the Car current Odometer value from PartnerEnablerService
-     * @return float - return current odometer value in Kilometer
-     * -1 - if permission to access the odometer api is denied
-     *  0 - if there is no odometer value/vhal property available.
-     */
     @Override
-    @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_CAR_MILEAGE_INFO)
-    public Response<Float> getCurrentMileage() {
-        Response<Float> response = new Response<>(Response.Status.VALUE_NOT_AVAILABLE, 0.0f);
+    @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_TURN_SIGNAL_INDICATOR)
+    public Response<VehicleSignalIndicator> getTurnSignalIndicator() {
+        Response<VehicleSignalIndicator> response = new Response<>(Response.Status.VALUE_NOT_AVAILABLE, VehicleSignalIndicator.NONE);
         try {
-            response.value = mService.getCurrentMileage();
+            response.value = convertTurnSignalIndicator(mService.getTurnSignalIndicator());
             response.status = Response.Status.SUCCESS;
         } catch (IllegalStateException e) {
             e.printStackTrace();
@@ -168,11 +175,11 @@ public class CarDataManagerImpl implements CarDataManager {
     }
 
     @Override
-    @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_TURN_SIGNAL_INDICATOR)
-    public Response<VehicleSignalIndicator> getTurnSignalIndicator() {
-        Response<VehicleSignalIndicator> response = new Response<>(Response.Status.VALUE_NOT_AVAILABLE, VehicleSignalIndicator.NONE);
+    @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_FOG_LIGHTS)
+    public Response<VehicleLightState> getFogLightsState() {
+        Response<VehicleLightState> response = new Response<>(Response.Status.VALUE_NOT_AVAILABLE, VehicleLightState.OFF);
         try {
-            response.value = convertTurnSignalIndicator(mService.getTurnSignalIndicator());
+            response.value = convertToVehicleLightState(mService.getFogLightsState());
             response.status = Response.Status.SUCCESS;
         } catch (IllegalStateException e) {
             e.printStackTrace();
@@ -207,11 +214,11 @@ public class CarDataManagerImpl implements CarDataManager {
     }
 
     @Override
-    @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_FOG_LIGHTS)
-    public Response<VehicleLightState> getFogLightsState() {
-        Response<VehicleLightState> response = new Response<>(Response.Status.VALUE_NOT_AVAILABLE, VehicleLightState.OFF);
+    @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_STEERING_ANGLE_INFO)
+    public Response<Float> getSteeringAngle() {
+        Response<Float> response = new Response<>(Response.Status.VALUE_NOT_AVAILABLE, 0.0f);
         try {
-            response.value = convertToVehicleLightState(mService.getFogLightsState());
+            response.value = mService.getSteeringAngle();
             response.status = Response.Status.SUCCESS;
         } catch (IllegalStateException e) {
             e.printStackTrace();
@@ -242,27 +249,6 @@ public class CarDataManagerImpl implements CarDataManager {
         mSteeringAngleListener.remove(steeringAngleListener);
         removeCarDataListener();
         return Response.Status.SUCCESS;
-    }
-
-    @Override
-    @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_STEERING_ANGLE_INFO)
-    public Response<Float> getSteeringAngle() {
-        Response<Float> response = new Response<>(Response.Status.VALUE_NOT_AVAILABLE, 0.0f);
-        try {
-            response.value = mService.getSteeringAngle();
-            response.status = Response.Status.SUCCESS;
-        } catch (IllegalStateException e) {
-            e.printStackTrace();
-            response.status = Response.Status.INTERNAL_FAILURE;
-        } catch (SecurityException e) {
-            e.printStackTrace();
-            Log.d(TAG, e.getMessage());
-            response.status = Response.Status.PERMISSION_DENIED;
-        } catch (RuntimeException | RemoteException e) {
-            e.printStackTrace();
-            response.status = Response.Status.SERVICE_COMMUNICATION_FAILURE;
-        }
-        return response;
     }
 
     @Override

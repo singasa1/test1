@@ -19,6 +19,14 @@
 
 package com.volkswagenag.partnerlibrary;
 
+/**
+ * Listener interface for Fog lights state changes.
+ */
 public interface FogLightStateListener {
+    /**
+     * Callback called when the Fog lights state changes.
+     *
+     * @param fogLightState
+     */
     public abstract void onFogLightsChanged(VehicleLightState fogLightState);
 }
