@@ -47,8 +47,8 @@ public class NavigationManagerImpl implements NavigationManager {
 
     //private INavigationChangeListener mNavigationListener = new Navigation();
 
-    private HashSet<NavAppStateListener> mNavAppStateListener = new HashSet<NavAppStateListener>();
-    private HashSet<ActiveRouteUpdateListener> mActiveRouteListener = new HashSet<ActiveRouteUpdateListener>();
+    private HashSet<NavAppStateListener> mNavAppStateListener = new HashSet<>();
+    private HashSet<ActiveRouteUpdateListener> mActiveRouteListener = new HashSet<>();
 
     public NavigationManagerImpl(IPartnerEnabler service) {
         Log.d(TAG,"NavigationManagerImpl");
