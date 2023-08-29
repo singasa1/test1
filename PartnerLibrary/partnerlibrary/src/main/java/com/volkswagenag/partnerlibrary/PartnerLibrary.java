@@ -42,7 +42,7 @@ public interface PartnerLibrary {
      * Permission necessary to get the car current odomoter/mileage value through {@link CarDataManager}.
      */
     public static final String PERMISSION_RECEIVE_CAR_MILEAGE_INFO =
-            "com.volkswagenag.restricted.permission.CAR_MILEAGE";
+            "com.volkswagenag.restricted.permission.READ_CAR_MILEAGE";
 
     /**
      * Permission necessary to get the car current turn signal indicator value through {@link CarDataManager}.

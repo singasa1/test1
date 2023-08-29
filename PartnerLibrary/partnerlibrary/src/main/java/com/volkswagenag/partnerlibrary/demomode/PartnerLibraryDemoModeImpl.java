@@ -11,6 +11,7 @@ import com.volkswagenag.partnerlibrary.PartnerLibrary;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import com.volkswagenag.partnerlibrary.ILibStateChangeListener;
 import com.volkswagenag.partnerlibrary.Response;
@@ -43,8 +44,9 @@ public class PartnerLibraryDemoModeImpl implements PartnerLibrary {
     public Response.Status initialize() {
         Log.d(TAG, "initialize");
         try {
-            mCarDataManagerDemoMode = new CarDataManagerDemoModeImpl(mContext);
-            mNavigationManagerDemoMode = new NavigationManagerDemoModeImpl(mContext);
+            Set<String> permissionRequested = DemoModeUtils.getFilteredPermissionList(mContext);
+            mCarDataManagerDemoMode = new CarDataManagerDemoModeImpl(mContext, permissionRequested);
+            mNavigationManagerDemoMode = new NavigationManagerDemoModeImpl(mContext, permissionRequested);
         } catch (JSONException | IOException e) {
             return Response.Status.INITIALIZATION_FAILURE;
         }
