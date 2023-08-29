@@ -4,7 +4,12 @@
     package="com.cariad.technology.sampleapp">
 
     <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
+    <uses-permission android:name="com.volkswagenag.restricted.permission.READ_INFO_VIN"/>
     <uses-permission android:name="com.volkswagenag.restricted.permission.READ_CAR_MILEAGE" />
+    <uses-permission android:name="com.volkswagenag.restricted.permission.READ_SIGNAL_INDICATOR"/>
+    <uses-permission android:name="com.volkswagenag.restricted.permission.READ_FOG_LIGHTS"/>
+    <uses-permission android:name="com.volkswagenag.restricted.permission.READ_STEERING_ANGLE"/>
+    <uses-permission android:name="com.volkswagenag.restricted.permission.READ_NAV_ACTIVE_ROUTE"/>
 
     <application
         android:allowBackup="true"

@@ -57,14 +57,14 @@ import technology.cariad.partnerenablerservice.IPartnerEnabler;
 public class CarDataManagerImpl implements CarDataManager {
     private static final String TAG = CarDataManagerImpl.class.getSimpleName();
 
-    private IPartnerEnabler mService;
+    private final IPartnerEnabler mService;
 
-    private ICarDataChangeListener mCarDataChangeListener = new CarDataChangeListener();
+    private final ICarDataChangeListener mCarDataChangeListener = new CarDataChangeListener();
 
-    private HashSet<MileageListener> mMileageListeners = new HashSet<MileageListener>();
-    private HashSet<TurnSignalListener> mTurnSignalListener = new HashSet<TurnSignalListener>();
-    private HashSet<FogLightStateListener> mFogLightStateListener = new HashSet<FogLightStateListener>();
-    private HashSet<SteeringAngleListener> mSteeringAngleListener = new HashSet<SteeringAngleListener>();
+    private final HashSet<MileageListener> mMileageListeners = new HashSet<MileageListener>();
+    private final HashSet<TurnSignalListener> mTurnSignalListener = new HashSet<TurnSignalListener>();
+    private final HashSet<FogLightStateListener> mFogLightStateListener = new HashSet<FogLightStateListener>();
+    private final HashSet<SteeringAngleListener> mSteeringAngleListener = new HashSet<SteeringAngleListener>();
 
     public CarDataManagerImpl(IPartnerEnabler service) {
         Log.d(TAG,"CarDataManager");
@@ -91,11 +91,8 @@ public class CarDataManagerImpl implements CarDataManager {
     }
 
     private boolean isClientListenerNotRegistered() {
-        boolean retVal = false;
-        if (mMileageListeners.isEmpty() && mTurnSignalListener.isEmpty() &&
-                mFogLightStateListener.isEmpty() && mSteeringAngleListener.isEmpty()) {
-            retVal = true;
-        }
+        boolean retVal = mMileageListeners.isEmpty() && mTurnSignalListener.isEmpty() &&
+                mFogLightStateListener.isEmpty() && mSteeringAngleListener.isEmpty();
         return retVal;
     }
 

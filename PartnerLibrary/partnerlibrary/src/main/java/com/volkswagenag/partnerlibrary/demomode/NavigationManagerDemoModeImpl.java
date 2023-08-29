@@ -1,11 +1,15 @@
 package com.volkswagenag.partnerlibrary.demomode;
 
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.util.Log;
+
+import androidx.annotation.RequiresPermission;
 
 import com.volkswagenag.partnerlibrary.ActiveRouteUpdateListener;
 import com.volkswagenag.partnerlibrary.NavStateListener;
 import com.volkswagenag.partnerlibrary.NavigationManager;
+import com.volkswagenag.partnerlibrary.PartnerLibrary;
 import com.volkswagenag.partnerlibrary.Response;
 
 import org.json.JSONException;
@@ -14,6 +18,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -28,7 +33,15 @@ public class NavigationManagerDemoModeImpl implements NavigationManager {
     private final HashSet<ActiveRouteUpdateListener> mActiveRouteUpdateListeners = new HashSet<>();
     private final HashSet<NavStateListener> mNavigationStateListeners = new HashSet<>();
     private final ScheduledExecutorService mSchedulerService;
+    private final Set<String> mPermissionsRequested;
 
+    // cache
+    private final AtomicInteger mIndex = new AtomicInteger(0);
+    private ScheduledFuture<?> mChangeValuesAtFixedRateFuture;
+    private int mChangeFrequencySecs;
+    private int mMaxValueOfIndex;
+    private List<Boolean> mIsNavStartedList;
+    private List<String> mActiveRoutesList;
     private final Runnable runnable = new Runnable() {
         @Override
         public void run() {
@@ -36,18 +49,10 @@ public class NavigationManagerDemoModeImpl implements NavigationManager {
         }
     };
 
-    private ScheduledFuture<?> mChangeValuesAtFixedRateFuture;
-
-    // cache
-    private AtomicInteger mIndex = new AtomicInteger(0);
-    private int mChangeFrequencySecs;
-    private int mMaxValueOfIndex;
-    private List<Boolean> mIsNavStartedList;
-    private List<String> mActiveRoutesList;
-
-    public NavigationManagerDemoModeImpl(Context context) throws JSONException, IOException {
+    public NavigationManagerDemoModeImpl(Context context, Set<String> permissionsRequested) throws JSONException, IOException {
         mContext = context;
         mSchedulerService = Executors.newScheduledThreadPool(1);
+        mPermissionsRequested = permissionsRequested;
         initializeCache();
         logCache();
     }
@@ -59,7 +64,8 @@ public class NavigationManagerDemoModeImpl implements NavigationManager {
     public void startScheduler() {
         mIndex.set(0);
         mChangeValuesAtFixedRateFuture =
-                mSchedulerService.scheduleAtFixedRate(runnable, mChangeFrequencySecs, mChangeFrequencySecs, TimeUnit.SECONDS);
+                mSchedulerService.scheduleAtFixedRate(runnable, mChangeFrequencySecs,
+                        mChangeFrequencySecs, TimeUnit.SECONDS);
     }
 
     /**
@@ -70,7 +76,11 @@ public class NavigationManagerDemoModeImpl implements NavigationManager {
     }
 
     @Override
+    @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE)
     public Response.Status registerNavStateListener(NavStateListener listener) {
+        if (!mPermissionsRequested.contains(PartnerLibrary.PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE)) {
+            return Response.Status.PERMISSION_DENIED;
+        }
         mNavigationStateListeners.add(listener);
         return Response.Status.SUCCESS;
     }
@@ -82,14 +92,22 @@ public class NavigationManagerDemoModeImpl implements NavigationManager {
     }
 
     @Override
+    @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE)
     public Response<Boolean> isNavStarted() {
-        return new Response<>(
+        if (!mPermissionsRequested.contains(PartnerLibrary.PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE)) {
+            return new Response(Response.Status.PERMISSION_DENIED);
+        }
+        return new Response(
                 Response.Status.SUCCESS,
                 new Boolean(mIsNavStartedList.get(mIndex.get() % mIsNavStartedList.size())));
     }
 
     @Override
+    @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE)
     public Response.Status registerActiveRouteUpdateListener(ActiveRouteUpdateListener activeRouteUpdateListener) {
+        if (!mPermissionsRequested.contains(PartnerLibrary.PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE)) {
+            return Response.Status.PERMISSION_DENIED;
+        }
         mActiveRouteUpdateListeners.add(activeRouteUpdateListener);
         return Response.Status.SUCCESS;
     }
@@ -101,8 +119,12 @@ public class NavigationManagerDemoModeImpl implements NavigationManager {
     }
 
     @Override
+    @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE)
     public Response<String> getActiveRoute() {
-        return new Response<>(Response.Status.SUCCESS,
+        if (!mPermissionsRequested.contains(PartnerLibrary.PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE)) {
+            return new Response(Response.Status.PERMISSION_DENIED);
+        }
+        return new Response(Response.Status.SUCCESS,
                 mActiveRoutesList.get(mIndex.get() % mActiveRoutesList.size()));
     }
 
@@ -116,13 +138,14 @@ public class NavigationManagerDemoModeImpl implements NavigationManager {
                 != mActiveRoutesList.get(next % mActiveRoutesList.size()) &&
                 !mActiveRoutesList.get(next % mActiveRoutesList.size()).isEmpty() &&
                 mIsNavStartedList.get(next % mIsNavStartedList.size())) {
-            for (ActiveRouteUpdateListener activeRouteUpdateListener : mActiveRouteUpdateListeners) {
+            for (ActiveRouteUpdateListener activeRouteUpdateListener :
+                    mActiveRouteUpdateListeners) {
                 activeRouteUpdateListener.onActiveRouteChange(mActiveRoutesList.get(next % mActiveRoutesList.size()));
             }
         }
 
         if (mIsNavStartedList.get(previous % mIsNavStartedList.size())
-               != mIsNavStartedList.get(next % mIsNavStartedList.size())) {
+                != mIsNavStartedList.get(next % mIsNavStartedList.size())) {
             for (NavStateListener navigationListener : mNavigationStateListeners) {
                 navigationListener.onNavStateChanged(mIsNavStartedList.get(next % mIsNavStartedList.size()));
             }

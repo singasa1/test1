@@ -1,6 +1,8 @@
 package com.volkswagenag.partnerlibrary.demomode;
 
 import android.content.Context;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -13,7 +15,11 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
 public class DemoModeUtils {
 
     /**
@@ -33,6 +39,8 @@ public class DemoModeUtils {
     private static final String DEMO_MODE_PROPERTY = "volkswagenag.parterapi.demomode";
     private static final String PERSIST_DEMO_MODE_PROPERTY = "persist.volkswagenag.parterapi.demomode";
     private static final String GET_PROP_LOCATION = "/system/bin/getprop";
+
+    private static final String CARIAD_VWAE_RESTRICTED_NAMESPACE = "com.volkswagenag.restricted.";
 
     /**
      * Read JSONObject from the file specified by fileName. The should be located in the context's
@@ -113,5 +121,26 @@ public class DemoModeUtils {
             list.add(converter.convert(jsonArray.getString(i)));
         }
         return list;
+    }
+
+    public static Set<String> getFilteredPermissionList(Context context) {
+        Set<String> filteredPermissions = new HashSet<>();
+        try {
+            PackageInfo packageInfo = context
+                    .getPackageManager()
+                    .getPackageInfo(
+                            context.getPackageName(),
+                            PackageManager.GET_PERMISSIONS);
+
+            for (String permission : packageInfo.requestedPermissions) {
+                Log.d(TAG, "permission Name: " + permission);
+                if (permission.startsWith(CARIAD_VWAE_RESTRICTED_NAMESPACE)) {
+                    filteredPermissions.add(permission);
+                }
+            }
+        } catch (PackageManager.NameNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+        return filteredPermissions;
     }
 }
