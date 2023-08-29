@@ -92,7 +92,7 @@ public class NavigationManagerImpl implements NavigationManager {
 
     @Override
     @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE)
-    public Response.Status registerNavStateListener(NavAppStateListener navAppStateListener) {
+    public Response.Status registerNavAppStateListener(NavAppStateListener navAppStateListener) {
         // Add this client to listeners only if it has permission to access the navigation app state
         // TODO: Need to do Real permission check based implementation and error communication
         mNavAppStateListener.add(navAppStateListener);
@@ -100,7 +100,7 @@ public class NavigationManagerImpl implements NavigationManager {
     }
 
     @Override
-    public Response.Status unregisterNavStateListener(NavAppStateListener navAppStateListener) {
+    public Response.Status unregisterNavAppStateListener(NavAppStateListener navAppStateListener) {
         mNavAppStateListener.remove(navAppStateListener);
         removeNavStateListener();
         return Response.Status.SUCCESS;

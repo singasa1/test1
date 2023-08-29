@@ -76,7 +76,7 @@ public class NavigationManagerDemoModeImpl implements NavigationManager {
 
     @Override
     @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE)
-    public Response.Status registerNavStateListener(NavAppStateListener listener) {
+    public Response.Status registerNavAppStateListener(NavAppStateListener listener) {
         if (!mPermissionsRequested.contains(PartnerLibrary.PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE)) {
             return Response.Status.PERMISSION_DENIED;
         }
@@ -85,7 +85,7 @@ public class NavigationManagerDemoModeImpl implements NavigationManager {
     }
 
     @Override
-    public Response.Status unregisterNavStateListener(NavAppStateListener listener) {
+    public Response.Status unregisterNavAppStateListener(NavAppStateListener listener) {
         mNavigationAppStateListeners.remove(listener);
         return Response.Status.SUCCESS;
     }

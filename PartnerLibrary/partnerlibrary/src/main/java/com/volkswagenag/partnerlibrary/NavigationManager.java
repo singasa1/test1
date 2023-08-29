@@ -51,7 +51,7 @@ public interface NavigationManager {
      * @return {@link Response.Status}
      */
     @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE)
-    Response.Status registerNavStateListener(NavAppStateListener listener );
+    Response.Status registerNavAppStateListener(NavAppStateListener listener );
 
     /**
      * Remove the registered {@link NavAppStateListener} listener.
@@ -59,7 +59,7 @@ public interface NavigationManager {
      * @param listener NavStateListener object from client/app.
      * @return {@link Response.Status}
      */
-    Response.Status unregisterNavStateListener(NavAppStateListener listener);
+    Response.Status unregisterNavAppStateListener(NavAppStateListener listener);
 
     /**
      * Returns the route guidance of the current active route from Navigation Application.

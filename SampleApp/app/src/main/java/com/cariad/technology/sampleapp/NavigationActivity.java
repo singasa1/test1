@@ -58,9 +58,9 @@ public class NavigationActivity extends AppCompatActivity implements ActiveRoute
             logAndShowError("registerActiveRouteUpdateListener failed with ", status);
         }
 
-        status =  mNavigationManager.registerNavStateListener(NavigationActivity.this);
+        status =  mNavigationManager.registerNavAppStateListener(NavigationActivity.this);
         if (status != Response.Status.SUCCESS) {
-            logAndShowError("registerNavStateListener failed with ", status);
+            logAndShowError("registerNavAppStateListener failed with ", status);
         }
     }
 
