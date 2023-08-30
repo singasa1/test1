@@ -248,4 +248,4 @@ VIN number: 1FMZU77E22UC18440 always
 **Data interpretation:**
 The simulation starts with taking the first item in the array and updating the value to the next item every 30 secs (change_frequency_secs). It continuously loops through the array and starts with the first item after the last item is considered. Listeners are triggered whenever the value changes from the previous one in the array.
 
-Note: The String and booleans in `active_route` and `nav_started` are mapped one on one. i.e, if the value in `nav_started[i]` is false the value in `active_route[i]` is ignored.
+Note: The String and booleans in `active_route` and `nav_app_started` are mapped one on one. i.e, if the value in `nav_app_started[i]` is false the value in `active_route[i]` is ignored.
