@@ -19,6 +19,14 @@
 
 package com.volkswagenag.partnerlibrary;
 
+/**
+ * Listener interface to listen to turn signal state changes.
+ */
 public interface TurnSignalListener {
+    /**
+     * Callback Called when the turn signal state changes.
+     *
+     * @param signalIndicator
+     */
     public abstract void onTurnSignalStateChanged(VehicleSignalIndicator signalIndicator);
 }

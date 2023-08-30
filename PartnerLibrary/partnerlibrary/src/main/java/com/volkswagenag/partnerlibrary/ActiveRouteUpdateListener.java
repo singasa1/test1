@@ -19,9 +19,14 @@
 
 package com.volkswagenag.partnerlibrary;
 
+/**
+ * Listener interface for Active route updates.
+ */
 public interface ActiveRouteUpdateListener {
     /**
-     * Callback to update the active route
+     * Callback to update the active route.
+     *
+     * @param activeRoute
      */
     public abstract void onActiveRouteChange(String activeRoute);
 }

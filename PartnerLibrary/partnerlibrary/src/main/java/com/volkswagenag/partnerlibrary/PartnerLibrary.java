@@ -24,8 +24,9 @@ import com.volkswagenag.partnerlibrary.impl.PartnerLibraryFactory;
 
 /**
  * <h1>Partner Library</h1>
- * Partner Library provides wrapper apis for different app developers.
- * It has apis for getting the Active Route, Interior/Exterior Light status.
+ * PartnerLibrary provides APIs to initialize, get and use Partner APIs.
+ * Use this interface to maintain the connection with PartnerEnabler Service and
+ * to get other Partner API instances.
  *
  * @author Sathya Singaravelu
  * @version 1.0
@@ -33,49 +34,50 @@ import com.volkswagenag.partnerlibrary.impl.PartnerLibraryFactory;
  */
 public interface PartnerLibrary {
     /**
-     * Permission necessary to get the car current odomoter/mileage value through {@link CarDataManager}.
+     * Permission string to get the car current odomoter/mileage value through {@link CarDataManager}.
      */
     public static final String PERMISSION_RECEIVE_CAR_INFO_VIN =
             "com.volkswagenag.restricted.permission.READ_INFO_VIN";
 
     /**
-     * Permission necessary to get the car current odomoter/mileage value through {@link CarDataManager}.
+     * Permission string to get the car current odomoter/mileage value through {@link CarDataManager}.
      */
     public static final String PERMISSION_RECEIVE_CAR_MILEAGE_INFO =
             "com.volkswagenag.restricted.permission.READ_CAR_MILEAGE";
 
     /**
-     * Permission necessary to get the car current turn signal indicator value through {@link CarDataManager}.
+     * Permission string to get the car current turn signal indicator value through {@link CarDataManager}.
      */
     public static final String PERMISSION_RECEIVE_TURN_SIGNAL_INDICATOR =
             "com.volkswagenag.restricted.permission.READ_SIGNAL_INDICATOR";
 
     /**
-     * Permission necessary to get the car fog lights info through {@link CarDataManager}.
+     * Permission string to get the car fog lights info through {@link CarDataManager}.
      */
     public static final String PERMISSION_RECEIVE_FOG_LIGHTS =
             "com.volkswagenag.restricted.permission.READ_FOG_LIGHTS";
 
     /**
-     * Permission necessary to get the car current steering angle value through {@link CarDataManager}.
+     * Permission string to get the car current steering angle value through {@link CarDataManager}.
      */
     public static final String PERMISSION_RECEIVE_STEERING_ANGLE_INFO =
             "com.volkswagenag.restricted.permission.READ_STEERING_ANGLE";
 
     /**
-     * Permission necessary to get the car active route value through {@link NavigationManager}.
+     * Permission string to get the car active route value through {@link NavigationManager}.
      */
     public static final String PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE =
             "com.volkswagenag.restricted.permission.READ_NAV_ACTIVE_ROUTE";
 
     /**
-     * Permission necessary to get the phone state.
+     * Permission string to get the phone state.
      */
     public static final String PERMISSION_RECEIVE_PHONE_STATE =
             "com.volkswagenag.restricted.permission.READ_PRIVILEGED_PHONE_STATE";
 
     /**
-     * Returns the Singleton instance of PartnerLibrary to access Partner APIs
+     * Returns the Singleton instance of {@link PartnerLibrary} to access Partner APIs
+     *
      * @param context Application context
      * @return {@link PartnerLibrary} instance
      */
@@ -83,53 +85,67 @@ public interface PartnerLibrary {
         return PartnerLibraryFactory.getPartnerLibraryInstance(context);
     }
     /**
-     * This method binds to the PartnerEnabler service.
+     * Binds to the PartnerEnabler Service.
      *
      * @return {@link Response.Status}
      */
     Response.Status initialize();
 
     /**
-     * This method unbinds the PartnerEnabler service
+     * Un-binds from the PartnerEnabler service
      *
      * @return {@link Response.Status}
      */
     Response.Status release();
 
     /**
-     * This method initializes the PartnerEnabler service components
+     * Initializes the PartnerEnabler service components.
+     * Note: {@link PartnerLibrary#initialize()} must be called, to bind to the
+     * PartnerEnablerService, before calling this method.
      *
      * @return {@link Response.Status}
      */
     Response.Status start();
 
     /**
-     * This method uninitializes the PartnerEnabler service components
+     * Uninitializes the PartnerEnabler service components.
+     * Note: {@link PartnerLibrary#initialize()} must be called, to bind to the
+     * PartnerEnablerService, before calling this method.
      *
      * @return {@link Response.Status}
      */
     Response.Status stop();
 
     /**
-     * This method is to add the listener to get PartnerEnablerServiceConnection status.
-     * @param listener ILibStateChangeListener object from client/app.
+     * Add the {@link ILibStateChangeListener} which will be called when PartnerEnabler Service
+     * Connection status changes.
+     *
+     * @param listener {@link ILibStateChangeListener} object from client/app.
      */
     void addListener(ILibStateChangeListener listener);
 
     /**
-     * This method is to remove the listener.
+     * Remove the registered {@link ILibStateChangeListener}.
+     *
+     * @param listener {@link ILibStateChangeListener} object from client/app.
      */
     void removeListener(ILibStateChangeListener listener);
 
     /**
-     * Get {@link CarDataManager} instance to get car related data/information
-     * @return {@link CarDataManager}
+     * Get {@link CarDataManager} instance to get car related data/information.
+     * Note: {@link PartnerLibrary#initialize()} must be called, to bind to the
+     * PartnerEnablerService, before calling this method.
+     *
+     * @return {@link Response<CarDataManager>} instance
      */
     Response<CarDataManager> getCarDataManager();
 
     /**
-     * Get {@link NavigationManager} instance to get current route
-     * @return {@link NavigationManager}
+     * Get {@link NavigationManager} instance to get current route.
+     * Note: {@link PartnerLibrary#initialize()} must be called, to bind to the
+     * PartnerEnablerService, before calling this method.
+     *
+     * @return {@link Response<NavigationManager>} instance
      */
     Response<NavigationManager> getNavigationManager();
 

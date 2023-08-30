@@ -14,10 +14,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.volkswagenag.partnerlibrary.PartnerLibrary;
 import com.volkswagenag.partnerlibrary.NavigationManager;
 import com.volkswagenag.partnerlibrary.ActiveRouteUpdateListener;
-import com.volkswagenag.partnerlibrary.NavStateListener;
+import com.volkswagenag.partnerlibrary.NavAppStateListener;
 import com.volkswagenag.partnerlibrary.Response;
 
-public class NavigationActivity extends AppCompatActivity implements ActiveRouteUpdateListener, NavStateListener, AdapterView.OnItemSelectedListener {
+public class NavigationActivity extends AppCompatActivity implements ActiveRouteUpdateListener, NavAppStateListener, AdapterView.OnItemSelectedListener {
 
     private final String TAG = NavigationActivity.this.getClass().getSimpleName();
 
@@ -31,7 +31,7 @@ public class NavigationActivity extends AppCompatActivity implements ActiveRoute
     // NOTE: Donot change the order - only add new ones at the end.
     // {@link NavigationActivity#onItemSelected} should be changed if the order in this array is changed.
     private String[] mNavigationAPIMethods = {
-            "isNavStarted",
+            "isNavAppStarted",
             "getActiveRoute"
     };
 
@@ -58,9 +58,9 @@ public class NavigationActivity extends AppCompatActivity implements ActiveRoute
             logAndShowError("registerActiveRouteUpdateListener failed with ", status);
         }
 
-        status =  mNavigationManager.registerNavStateListener(NavigationActivity.this);
+        status =  mNavigationManager.registerNavAppStateListener(NavigationActivity.this);
         if (status != Response.Status.SUCCESS) {
-            logAndShowError("registerNavStateListener failed with ", status);
+            logAndShowError("registerNavAppStateListener failed with ", status);
         }
     }
 
@@ -85,11 +85,11 @@ public class NavigationActivity extends AppCompatActivity implements ActiveRoute
         try {
             switch (position) {
                 case 0:
-                    Response<Boolean> booleanResponse = mNavigationManager.isNavStarted();
+                    Response<Boolean> booleanResponse = mNavigationManager.isNavAppStarted();
                     if (booleanResponse.status == Response.Status.SUCCESS) {
                         mResultTextView.setText("Navigation Application State: " + booleanResponse.value);
                     } else {
-                        logAndShowError("isNavStarted call failed with: ", booleanResponse.status);
+                        logAndShowError("isNavAppStarted call failed with: ", booleanResponse.status);
                     }
                     break;
                 case 1:
@@ -126,7 +126,7 @@ public class NavigationActivity extends AppCompatActivity implements ActiveRoute
 
 
     @Override
-    public void onNavStateChanged(boolean status) {
+    public void onNavAppStateChanged(boolean status) {
         runOnUiThread (new Thread(new Runnable() {
             public void run() {
                 mTextViewListenerUpdateNavStarted.setText("Navigation app started: " + status);

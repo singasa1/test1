@@ -18,9 +18,13 @@
  */
 package com.volkswagenag.partnerlibrary;
 
+import androidx.annotation.RequiresPermission;
+
 /**
  * <h1>Navigation Manager</h1>
  * Navigation Manager provides wrapper apis for navigation related data such as navigation app state and route.
+ * Note: {@link PartnerLibrary#initialize()} must be called, to bind to the PartnerEnablerService,
+ * before calling any methods in this interface.
  *
  * @author Sathya Singaravelu
  * @version 1.0
@@ -29,40 +33,62 @@ package com.volkswagenag.partnerlibrary;
 public interface NavigationManager {
 
     /**
-     * This method is to add the listener to get Navigation Core App status.
+     * Returns the Navigation Application state.
+     * <p>Requires Permission: {@link PartnerLibrary#PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE}</p>
+     *
+     * @return {@link Response<Boolean>} with value:
+     *         true - if Navigation Application state is fully operable.
+     *         false - if Navigation Application state is Loading, NavDB Error, NoLicense, etc,.
+     */
+    @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE)
+    Response<Boolean> isNavAppStarted();
+
+    /**
+     * Add the {@link NavAppStateListener} listener, which is called when Navigation Core App status changes.
+     * <p>Requires Permission: {@link PartnerLibrary#PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE}</p>
+     *
      * @param listener NavStateListener object from client/app.
+     * @return {@link Response.Status}
      */
-    Response.Status registerNavStateListener(NavStateListener listener );
+    @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE)
+    Response.Status registerNavAppStateListener(NavAppStateListener listener );
 
     /**
-     * This method is to remove the navigation state listener.
+     * Remove the registered {@link NavAppStateListener} listener.
+     *
+     * @param listener NavStateListener object from client/app.
+     * @return {@link Response.Status}
      */
-    Response.Status unregisterNavStateListener(NavStateListener listener);
+    Response.Status unregisterNavAppStateListener(NavAppStateListener listener);
 
     /**
-     * This method is to get the Navigation Application state.
-     * @return Returns true - if Navigation Application state is fully operable.
-     *         Returns false - if Navigation Application state is Loading, NavDB Error, NoLicense, etc,.
+     * Returns the route guidance of the current active route from Navigation Application.
+     * <p>Requires Permission: {@link PartnerLibrary#PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE}</p>
+     *
+     * @return {@link Response<String>} with value:
+     *         A JSON string with the current route encoded using flexible polyline encoding.
+     *         ex: {"version": 1, "route": "<route encoded as polyline>"} OR
+     *         null - if there is no active route.
      */
-    Response<Boolean> isNavStarted();
+    @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE)
+    Response<String> getActiveRoute();
 
     /**
-     * This method is to add the listener to get the active guided route from Navigation App.
+     * Add the {@link ActiveRouteUpdateListener} listener to get the active guided route from Navigation App.
+     * <p>Requires Permission: {@link PartnerLibrary#PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE}</p>
+     *
      * @param activeRouteUpdateListener ActiveRouteUpdateListener object from client/app.
+     * @return {@link Response.Status}
      */
+    @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE)
     Response.Status registerActiveRouteUpdateListener(ActiveRouteUpdateListener activeRouteUpdateListener);
 
     /**
-     * This method is to remove the callback that is registered to get the active route from Navigation App.
+     * Remove the registered {@link ActiveRouteUpdateListener} listener that is registered to get
+     * the active route from Navigation App.
+     *
      * @param activeRouteUpdateListener ActiveRouteUpdateListener object from client/app.
+     * @return {@link Response.Status}
      */
     Response.Status unregisterActiveRouteUpdateListener(ActiveRouteUpdateListener activeRouteUpdateListener);
-
-    /**
-     * This method is to get the route guidance of the current active route from Navigation Application.
-     * @return Returns null - if there is no active route.
-     *         Returns a JSON string with the current route encoded using flexible polyline encoding.
-     *         ex: {"version": 1, "route": "<route encoded as polyline>"}
-     */
-    Response<String> getActiveRoute();
 }

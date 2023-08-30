@@ -19,8 +19,20 @@
 
 package com.volkswagenag.partnerlibrary;
 
+/**
+ * Vehicle Signal Indicator state representation.
+ */
 public enum VehicleSignalIndicator {
+    /**
+     * Signal Indicator is not active.
+     */
     NONE,
+    /**
+     * Right signal indicator is active.
+     */
     RIGHT,
+    /**
+     * Left signal indicator is active.
+     */
     LEFT,
 }

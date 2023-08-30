@@ -1,7 +1,7 @@
 package com.volkswagenag.partnerlibrary;
 
 /**
- * Response for all the APIs
+ * Response type for all the APIs
  * @param <T> Type of the response for that specific API
  */
 public class Response<T> {

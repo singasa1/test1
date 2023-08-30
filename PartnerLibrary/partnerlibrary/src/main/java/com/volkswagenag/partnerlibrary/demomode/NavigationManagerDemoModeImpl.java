@@ -1,13 +1,12 @@
 package com.volkswagenag.partnerlibrary.demomode;
 
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.util.Log;
 
 import androidx.annotation.RequiresPermission;
 
 import com.volkswagenag.partnerlibrary.ActiveRouteUpdateListener;
-import com.volkswagenag.partnerlibrary.NavStateListener;
+import com.volkswagenag.partnerlibrary.NavAppStateListener;
 import com.volkswagenag.partnerlibrary.NavigationManager;
 import com.volkswagenag.partnerlibrary.PartnerLibrary;
 import com.volkswagenag.partnerlibrary.Response;
@@ -31,7 +30,7 @@ public class NavigationManagerDemoModeImpl implements NavigationManager {
 
     private final Context mContext;
     private final HashSet<ActiveRouteUpdateListener> mActiveRouteUpdateListeners = new HashSet<>();
-    private final HashSet<NavStateListener> mNavigationStateListeners = new HashSet<>();
+    private final HashSet<NavAppStateListener> mNavigationAppStateListeners = new HashSet<>();
     private final ScheduledExecutorService mSchedulerService;
     private final Set<String> mPermissionsRequested;
 
@@ -77,23 +76,23 @@ public class NavigationManagerDemoModeImpl implements NavigationManager {
 
     @Override
     @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE)
-    public Response.Status registerNavStateListener(NavStateListener listener) {
+    public Response.Status registerNavAppStateListener(NavAppStateListener listener) {
         if (!mPermissionsRequested.contains(PartnerLibrary.PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE)) {
             return Response.Status.PERMISSION_DENIED;
         }
-        mNavigationStateListeners.add(listener);
+        mNavigationAppStateListeners.add(listener);
         return Response.Status.SUCCESS;
     }
 
     @Override
-    public Response.Status unregisterNavStateListener(NavStateListener listener) {
-        mNavigationStateListeners.remove(listener);
+    public Response.Status unregisterNavAppStateListener(NavAppStateListener listener) {
+        mNavigationAppStateListeners.remove(listener);
         return Response.Status.SUCCESS;
     }
 
     @Override
     @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE)
-    public Response<Boolean> isNavStarted() {
+    public Response<Boolean> isNavAppStarted() {
         if (!mPermissionsRequested.contains(PartnerLibrary.PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE)) {
             return new Response(Response.Status.PERMISSION_DENIED);
         }
@@ -146,8 +145,8 @@ public class NavigationManagerDemoModeImpl implements NavigationManager {
 
         if (mIsNavStartedList.get(previous % mIsNavStartedList.size())
                 != mIsNavStartedList.get(next % mIsNavStartedList.size())) {
-            for (NavStateListener navigationListener : mNavigationStateListeners) {
-                navigationListener.onNavStateChanged(mIsNavStartedList.get(next % mIsNavStartedList.size()));
+            for (NavAppStateListener navigationListener : mNavigationAppStateListeners) {
+                navigationListener.onNavAppStateChanged(mIsNavStartedList.get(next % mIsNavStartedList.size()));
             }
         }
     }

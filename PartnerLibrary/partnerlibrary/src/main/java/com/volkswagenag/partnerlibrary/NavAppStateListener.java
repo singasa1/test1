@@ -19,9 +19,14 @@
 
 package com.volkswagenag.partnerlibrary;
 
-public interface NavStateListener {
+/**
+ * Listener interface for Navigation application state changes
+ */
+public interface NavAppStateListener {
     /**
      * Callback to trigger once Navigation App state changes
+     *
+     * @param started
      */
-    public abstract void onNavStateChanged(boolean started);
+    public abstract void onNavAppStateChanged(boolean started);
 }
