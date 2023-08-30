@@ -3,9 +3,9 @@
 
 ## Introduction
 
-The goal of the Android Automotive Partner API (aka Partner API) is to provide exclusive access for vehicle data and Infotainment functions to app developers.
+The goal of the CARIAD Android Partner API (aka Partner API) is to provide exclusive access for vehicle data and Infotainment functions to app developers.
 	
-This is a closed API designed for partners who have a commercial relationship with CARIAD and VW Group?
+This is a closed API designed for partners who have a commercial relationship with CARIAD and VW Group.
 	
 During runtime, the Partner API is responsible for,
 * Verifying the identity of the Partner 
@@ -20,11 +20,11 @@ The Partner API does not replace any standard Android mechanism available to par
 ## API specification
 
 Currently the Partner API supports the following APIs, 
-* [Partner API](www.google.com) (TODO: Hyperlinks to subpage)
-* [Vehicle API](www.google.com) (TODO: Hyperlinks to subpage)
-* [Current Route API](www.google.com) (TODO: Hyperlinks to subpage)
+* [PartnerLibraryManager](/root/technology.cariad.partnerlibrary/-partner-library-manager/index.md) (TODO: Hyperlinks to subpage)
+* [CarDataManager](/root/technology.cariad.partnerlibrary/-car-data-manager/index.md) (TODO: Hyperlinks to subpage)
+* [NavigationManager](/root/technology.cariad.partnerlibrary/-navigation-manager/index.md) (TODO: Hyperlinks to subpage)
 * Map Rendering API (_Coming soon!_)
-* Payment API (Coming soon!)
+* Payment API (_Coming soon!_)
 
 ## Implementation guide
 
@@ -38,6 +38,7 @@ You need the following information when requesting a Partner token
 * Package name
 * List of data-points
 * Intended description of usage of data
+* List of permissions defined in [PartnerLibraryManager](/root/technology.cariad.partnerlibrary/-partner-library-manager/index.md) that will be requested by the app.
 * Signing certificate of the Partner application
 			
 Please send the following information to [Sagnik Dhar](mailto:sagnik.dhar@cariad.us) to request your Partner token. In the future this process will be automated via the Partner portal. 
@@ -49,6 +50,8 @@ You will need to add the Partner token generated in the previous step in your An
 The specific way to add the Partner token in the AndroidManifest.xml is as below,
     Example tag
     <meta-data android:name="VWAE_Sig_V1" android:value="SM3X..">
+
+3. Along with the partner token, you will need to define the requested permissions from [PartnerLibraryManager](/root/technology.cariad.partnerlibrary/-partner-library-manager/index.md) in your manifest to make sure the Application passes our verification. 
 
 #### Sample AndroidManifest.xml file:
 
@@ -182,6 +185,7 @@ Note: Feel free to use or not use persist depending on the test requirements. Us
 #### File and Schema definitions:
 The following are the files and JSON schema for the currently supported APIs:
 Note: filenames should exactly be the same.
+
 **1. CarDataManager:**
 
 **Filename:** car_data.json
@@ -209,6 +213,15 @@ Note: filenames should exactly be the same.
  "vehicle_identity_number": "1FMZU77E22UC18440"
 }
 ```
+**Data interpretation:**
+The simulation starts with taking the first item in the array and updating the value to the next item every 10 secs (change_frequency_secs). It continuously loops through the array and starts with the first item after the last item is considered. Listeners are triggered whenever the value changes from the previous one in the array.
+
+From the example,
+Mileage Value: 5.0 (0 secs); 5.0 (10 secs); 5.5 (20 secs); 10 (30 secs) so on.. The listeners are triggered at 20 secs, 30 secs etc, whenever the value changes from the previous one.
+Turn Signal: NONE (0 secs); NONE (10 secs); RIGHT (20 secs); RIGHT (30 secs) so on.. The listeners are triggered at 20 secs, 50 secs etc, whenever the value changes from the previous one.
+Fog Lights: DAYTIME_RUNNING (0 secs); DAYTIME_RUNNING (10 secs); so on.. Its the same value through the simulation.
+Steering Angle: -80.0 (0 secs); -44.5 (10 secs); -10.3 (20 secs) so on..
+VIN number: 1FMZU77E22UC18440 always
 
 **2. NavigationManager:**
 
@@ -218,18 +231,21 @@ Note: filenames should exactly be the same.
 ```
 {
  "change_frequency_secs": Integer,
- "nav_started": Boolean array,
+ "nav_app_started": Boolean array,
  "active_route": String Array
 }
 ```
-Note: The String and booleans in `active_route` and `nav_started` are mapped one on one. i.e, if the value in `nav_started[i]` is false the value in `active_route[i]` is ignored.
 
 **Example:**
 ```
 {
  "change_frequency_secs": 30,
- "nav_started": ["false", "true", "false", "false", "true"],
+ "nav_app_started": ["false", "true", "false", "false", "true"],
  "active_route": ["", "kclcF...@sC@YIOKI", "", "", "wblcF~...SZSF_@?"]
 }
 ```
 
+**Data interpretation:**
+The simulation starts with taking the first item in the array and updating the value to the next item every 30 secs (change_frequency_secs). It continuously loops through the array and starts with the first item after the last item is considered. Listeners are triggered whenever the value changes from the previous one in the array.
+
+Note: The String and booleans in `active_route` and `nav_started` are mapped one on one. i.e, if the value in `nav_started[i]` is false the value in `active_route[i]` is ignored.
