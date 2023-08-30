@@ -8,7 +8,7 @@ import androidx.annotation.RequiresPermission;
 import com.volkswagenag.partnerlibrary.CarDataManager;
 import com.volkswagenag.partnerlibrary.FogLightStateListener;
 import com.volkswagenag.partnerlibrary.MileageListener;
-import com.volkswagenag.partnerlibrary.PartnerLibrary;
+import com.volkswagenag.partnerlibrary.PartnerLibraryManager;
 import com.volkswagenag.partnerlibrary.Response;
 import com.volkswagenag.partnerlibrary.SteeringAngleListener;
 import com.volkswagenag.partnerlibrary.TurnSignalListener;
@@ -86,9 +86,9 @@ public class CarDataManagerDemoModeImpl implements CarDataManager {
     }
 
     @Override
-    @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_CAR_MILEAGE_INFO)
+    @RequiresPermission(PartnerLibraryManager.PERMISSION_RECEIVE_CAR_MILEAGE_INFO)
     public Response.Status registerMileageListener(MileageListener mileageListener) {
-        if (!mPermissionsRequested.contains(PartnerLibrary.PERMISSION_RECEIVE_CAR_MILEAGE_INFO)) {
+        if (!mPermissionsRequested.contains(PartnerLibraryManager.PERMISSION_RECEIVE_CAR_MILEAGE_INFO)) {
             return Response.Status.PERMISSION_DENIED;
         }
         mMileageListeners.add(mileageListener);
@@ -102,18 +102,18 @@ public class CarDataManagerDemoModeImpl implements CarDataManager {
     }
 
     @Override
-    @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_CAR_MILEAGE_INFO)
+    @RequiresPermission(PartnerLibraryManager.PERMISSION_RECEIVE_CAR_MILEAGE_INFO)
     public Response<Float> getCurrentMileage() {
-        if (!mPermissionsRequested.contains(PartnerLibrary.PERMISSION_RECEIVE_CAR_MILEAGE_INFO)) {
+        if (!mPermissionsRequested.contains(PartnerLibraryManager.PERMISSION_RECEIVE_CAR_MILEAGE_INFO)) {
             return new Response(Response.Status.PERMISSION_DENIED);
         }
         return new Response(Response.Status.SUCCESS, mMileageList.get(mIndex.get() % mMileageList.size()).floatValue());
     }
 
     @Override
-    @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_TURN_SIGNAL_INDICATOR)
+    @RequiresPermission(PartnerLibraryManager.PERMISSION_RECEIVE_TURN_SIGNAL_INDICATOR)
     public Response.Status registerTurnSignalListener(TurnSignalListener turnSignalListener) {
-        if (!mPermissionsRequested.contains(PartnerLibrary.PERMISSION_RECEIVE_TURN_SIGNAL_INDICATOR)) {
+        if (!mPermissionsRequested.contains(PartnerLibraryManager.PERMISSION_RECEIVE_TURN_SIGNAL_INDICATOR)) {
             return Response.Status.PERMISSION_DENIED;
         }
         mTurnSignalListener.add(turnSignalListener);
@@ -127,9 +127,9 @@ public class CarDataManagerDemoModeImpl implements CarDataManager {
     }
 
     @Override
-    @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_TURN_SIGNAL_INDICATOR)
+    @RequiresPermission(PartnerLibraryManager.PERMISSION_RECEIVE_TURN_SIGNAL_INDICATOR)
     public Response<VehicleSignalIndicator> getTurnSignalIndicator() {
-        if (!mPermissionsRequested.contains(PartnerLibrary.PERMISSION_RECEIVE_TURN_SIGNAL_INDICATOR)) {
+        if (!mPermissionsRequested.contains(PartnerLibraryManager.PERMISSION_RECEIVE_TURN_SIGNAL_INDICATOR)) {
             return new Response(Response.Status.PERMISSION_DENIED);
         }
         return new Response(Response.Status.SUCCESS,
@@ -137,9 +137,9 @@ public class CarDataManagerDemoModeImpl implements CarDataManager {
     }
 
     @Override
-    @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_FOG_LIGHTS)
+    @RequiresPermission(PartnerLibraryManager.PERMISSION_RECEIVE_FOG_LIGHTS)
     public Response.Status registerFogLightStateListener(FogLightStateListener lightStateListener) {
-        if (!mPermissionsRequested.contains(PartnerLibrary.PERMISSION_RECEIVE_FOG_LIGHTS)) {
+        if (!mPermissionsRequested.contains(PartnerLibraryManager.PERMISSION_RECEIVE_FOG_LIGHTS)) {
             return Response.Status.PERMISSION_DENIED;
         }
         mFogLightStateListener.add(lightStateListener);
@@ -153,9 +153,9 @@ public class CarDataManagerDemoModeImpl implements CarDataManager {
     }
 
     @Override
-    @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_FOG_LIGHTS)
+    @RequiresPermission(PartnerLibraryManager.PERMISSION_RECEIVE_FOG_LIGHTS)
     public Response<VehicleLightState> getFogLightsState() {
-        if (!mPermissionsRequested.contains(PartnerLibrary.PERMISSION_RECEIVE_FOG_LIGHTS)) {
+        if (!mPermissionsRequested.contains(PartnerLibraryManager.PERMISSION_RECEIVE_FOG_LIGHTS)) {
             return new Response(Response.Status.PERMISSION_DENIED);
         }
         return new Response(Response.Status.SUCCESS,
@@ -163,9 +163,9 @@ public class CarDataManagerDemoModeImpl implements CarDataManager {
     }
 
     @Override
-    @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_STEERING_ANGLE_INFO)
+    @RequiresPermission(PartnerLibraryManager.PERMISSION_RECEIVE_STEERING_ANGLE_INFO)
     public Response.Status registerSteeringAngleListener(SteeringAngleListener steeringAngleListener) {
-        if (!mPermissionsRequested.contains(PartnerLibrary.PERMISSION_RECEIVE_STEERING_ANGLE_INFO)) {
+        if (!mPermissionsRequested.contains(PartnerLibraryManager.PERMISSION_RECEIVE_STEERING_ANGLE_INFO)) {
             return Response.Status.PERMISSION_DENIED;
         }
         mSteeringAngleListener.add(steeringAngleListener);
@@ -179,9 +179,9 @@ public class CarDataManagerDemoModeImpl implements CarDataManager {
     }
 
     @Override
-    @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_STEERING_ANGLE_INFO)
+    @RequiresPermission(PartnerLibraryManager.PERMISSION_RECEIVE_STEERING_ANGLE_INFO)
     public Response<Float> getSteeringAngle() {
-        if (!mPermissionsRequested.contains(PartnerLibrary.PERMISSION_RECEIVE_STEERING_ANGLE_INFO)) {
+        if (!mPermissionsRequested.contains(PartnerLibraryManager.PERMISSION_RECEIVE_STEERING_ANGLE_INFO)) {
             return new Response(Response.Status.PERMISSION_DENIED);
         }
         return new Response(Response.Status.SUCCESS,
@@ -189,9 +189,9 @@ public class CarDataManagerDemoModeImpl implements CarDataManager {
     }
 
     @Override
-    @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_CAR_INFO_VIN)
+    @RequiresPermission(PartnerLibraryManager.PERMISSION_RECEIVE_CAR_INFO_VIN)
     public Response<String> getVehicleIdentityNumber() {
-        if (!mPermissionsRequested.contains(PartnerLibrary.PERMISSION_RECEIVE_CAR_INFO_VIN)) {
+        if (!mPermissionsRequested.contains(PartnerLibraryManager.PERMISSION_RECEIVE_CAR_INFO_VIN)) {
             return new Response(Response.Status.PERMISSION_DENIED);
         }
         return new Response(Response.Status.SUCCESS, mVehicleIdentityNumber);

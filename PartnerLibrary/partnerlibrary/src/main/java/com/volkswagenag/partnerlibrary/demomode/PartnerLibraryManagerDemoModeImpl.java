@@ -6,7 +6,7 @@ import android.util.Log;
 
 import com.volkswagenag.partnerlibrary.CarDataManager;
 import com.volkswagenag.partnerlibrary.NavigationManager;
-import com.volkswagenag.partnerlibrary.PartnerLibrary;
+import com.volkswagenag.partnerlibrary.PartnerLibraryManager;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -19,24 +19,24 @@ import com.volkswagenag.partnerlibrary.Response;
 import org.json.JSONException;
 
 
-public class PartnerLibraryDemoModeImpl implements PartnerLibrary {
+public class PartnerLibraryManagerDemoModeImpl implements PartnerLibraryManager {
 
-    private static PartnerLibraryDemoModeImpl mPartnerLibraryDemoModeImplInstance;
-    private static final String TAG = PartnerLibraryDemoModeImpl.class.getSimpleName();
+    private static PartnerLibraryManagerDemoModeImpl mPartnerLibraryDemoModeImplInstance;
+    private static final String TAG = PartnerLibraryManagerDemoModeImpl.class.getSimpleName();
 
     private Context mContext;
     private CarDataManagerDemoModeImpl mCarDataManagerDemoMode;
     private NavigationManagerDemoModeImpl mNavigationManagerDemoMode;
     private List<ILibStateChangeListener> mClientListeners = new ArrayList<>();
 
-   public static PartnerLibraryDemoModeImpl getInstance(Context context) {
+   public static PartnerLibraryManagerDemoModeImpl getInstance(Context context) {
         if (mPartnerLibraryDemoModeImplInstance == null) {
-            mPartnerLibraryDemoModeImplInstance = new PartnerLibraryDemoModeImpl(context);
+            mPartnerLibraryDemoModeImplInstance = new PartnerLibraryManagerDemoModeImpl(context);
         }
         return mPartnerLibraryDemoModeImplInstance;
     }
 
-    private PartnerLibraryDemoModeImpl(Context context) {
+    private PartnerLibraryManagerDemoModeImpl(Context context) {
        mContext = context;
     }
 

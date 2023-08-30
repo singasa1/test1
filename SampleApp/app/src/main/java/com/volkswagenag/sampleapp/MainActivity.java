@@ -1,4 +1,4 @@
-package com.cariad.technology.sampleapp;
+package com.volkswagenag.sampleapp;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -6,17 +6,14 @@ import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ProgressBar;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.volkswagenag.partnerlibrary.PartnerLibrary;
+import com.volkswagenag.partnerlibrary.PartnerLibraryManager;
 import com.volkswagenag.partnerlibrary.Response;
 import com.volkswagenag.partnerlibrary.ILibStateChangeListener;
 
@@ -29,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView mServiceStatusTextView;
     private ProgressBar mServiceStateProgressBar;
 
-    private PartnerLibrary mPartnerLibrary;
+    private PartnerLibraryManager mPartnerLibraryManager;
 
     private LibStateListener mLibStateChangeListener;
     private boolean mIsServiceConnected = false;
@@ -49,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
                     mCarDataButton.setVisibility(View.VISIBLE);
                     mNavigationButton.setVisibility(View.VISIBLE);
 
-                    Response.Status status = mPartnerLibrary.start();
+                    Response.Status status = mPartnerLibraryManager.start();
                     if (status != Response.Status.SUCCESS) {
                         Log.e(TAG, "Failure in starting the service " + status.toString());
                         showToast("Failure in starting the service: " + status.toString());
@@ -63,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 mCarDataButton.setVisibility(View.INVISIBLE);
                 mNavigationButton.setVisibility(View.INVISIBLE);
-                Response.Status status = mPartnerLibrary.stop();
+                Response.Status status = mPartnerLibraryManager.stop();
                 if (status != Response.Status.SUCCESS) {
                     Log.e(TAG, "Failure in stopping the service " + status.toString());
                     showToast("Failure in stopping the service: " + status.toString());
@@ -84,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         initializeViews();
         mLibStateChangeListener = new LibStateListener();
-        mPartnerLibrary = PartnerLibrary.getInstance(this);
+        mPartnerLibraryManager = PartnerLibraryManager.getInstance(this);
         mIsServiceConnected = false;
     }
 
@@ -105,14 +102,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (!mIsServiceConnected) {
-                    Log.d(TAG, "Clicked start PartnerLibrary");
+                    Log.d(TAG, "Clicked start PartnerLibraryManager");
                     mServiceStateProgressBar.setVisibility(View.VISIBLE);
                     mServiceStatusTextView.setVisibility(View.VISIBLE);
                     mServiceStatusTextView.setText(R.string.service_state_connecting);
-                    initializePartnerLibrary();
+                    initializePartnerLibraryManager();
                 } else {
-                    Log.d(TAG, "Clicked stop PartnerLibrary");
-                    deinitializePartnerLibrary();
+                    Log.d(TAG, "Clicked stop PartnerLibraryManager");
+                    deinitializePartnerLibraryManager();
                     mServiceStatusTextView.setText("Service disconnected");
                     mStartServiceButton.setText(R.string.start_service);
                 }
@@ -151,25 +148,25 @@ public class MainActivity extends AppCompatActivity {
         MainActivity.this.startActivity(myIntent);
     }
 
-    private void initializePartnerLibrary() {
+    private void initializePartnerLibraryManager() {
         Log.d(TAG, "initialize");
-        mPartnerLibrary.addListener(mLibStateChangeListener);
-        if (mPartnerLibrary.initialize() != Response.Status.SUCCESS) {
+        mPartnerLibraryManager.addListener(mLibStateChangeListener);
+        if (mPartnerLibraryManager.initialize() != Response.Status.SUCCESS) {
             Log.e(TAG, "Failure in service initialization");
             showToast("Failure in service initialization!");
         }
     }
 
-    private void deinitializePartnerLibrary() {
-        if (mPartnerLibrary != null) {
+    private void deinitializePartnerLibraryManager() {
+        if (mPartnerLibraryManager != null) {
             try {
                 mIsServiceConnected = false;
-                Response.Status status = mPartnerLibrary.stop();
+                Response.Status status = mPartnerLibraryManager.stop();
                 if (status != Response.Status.SUCCESS) {
                     Log.e(TAG, "Failure in stopping the service " + status.toString());
                     showToast("Failure in stopping the service: " + status.toString());
                 }
-                mPartnerLibrary.release();
+                mPartnerLibraryManager.release();
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -183,7 +180,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy () {
         Log.d(TAG,"onDestroy");
-        deinitializePartnerLibrary();
+        deinitializePartnerLibraryManager();
         super.onDestroy();
     }
 }
