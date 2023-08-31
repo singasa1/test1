@@ -46,11 +46,12 @@ import technology.cariad.partnerenablerservice.ICarDataChangeListener;
 import technology.cariad.partnerenablerservice.IPartnerEnabler;
 
 /**
- * <h1>Partner Library</h1>
- * Partner Library provides wrapper apis for different app developers.
- * It has signature verification apis and other apis for getting the Active Route, Interior/Exterior Light status.
+ * <h1>CarDataManagerImpl</h1>
+ * Car Data Manager Impl provides implementation for CarDataManager wrapper apis for Vehicle data like mileage, steering angle etc.
+ * Note: {@link PartnerLibraryManager#initialize()} must be called, to bind to the PartnerEnablerService,
+ * before calling any methods in this interface.
  *
- * @author Sathya Singaravelu
+ * @author CARIAD Inc
  * @version 1.0
  * @since 2023-04-20
  */

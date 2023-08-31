@@ -21,6 +21,10 @@ package com.volkswagenag.partnerlibrary;
 
 /**
  * Listener interface for Fog lights state changes.
+ *
+ * @author CARIAD Inc
+ * @version 1.0
+ * @since 2023-04-20
  */
 public interface FogLightStateListener {
     /**

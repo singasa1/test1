@@ -23,12 +23,12 @@ import android.content.Context;
 import com.volkswagenag.partnerlibrary.impl.PartnerLibraryFactory;
 
 /**
- * <h1>Partner Library</h1>
- * PartnerLibrary provides APIs to initialize, get and use Partner APIs.
+ * <h1>PartnerLibraryManager</h1>
+ * PartnerLibraryManager provides APIs to initialize, get and use Partner APIs.
  * Use this interface to maintain the connection with PartnerEnabler Service and
  * to get other Partner API instances.
  *
- * @author Sathya Singaravelu
+ * @author CARIAD Inc
  * @version 1.0
  * @since 2023-04-20
  */

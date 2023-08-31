@@ -21,6 +21,10 @@ package com.volkswagenag.partnerlibrary;
 
 /**
  * Vehicle Signal Indicator state representation.
+ *
+ * @author CARIAD Inc
+ * @version 1.0
+ * @since 2023-04-20
  */
 public enum VehicleSignalIndicator {
     /**

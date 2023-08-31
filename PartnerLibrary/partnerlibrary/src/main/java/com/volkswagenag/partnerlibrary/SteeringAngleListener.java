@@ -20,7 +20,11 @@
 package com.volkswagenag.partnerlibrary;
 
 /**
- * Listener for Seerting angle value changes.
+ * Listener for Steering angle value changes.
+ *
+ * @author CARIAD Inc
+ * @version 1.0
+ * @since 2023-04-20
  */
 public interface SteeringAngleListener {
     /**

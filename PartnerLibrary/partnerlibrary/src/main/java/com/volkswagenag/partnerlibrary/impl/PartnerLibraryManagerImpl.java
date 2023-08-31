@@ -39,10 +39,9 @@ import java.util.List;
 
 /**
  * <h1>Partner Library</h1>
- * Partner Library provides wrapper apis for different app developers.
- * It has signature verification apis and other apis for getting the Active Route, Interior/Exterior Light status.
+ * Partner Library Impl provides implementation for PartnerLibraryManager wrapper apis for different app developers.
  *
- * @author Sathya Singaravelu
+ * @author CARIAD Inc
  * @version 1.0
  * @since 2023-04-20
  */
