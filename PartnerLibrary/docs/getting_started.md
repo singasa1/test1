@@ -20,9 +20,9 @@ The Partner API does not replace any standard Android mechanism available to par
 ## API specification
 
 Currently the Partner API supports the following APIs, 
-* [PartnerLibraryManager](/root/technology.cariad.partnerlibrary/-partner-library-manager/index.md) (TODO: Hyperlinks to subpage)
-* [CarDataManager](/root/technology.cariad.partnerlibrary/-car-data-manager/index.md) (TODO: Hyperlinks to subpage)
-* [NavigationManager](/root/technology.cariad.partnerlibrary/-navigation-manager/index.md) (TODO: Hyperlinks to subpage)
+* [PartnerLibraryManager](root/technology.cariad.partnerlibrary/-partner-library-manager/index.md) (TODO: Hyperlinks to subpage)
+* [CarDataManager](root/technology.cariad.partnerlibrary/-car-data-manager/index.md) (TODO: Hyperlinks to subpage)
+* [NavigationManager](root/technology.cariad.partnerlibrary/-navigation-manager/index.md) (TODO: Hyperlinks to subpage)
 * Map Rendering API (_Planned!_)
 * Payment API (_Planned!_)
 
