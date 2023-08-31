@@ -6,7 +6,7 @@ android {
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.cariad.technology.sampleapp"
+        applicationId "com.volkswagenag.sampleapp"
         minSdk 31
         targetSdk 32
         versionCode 1

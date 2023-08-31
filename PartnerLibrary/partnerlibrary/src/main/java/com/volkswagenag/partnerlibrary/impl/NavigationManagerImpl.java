@@ -25,7 +25,7 @@ import androidx.annotation.RequiresPermission;
 import com.volkswagenag.partnerlibrary.NavigationManager;
 import com.volkswagenag.partnerlibrary.NavAppStateListener;
 import com.volkswagenag.partnerlibrary.ActiveRouteUpdateListener;
-import com.volkswagenag.partnerlibrary.PartnerLibrary;
+import com.volkswagenag.partnerlibrary.PartnerLibraryManager;
 import com.volkswagenag.partnerlibrary.Response;
 
 import java.util.HashSet;
@@ -84,14 +84,14 @@ public class NavigationManagerImpl implements NavigationManager {
     }
 
     @Override
-    @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE)
+    @RequiresPermission(PartnerLibraryManager.PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE)
     public Response<Boolean> isNavAppStarted() {
         return new Response<>(Response.Status.SUCCESS, new Boolean(true));
         // TODO: Add real implementation
     }
 
     @Override
-    @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE)
+    @RequiresPermission(PartnerLibraryManager.PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE)
     public Response.Status registerNavAppStateListener(NavAppStateListener navAppStateListener) {
         // Add this client to listeners only if it has permission to access the navigation app state
         // TODO: Need to do Real permission check based implementation and error communication
@@ -107,14 +107,14 @@ public class NavigationManagerImpl implements NavigationManager {
     }
 
     @Override
-    @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE)
+    @RequiresPermission(PartnerLibraryManager.PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE)
     public Response<String> getActiveRoute() {
         return new Response<>(Response.Status.SUCCESS, null);
         // TODO: Real implementation need to be added to hook up with PartnerEnablerService.
     }
 
     @Override
-    @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE)
+    @RequiresPermission(PartnerLibraryManager.PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE)
     public Response.Status registerActiveRouteUpdateListener(ActiveRouteUpdateListener activeRouteUpdateListener) {
         // Add this client to listeners only if it has permission to access the navigation simplified route
         // TODO: Need to do Real permission check based implementation and error communication
