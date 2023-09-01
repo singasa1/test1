@@ -26,7 +26,7 @@ import androidx.annotation.RequiresPermission;
  * Note: {@link PartnerLibraryManager#initialize()} must be called, to bind to the PartnerEnablerService,
  * before calling any methods in this interface.
  *
- * @author Sathya Singaravelu
+ * @author CARIAD Inc
  * @version 1.0
  * @since 2023-08-21
  */

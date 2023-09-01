@@ -21,6 +21,10 @@ package com.volkswagenag.partnerlibrary;
 
 /**
  * Vehicle Lights state representation.
+ *
+ * @author CARIAD Inc
+ * @version 1.0
+ * @since 2023-04-20
  */
 public enum VehicleLightState {
     /**
