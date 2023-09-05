@@ -20,9 +20,9 @@ The Partner API does not replace any standard Android mechanism available to par
 ## API specification
 
 Currently the Partner API supports the following APIs, 
-* [PartnerLibraryManager](root/technology.cariad.partnerlibrary/-partner-library-manager/index.md) (TODO: Hyperlinks to subpage)
-* [CarDataManager](root/technology.cariad.partnerlibrary/-car-data-manager/index.md) (TODO: Hyperlinks to subpage)
-* [NavigationManager](root/technology.cariad.partnerlibrary/-navigation-manager/index.md) (TODO: Hyperlinks to subpage)
+* [PartnerLibraryManager](root/technology.cariad.partnerlibrary/-partner-library-manager/index.md)
+* [CarDataManager](root/technology.cariad.partnerlibrary/-car-data-manager/index.md)
+* [NavigationManager](root/technology.cariad.partnerlibrary/-navigation-manager/index.md)
 * Map Rendering API (_Planned!_)
 * Payment API (_Planned!_)
 
@@ -36,9 +36,8 @@ The Partner token is a MIME64 coded signature string generated using the “SHA2
 	
 You need the following information when requesting a Partner token
 * Package name
-* List of data-points
+* List of data-points along with the list of permissions defined in the [PartnerLibraryManager](root/technology.cariad.partnerlibrary/-partner-library-manager/index.md) that will be used by the partner application.
 * Intended description of usage of data
-* List of permissions defined in [PartnerLibraryManager](/root/technology.cariad.partnerlibrary/-partner-library-manager/index.md) that will be requested by the app.
 * Signing certificate of the Partner application
 			
 Please send the following information to [Sagnik Dhar](mailto:sagnik.dhar@cariad.us) to request your Partner token. In the future this process will be automated via the Partner portal. 
@@ -51,7 +50,7 @@ The specific way to add the Partner token in the AndroidManifest.xml is as below
     Example tag
     <meta-data android:name="VWAE_Sig_V1" android:value="SM3X..">
 
-3. Along with the partner token, you will need to define the requested permissions from [PartnerLibraryManager](/root/technology.cariad.partnerlibrary/-partner-library-manager/index.md) in your manifest to make sure the Application passes our verification. 
+3. Along with the partner token, you will need to define the requested permissions from [PartnerLibraryManager](root/technology.cariad.partnerlibrary/-partner-library-manager/index.md) in your manifest to make sure the Application passes our verification.
 
 #### Sample AndroidManifest.xml file:
 
