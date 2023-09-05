@@ -23,10 +23,10 @@ import androidx.annotation.RequiresPermission;
 /**
  * <h1>Navigation Manager</h1>
  * Navigation Manager provides wrapper apis for navigation related data such as navigation app state and route.
- * Note: {@link PartnerLibrary#initialize()} must be called, to bind to the PartnerEnablerService,
+ * Note: {@link PartnerLibraryManager#initialize()} must be called, to bind to the PartnerEnablerService,
  * before calling any methods in this interface.
  *
- * @author Sathya Singaravelu
+ * @author CARIAD Inc
  * @version 1.0
  * @since 2023-08-21
  */
@@ -34,23 +34,23 @@ public interface NavigationManager {
 
     /**
      * Returns the Navigation Application state.
-     * <p>Requires Permission: {@link PartnerLibrary#PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE}</p>
+     * <p>Requires Permission: {@link PartnerLibraryManager#PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE}</p>
      *
      * @return {@link Response<Boolean>} with value:
      *         true - if Navigation Application state is fully operable.
      *         false - if Navigation Application state is Loading, NavDB Error, NoLicense, etc,.
      */
-    @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE)
+    @RequiresPermission(PartnerLibraryManager.PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE)
     Response<Boolean> isNavAppStarted();
 
     /**
      * Add the {@link NavAppStateListener} listener, which is called when Navigation Core App status changes.
-     * <p>Requires Permission: {@link PartnerLibrary#PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE}</p>
+     * <p>Requires Permission: {@link PartnerLibraryManager#PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE}</p>
      *
      * @param listener NavStateListener object from client/app.
      * @return {@link Response.Status}
      */
-    @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE)
+    @RequiresPermission(PartnerLibraryManager.PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE)
     Response.Status registerNavAppStateListener(NavAppStateListener listener );
 
     /**
@@ -63,24 +63,24 @@ public interface NavigationManager {
 
     /**
      * Returns the route guidance of the current active route from Navigation Application.
-     * <p>Requires Permission: {@link PartnerLibrary#PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE}</p>
+     * <p>Requires Permission: {@link PartnerLibraryManager#PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE}</p>
      *
      * @return {@link Response<String>} with value:
      *         A JSON string with the current route encoded using flexible polyline encoding.
      *         ex: {"version": 1, "route": "<route encoded as polyline>"} OR
      *         null - if there is no active route.
      */
-    @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE)
+    @RequiresPermission(PartnerLibraryManager.PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE)
     Response<String> getActiveRoute();
 
     /**
      * Add the {@link ActiveRouteUpdateListener} listener to get the active guided route from Navigation App.
-     * <p>Requires Permission: {@link PartnerLibrary#PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE}</p>
+     * <p>Requires Permission: {@link PartnerLibraryManager#PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE}</p>
      *
      * @param activeRouteUpdateListener ActiveRouteUpdateListener object from client/app.
      * @return {@link Response.Status}
      */
-    @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE)
+    @RequiresPermission(PartnerLibraryManager.PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE)
     Response.Status registerActiveRouteUpdateListener(ActiveRouteUpdateListener activeRouteUpdateListener);
 
     /**

@@ -25,7 +25,7 @@ import androidx.annotation.RequiresPermission;
 import com.volkswagenag.partnerlibrary.NavigationManager;
 import com.volkswagenag.partnerlibrary.NavAppStateListener;
 import com.volkswagenag.partnerlibrary.ActiveRouteUpdateListener;
-import com.volkswagenag.partnerlibrary.PartnerLibrary;
+import com.volkswagenag.partnerlibrary.PartnerLibraryManager;
 import com.volkswagenag.partnerlibrary.Response;
 
 import java.util.HashSet;
@@ -33,10 +33,12 @@ import java.util.HashSet;
 import technology.cariad.partnerenablerservice.IPartnerEnabler;
 
 /**
- * <h1>Partner Library</h1>
- * Navigation Manager Implementation provides implementation to get the navigation related information from PartnerEnablerService.
+ * <h1>NavigationManagerImpl</h1>
+ * Navigation Manager Impl provides implementation for NavigationManager wrapper apis for navigation related data such as navigation app state and route.
+ * Note: {@link PartnerLibraryManager#initialize()} must be called, to bind to the PartnerEnablerService,
+ * before calling any methods in this interface.
  *
- * @author Sathya Singaravelu
+ * @author CARIAD Inc
  * @version 1.0
  * @since 2023-08-21
  */
@@ -84,14 +86,14 @@ public class NavigationManagerImpl implements NavigationManager {
     }
 
     @Override
-    @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE)
+    @RequiresPermission(PartnerLibraryManager.PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE)
     public Response<Boolean> isNavAppStarted() {
         return new Response<>(Response.Status.SUCCESS, new Boolean(true));
         // TODO: Add real implementation
     }
 
     @Override
-    @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE)
+    @RequiresPermission(PartnerLibraryManager.PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE)
     public Response.Status registerNavAppStateListener(NavAppStateListener navAppStateListener) {
         // Add this client to listeners only if it has permission to access the navigation app state
         // TODO: Need to do Real permission check based implementation and error communication
@@ -107,14 +109,14 @@ public class NavigationManagerImpl implements NavigationManager {
     }
 
     @Override
-    @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE)
+    @RequiresPermission(PartnerLibraryManager.PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE)
     public Response<String> getActiveRoute() {
         return new Response<>(Response.Status.SUCCESS, null);
         // TODO: Real implementation need to be added to hook up with PartnerEnablerService.
     }
 
     @Override
-    @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE)
+    @RequiresPermission(PartnerLibraryManager.PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE)
     public Response.Status registerActiveRouteUpdateListener(ActiveRouteUpdateListener activeRouteUpdateListener) {
         // Add this client to listeners only if it has permission to access the navigation simplified route
         // TODO: Need to do Real permission check based implementation and error communication

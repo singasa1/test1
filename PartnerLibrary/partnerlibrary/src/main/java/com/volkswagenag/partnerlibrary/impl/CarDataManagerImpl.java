@@ -33,7 +33,7 @@ import androidx.annotation.RequiresPermission;
 import com.volkswagenag.partnerlibrary.CarDataManager;
 import com.volkswagenag.partnerlibrary.FogLightStateListener;
 import com.volkswagenag.partnerlibrary.MileageListener;
-import com.volkswagenag.partnerlibrary.PartnerLibrary;
+import com.volkswagenag.partnerlibrary.PartnerLibraryManager;
 import com.volkswagenag.partnerlibrary.Response;
 import com.volkswagenag.partnerlibrary.SteeringAngleListener;
 import com.volkswagenag.partnerlibrary.TurnSignalListener;
@@ -46,11 +46,12 @@ import technology.cariad.partnerenablerservice.ICarDataChangeListener;
 import technology.cariad.partnerenablerservice.IPartnerEnabler;
 
 /**
- * <h1>Partner Library</h1>
- * Partner Library provides wrapper apis for different app developers.
- * It has signature verification apis and other apis for getting the Active Route, Interior/Exterior Light status.
+ * <h1>CarDataManagerImpl</h1>
+ * Car Data Manager Impl provides implementation for CarDataManager wrapper apis for Vehicle data like mileage, steering angle etc.
+ * Note: {@link PartnerLibraryManager#initialize()} must be called, to bind to the PartnerEnablerService,
+ * before calling any methods in this interface.
  *
- * @author Sathya Singaravelu
+ * @author CARIAD Inc
  * @version 1.0
  * @since 2023-04-20
  */
@@ -97,7 +98,7 @@ public class CarDataManagerImpl implements CarDataManager {
     }
 
     @Override
-    @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_CAR_MILEAGE_INFO)
+    @RequiresPermission(PartnerLibraryManager.PERMISSION_RECEIVE_CAR_MILEAGE_INFO)
     public Response<Float> getCurrentMileage() {
         Response<Float> response = new Response<>(Response.Status.VALUE_NOT_AVAILABLE, 0.0f);
         try {
@@ -118,7 +119,7 @@ public class CarDataManagerImpl implements CarDataManager {
     }
 
     @Override
-    @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_CAR_MILEAGE_INFO)
+    @RequiresPermission(PartnerLibraryManager.PERMISSION_RECEIVE_CAR_MILEAGE_INFO)
     public Response.Status registerMileageListener(MileageListener mileageListener) {
         // Add this client to listeners only if it has permission to access the odometer value by calling getCurrentMileage
         Response.Status status = getCurrentMileage().status;
@@ -136,7 +137,7 @@ public class CarDataManagerImpl implements CarDataManager {
     }
 
     @Override
-    @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_TURN_SIGNAL_INDICATOR)
+    @RequiresPermission(PartnerLibraryManager.PERMISSION_RECEIVE_TURN_SIGNAL_INDICATOR)
     public Response<VehicleSignalIndicator> getTurnSignalIndicator() {
         Response<VehicleSignalIndicator> response = new Response<>(Response.Status.VALUE_NOT_AVAILABLE, VehicleSignalIndicator.NONE);
         try {
@@ -157,7 +158,7 @@ public class CarDataManagerImpl implements CarDataManager {
     }
 
     @Override
-    @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_TURN_SIGNAL_INDICATOR)
+    @RequiresPermission(PartnerLibraryManager.PERMISSION_RECEIVE_TURN_SIGNAL_INDICATOR)
     public Response.Status registerTurnSignalListener(TurnSignalListener turnSignalListener) {
         // Add this client to listeners only if it has permission to access the turn signal indicator value by calling getTurnSignalIndicator
         Response.Status status = getTurnSignalIndicator().status;
@@ -175,7 +176,7 @@ public class CarDataManagerImpl implements CarDataManager {
     }
 
     @Override
-    @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_FOG_LIGHTS)
+    @RequiresPermission(PartnerLibraryManager.PERMISSION_RECEIVE_FOG_LIGHTS)
     public Response<VehicleLightState> getFogLightsState() {
         Response<VehicleLightState> response = new Response<>(Response.Status.VALUE_NOT_AVAILABLE, VehicleLightState.OFF);
         try {
@@ -196,7 +197,7 @@ public class CarDataManagerImpl implements CarDataManager {
     }
 
     @Override
-    @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_FOG_LIGHTS)
+    @RequiresPermission(PartnerLibraryManager.PERMISSION_RECEIVE_FOG_LIGHTS)
     public Response.Status registerFogLightStateListener(FogLightStateListener lightStateListener) {
         Response.Status status = getFogLightsState().status;
         // Add this client to listeners only if it has permission to access the fog light state value by calling getFogLightState
@@ -214,7 +215,7 @@ public class CarDataManagerImpl implements CarDataManager {
     }
 
     @Override
-    @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_STEERING_ANGLE_INFO)
+    @RequiresPermission(PartnerLibraryManager.PERMISSION_RECEIVE_STEERING_ANGLE_INFO)
     public Response<Float> getSteeringAngle() {
         Response<Float> response = new Response<>(Response.Status.VALUE_NOT_AVAILABLE, 0.0f);
         try {
@@ -235,7 +236,7 @@ public class CarDataManagerImpl implements CarDataManager {
     }
 
     @Override
-    @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_STEERING_ANGLE_INFO)
+    @RequiresPermission(PartnerLibraryManager.PERMISSION_RECEIVE_STEERING_ANGLE_INFO)
     public Response.Status registerSteeringAngleListener(SteeringAngleListener steeringAngleListener) {
         Response.Status status = getSteeringAngle().status;
         // Add this client to listeners only if it has permission to access the steering angle value by calling getSteeringAngle
@@ -252,7 +253,7 @@ public class CarDataManagerImpl implements CarDataManager {
     }
 
     @Override
-    @RequiresPermission(PartnerLibrary.PERMISSION_RECEIVE_CAR_INFO_VIN)
+    @RequiresPermission(PartnerLibraryManager.PERMISSION_RECEIVE_CAR_INFO_VIN)
     public Response<String> getVehicleIdentityNumber() {
         Response<String> response = new Response<>(Response.Status.VALUE_NOT_AVAILABLE, null);
         try {

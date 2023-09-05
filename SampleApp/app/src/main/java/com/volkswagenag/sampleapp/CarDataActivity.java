@@ -1,4 +1,4 @@
-package com.cariad.technology.sampleapp;
+package com.volkswagenag.sampleapp;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -11,7 +11,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.volkswagenag.partnerlibrary.PartnerLibrary;
+import com.volkswagenag.partnerlibrary.PartnerLibraryManager;
 import com.volkswagenag.partnerlibrary.CarDataManager;
 import com.volkswagenag.partnerlibrary.Response;
 import com.volkswagenag.partnerlibrary.MileageListener;
@@ -56,9 +56,9 @@ public class CarDataActivity extends AppCompatActivity implements MileageListene
     @Override
     public void onResume() {
         super.onResume();
-        Response<CarDataManager> carDataManagerResponse = PartnerLibrary.getInstance(this).getCarDataManager();
+        Response<CarDataManager> carDataManagerResponse = PartnerLibraryManager.getInstance(this).getCarDataManager();
         if (carDataManagerResponse.status != Response.Status.SUCCESS) {
-            logAndShowError("Error obtaining NavigationManager from PartnerLibrary: ", carDataManagerResponse.status);
+            logAndShowError("Error obtaining NavigationManager from PartnerLibraryManager: ", carDataManagerResponse.status);
             return;
         }
         mCarDataManager = carDataManagerResponse.value;

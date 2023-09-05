@@ -23,16 +23,16 @@ import android.content.Context;
 import com.volkswagenag.partnerlibrary.impl.PartnerLibraryFactory;
 
 /**
- * <h1>Partner Library</h1>
- * PartnerLibrary provides APIs to initialize, get and use Partner APIs.
+ * <h1>PartnerLibraryManager</h1>
+ * PartnerLibraryManager provides APIs to initialize, get and use Partner APIs.
  * Use this interface to maintain the connection with PartnerEnabler Service and
  * to get other Partner API instances.
  *
- * @author Sathya Singaravelu
+ * @author CARIAD Inc
  * @version 1.0
  * @since 2023-04-20
  */
-public interface PartnerLibrary {
+public interface PartnerLibraryManager {
     /**
      * Permission string to get the car current odomoter/mileage value through {@link CarDataManager}.
      */
@@ -76,12 +76,12 @@ public interface PartnerLibrary {
             "com.volkswagenag.restricted.permission.READ_PRIVILEGED_PHONE_STATE";
 
     /**
-     * Returns the Singleton instance of {@link PartnerLibrary} to access Partner APIs
+     * Returns the Singleton instance of {@link PartnerLibraryManager} to access Partner APIs
      *
      * @param context Application context
-     * @return {@link PartnerLibrary} instance
+     * @return {@link PartnerLibraryManager} instance
      */
-    static PartnerLibrary getInstance(Context context) {
+    static PartnerLibraryManager getInstance(Context context) {
         return PartnerLibraryFactory.getPartnerLibraryInstance(context);
     }
     /**
@@ -100,7 +100,7 @@ public interface PartnerLibrary {
 
     /**
      * Initializes the PartnerEnabler service components.
-     * Note: {@link PartnerLibrary#initialize()} must be called, to bind to the
+     * Note: {@link PartnerLibraryManager#initialize()} must be called, to bind to the
      * PartnerEnablerService, before calling this method.
      *
      * @return {@link Response.Status}
@@ -109,7 +109,7 @@ public interface PartnerLibrary {
 
     /**
      * Uninitializes the PartnerEnabler service components.
-     * Note: {@link PartnerLibrary#initialize()} must be called, to bind to the
+     * Note: {@link PartnerLibraryManager#initialize()} must be called, to bind to the
      * PartnerEnablerService, before calling this method.
      *
      * @return {@link Response.Status}
@@ -133,7 +133,7 @@ public interface PartnerLibrary {
 
     /**
      * Get {@link CarDataManager} instance to get car related data/information.
-     * Note: {@link PartnerLibrary#initialize()} must be called, to bind to the
+     * Note: {@link PartnerLibraryManager#initialize()} must be called, to bind to the
      * PartnerEnablerService, before calling this method.
      *
      * @return {@link Response<CarDataManager>} instance
@@ -142,7 +142,7 @@ public interface PartnerLibrary {
 
     /**
      * Get {@link NavigationManager} instance to get current route.
-     * Note: {@link PartnerLibrary#initialize()} must be called, to bind to the
+     * Note: {@link PartnerLibraryManager#initialize()} must be called, to bind to the
      * PartnerEnablerService, before calling this method.
      *
      * @return {@link Response<NavigationManager>} instance

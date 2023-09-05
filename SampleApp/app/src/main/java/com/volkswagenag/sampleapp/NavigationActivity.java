@@ -1,4 +1,4 @@
-package com.cariad.technology.sampleapp;
+package com.volkswagenag.sampleapp;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -11,7 +11,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.volkswagenag.partnerlibrary.PartnerLibrary;
+import com.volkswagenag.partnerlibrary.PartnerLibraryManager;
 import com.volkswagenag.partnerlibrary.NavigationManager;
 import com.volkswagenag.partnerlibrary.ActiveRouteUpdateListener;
 import com.volkswagenag.partnerlibrary.NavAppStateListener;
@@ -46,9 +46,9 @@ public class NavigationActivity extends AppCompatActivity implements ActiveRoute
     @Override
     public void onResume() {
         super.onResume();
-        Response<NavigationManager> navigationManagerResponse = PartnerLibrary.getInstance(this).getNavigationManager();
+        Response<NavigationManager> navigationManagerResponse = PartnerLibraryManager.getInstance(this).getNavigationManager();
         if (navigationManagerResponse.status != Response.Status.SUCCESS) {
-            logAndShowError("Error obtaining NavigationManager from PartnerLibrary: ", navigationManagerResponse.status);
+            logAndShowError("Error obtaining NavigationManager from PartnerLibraryManager: ", navigationManagerResponse.status);
             return;
         }
         mNavigationManager = navigationManagerResponse.value;

@@ -28,7 +28,7 @@ import android.util.Log;
 
 import com.volkswagenag.partnerlibrary.CarDataManager;
 import com.volkswagenag.partnerlibrary.NavigationManager;
-import com.volkswagenag.partnerlibrary.PartnerLibrary;
+import com.volkswagenag.partnerlibrary.PartnerLibraryManager;
 
 import technology.cariad.partnerenablerservice.IPartnerEnabler;
 import com.volkswagenag.partnerlibrary.ILibStateChangeListener;
@@ -39,15 +39,14 @@ import java.util.List;
 
 /**
  * <h1>Partner Library</h1>
- * Partner Library provides wrapper apis for different app developers.
- * It has signature verification apis and other apis for getting the Active Route, Interior/Exterior Light status.
+ * Partner Library Impl provides implementation for PartnerLibraryManager wrapper apis for different app developers.
  *
- * @author Sathya Singaravelu
+ * @author CARIAD Inc
  * @version 1.0
  * @since 2023-04-20
  */
-public class PartnerLibraryImpl implements PartnerLibrary {
-    private static final String TAG = PartnerLibraryImpl.class.getSimpleName();
+public class PartnerLibraryManagerImpl implements PartnerLibraryManager {
+    private static final String TAG = PartnerLibraryManagerImpl.class.getSimpleName();
 
     private IPartnerEnabler mService;
     private PartnerEnablerServiceConnection mServiceConnection;
@@ -62,11 +61,11 @@ public class PartnerLibraryImpl implements PartnerLibrary {
     private static final String partnerApiServicePackageName = "technology.cariad.partnerenablerservice";
 
 
-    private static PartnerLibraryImpl mPartnerLibraryImplInstance;
+    private static PartnerLibraryManagerImpl mPartnerLibraryImplInstance;
 
-    public static PartnerLibraryImpl getInstance(Context context) {
+    public static PartnerLibraryManagerImpl getInstance(Context context) {
         if (mPartnerLibraryImplInstance == null) {
-            mPartnerLibraryImplInstance = new PartnerLibraryImpl(context);
+            mPartnerLibraryImplInstance = new PartnerLibraryManagerImpl(context);
         }
         return mPartnerLibraryImplInstance;
     }
@@ -111,7 +110,7 @@ public class PartnerLibraryImpl implements PartnerLibrary {
         }
     }
 
-    private PartnerLibraryImpl(Context context) {
+    private PartnerLibraryManagerImpl(Context context) {
         Log.d(TAG,"PartnerLibrary");
         mContext = context;
     }
