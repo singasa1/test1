@@ -19,14 +19,14 @@
 package technology.cariad.partnerenablerservice;
 
 // Declare any non-default types here with import statements
-import technology.cariad.partnerenablerservice.ICarDataChangeListener;
+import technology.cariad.partnerenablerservice.ITurnSignalStateListener;
 
 /**
- * Interface used to interact with the PartnerEnablerService.  Mostly this is used by the
+ * Interface used to interact with the ExteriorLightService in PartnerEnablerService.  Mostly this is used by the
  * PartnerLibrary class.
  * {@hide}
  */
-interface IPartnerEnabler {
+interface IExteriorLightService {
 
     /**
      * GetVehicleSignalIndicator Binder calls returns one of
@@ -37,64 +37,20 @@ interface IPartnerEnabler {
     const int VEHICLE_SIGNAL_INDICATOR_LEFT = 2;
 
     /**
-     * GetFogLisghState Binder calls may returns one of
-     * the following light state.
-    */
-    const int VEHICLE_LIGHT_STATE_OFF = 0;
-    const int VEHICLE_LIGHT_STATE_ON = 1;
-    const int VEHICLE_LIGHT_STATE_DAYTIME_RUNNING = 2;
-
-    /**
-     * This method initializes the required components in the PartnerEnablerService.
-    */
-    void initialize() = 0;
-
-    /**
-     * This method releases/destroy the components created in the PartnerEnablerService.
-    */
-    void release() = 1;
-
-    /**
-     * This method returns the Car current Odometer value. continuous change prop type
-     * @return: It returns value ranges from 0 to 4294967293.
-    */
-    float getCurrentMileage() = 2;
-
-    /**
      * This method returns the Car current signal indicator value. on_change prop type
      * 0 - None
      * 1 - Right
      * 2 - Left
     */
-    int getTurnSignalIndicator() = 3;
-
-    /**
-     * This method returns the Car fog light state. on_change prop type
-     * 0 - OFF
-     * 1 - ON
-     * 2 - DAYLIGHT_RUNNING
-    */
-    int getFogLightsState() = 4;
-    /**
-     * This method returns the Car steering angle in degrees. positive - right; negative - left. continuous change prop type.
-     * @return: It returns value ranges from -1200 to 1200.
-    */
-    float getSteeringAngle() = 5;
-
-    /**
-     * This method returns the Car VIN Number.
-    */
-    String getVehicleIdentityNumber() = 6;
+    int getTurnSignalIndicator();
 
     /**
      * Registers a listener @link#ICarDataChangeListener to be called when the car data changes.
     */
-    void addCarDataChangeListener(in ICarDataChangeListener listener) = 7;
+    void addTurnSignalStateListener(in ITurnSignalStateListener listener);
 
     /**
     * Removes the provided listener from receiving the callbacks.
     */
-    void removeCarDataChangeListener(in ICarDataChangeListener listener) = 8;
-
-    IBinder getAPIService(in String serviceName) = 9;
+    void removeTurnSignalStateListener(in ITurnSignalStateListener listener);
 }

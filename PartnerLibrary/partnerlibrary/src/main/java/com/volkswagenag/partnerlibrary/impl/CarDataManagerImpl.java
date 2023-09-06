@@ -25,6 +25,7 @@ import static technology.cariad.partnerenablerservice.IPartnerEnabler.VEHICLE_SI
 import static technology.cariad.partnerenablerservice.IPartnerEnabler.VEHICLE_SIGNAL_INDICATOR_NONE;
 import static technology.cariad.partnerenablerservice.IPartnerEnabler.VEHICLE_SIGNAL_INDICATOR_RIGHT;
 
+import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
 
@@ -43,7 +44,9 @@ import com.volkswagenag.partnerlibrary.VehicleSignalIndicator;
 import java.util.HashSet;
 
 import technology.cariad.partnerenablerservice.ICarDataChangeListener;
+import technology.cariad.partnerenablerservice.IExteriorLightService;
 import technology.cariad.partnerenablerservice.IPartnerEnabler;
+import technology.cariad.partnerenablerservice.ITurnSignalStateListener;
 
 /**
  * <h1>CarDataManagerImpl</h1>
@@ -61,6 +64,7 @@ public class CarDataManagerImpl implements CarDataManager {
     private final IPartnerEnabler mService;
 
     private final ICarDataChangeListener mCarDataChangeListener = new CarDataChangeListener();
+    private final ITurnSignalStateListener mTurnSignalStateListener = new TurnSignalStateListener();
 
     private final HashSet<MileageListener> mMileageListeners = new HashSet<MileageListener>();
     private final HashSet<TurnSignalListener> mTurnSignalListener = new HashSet<TurnSignalListener>();
@@ -141,7 +145,10 @@ public class CarDataManagerImpl implements CarDataManager {
     public Response<VehicleSignalIndicator> getTurnSignalIndicator() {
         Response<VehicleSignalIndicator> response = new Response<>(Response.Status.VALUE_NOT_AVAILABLE, VehicleSignalIndicator.NONE);
         try {
-            response.value = convertTurnSignalIndicator(mService.getTurnSignalIndicator());
+            IBinder binder = mService.getAPIService(PartnerLibraryManager.EXTERIOR_LIGHT);
+            IExteriorLightService exteriorLightService = (IExteriorLightService)IExteriorLightService.Stub.asInterface(binder);
+//            response.value = convertTurnSignalIndicator(mService.getTurnSignalIndicator());
+            response.value = convertTurnSignalIndicator(exteriorLightService.getTurnSignalIndicator());
             response.status = Response.Status.SUCCESS;
         } catch (IllegalStateException e) {
             e.printStackTrace();
@@ -160,19 +167,44 @@ public class CarDataManagerImpl implements CarDataManager {
     @Override
     @RequiresPermission(PartnerLibraryManager.PERMISSION_RECEIVE_TURN_SIGNAL_INDICATOR)
     public Response.Status registerTurnSignalListener(TurnSignalListener turnSignalListener) {
-        // Add this client to listeners only if it has permission to access the turn signal indicator value by calling getTurnSignalIndicator
-        Response.Status status = getTurnSignalIndicator().status;
-        if (status == Response.Status.SUCCESS) {
+        Response.Status status;
+        try {
+            IBinder binder = mService.getAPIService(PartnerLibraryManager.EXTERIOR_LIGHT);
+            IExteriorLightService exteriorLightService = (IExteriorLightService)IExteriorLightService.Stub.asInterface(binder);
+            Log.i(TAG, "getExteriorLightService binder=" + binder);
+            exteriorLightService.addTurnSignalStateListener(mTurnSignalStateListener);
             mTurnSignalListener.add(turnSignalListener);
+            status = Response.Status.SUCCESS;
+        } catch (RemoteException re) {
+            status = Response.Status.SERVICE_COMMUNICATION_FAILURE;
+            Log.e(TAG, "getExteriorLightService: remoteException " + re);
+        } catch (Throwable t) {
+            status = Response.Status.SERVICE_COMMUNICATION_FAILURE;
+            Log.e(TAG, "getExteriorLightService: throwable " + t);
         }
         return status;
     }
 
     @Override
     public Response.Status unregisterTurnSignalListener(TurnSignalListener turnSignalListener) {
+        Response.Status status;
+        try {
+            IBinder binder = mService.getAPIService(PartnerLibraryManager.EXTERIOR_LIGHT);
+            IExteriorLightService exteriorLightService = (IExteriorLightService)IExteriorLightService.Stub.asInterface(binder);
+            Log.i(TAG, "getExteriorLightService binder=" + binder);
+            exteriorLightService.removeTurnSignalStateListener(mTurnSignalStateListener);
+            mTurnSignalListener.remove(turnSignalListener);
+            status = Response.Status.SUCCESS;
+        } catch (RemoteException re) {
+            status = Response.Status.SERVICE_COMMUNICATION_FAILURE;
+            Log.e(TAG, "getExteriorLightService: remoteException " + re);
+        } catch (Throwable t) {
+            status = Response.Status.SERVICE_COMMUNICATION_FAILURE;
+            Log.e(TAG, "getExteriorLightService: throwable " + t);
+        }
         mTurnSignalListener.remove(turnSignalListener);
-        removeCarDataListener();
-        return Response.Status.SUCCESS;
+//        removeCarDataListener();
+        return status;
     }
 
     @Override
@@ -333,6 +365,18 @@ public class CarDataManagerImpl implements CarDataManager {
 
         public void onTurnSignalStateChanged(int signalIndicator) {
             Log.d(TAG, "calling listener onTurnSignalStateChanged with value: " + signalIndicator);
+            for(TurnSignalListener listener: mTurnSignalListener) {
+                VehicleSignalIndicator indicator = convertTurnSignalIndicator(signalIndicator);
+                listener.onTurnSignalStateChanged(indicator);
+            }
+        }
+    }
+
+    private class TurnSignalStateListener extends ITurnSignalStateListener.Stub {
+
+        @Override
+        public void onTurnSignalStateChanged(int signalIndicator) throws RemoteException {
+            Log.d(TAG, "calling listener onTurnSignalStateChangedListener with value: " + signalIndicator);
             for(TurnSignalListener listener: mTurnSignalListener) {
                 VehicleSignalIndicator indicator = convertTurnSignalIndicator(signalIndicator);
                 listener.onTurnSignalStateChanged(indicator);

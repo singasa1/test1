@@ -28,6 +28,7 @@ import android.car.hardware.property.CarPropertyManager;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Binder;
+import android.os.IBinder;
 import android.os.RemoteCallbackList;
 import android.os.RemoteException;
 import android.util.Log;
@@ -39,10 +40,9 @@ public class PartnerEnablerImpl extends IPartnerEnabler.Stub {
     private static final String TAG = "PartnerEnablerService:" + PartnerEnablerImpl.class.getSimpleName();
     private static final String VWAE_CAR_MILEAGE_PERMISSION = "com.volkswagenag.restricted.permission.READ_CAR_MILEAGE";
 
-    private static final int PROPERTY_UPDATE_RATE_HZ = 5000;
-
     private final Context mContext;
     private PartnerAccessManager mPartnerAccessManager;
+    private ExteriorLightService mExteriorLightService;
 
     @GuardedBy("mLock")
     private Car mCar;
@@ -99,7 +99,7 @@ public class PartnerEnablerImpl extends IPartnerEnabler.Stub {
     @Override
     public void initialize() throws SecurityException {
         Log.d(TAG, "initialize");
-        verifyAccess(mContext.getPackageManager().getNameForUid(Binder.getCallingUid()));
+//        verifyAccess(mContext.getPackageManager().getNameForUid(Binder.getCallingUid()));
 
         mCarPropertyManager =
                 (CarPropertyManager) Car.createCar(mContext).getCarManager(Car.PROPERTY_SERVICE);
@@ -109,11 +109,13 @@ public class PartnerEnablerImpl extends IPartnerEnabler.Stub {
         }
         if (!mCarPropertyManager.registerCallback(mCarPropertyEventCallback,
                 PERF_ODOMETER,
-                PROPERTY_UPDATE_RATE_HZ)) {
+                PartnerAPI.PROPERTY_UPDATE_RATE_HZ)) {
             Log.e(TAG,
                     "Failed to register callback for PERF_ODOMETER with CarPropertyManager");
 //            return;
         }
+
+        mExteriorLightService= new ExteriorLightService(mContext, mCarPropertyManager);
     }
 
     @Override
@@ -186,5 +188,23 @@ public class PartnerEnablerImpl extends IPartnerEnabler.Stub {
     }
 
     @Override
-    public void removeCarDataChangeListener(ICarDataChangeListener listener) throws RemoteException{}
+    public void removeCarDataChangeListener(ICarDataChangeListener listener) throws RemoteException{
+        if (listener == null) {
+            throw new IllegalArgumentException("ICarDataChaneListener is null");
+        }
+        mCarDataChangeListeners.unregister(listener);
+    }
+
+    @Override
+    public IBinder getAPIService(String serviceName) throws RemoteException {
+        Log.i(TAG, "calling getAPIService for service:" + serviceName);
+        switch (serviceName) {
+            case PartnerAPI.EXTERIOR_LIGHT:
+                Log.i(TAG, " getAPIService: mExteriorLightService=" + mExteriorLightService);
+                return mExteriorLightService;
+            default:
+                Log.w(TAG, "getAPIService for unknown service:" + serviceName);
+                return null;
+        }
+    }
 }

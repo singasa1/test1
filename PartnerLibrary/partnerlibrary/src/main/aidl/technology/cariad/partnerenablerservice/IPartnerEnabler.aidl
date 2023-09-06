@@ -52,13 +52,13 @@ interface IPartnerEnabler {
     /**
      * This method releases/destroy the components created in the PartnerEnablerService.
     */
-    void release() = 2;
+    void release() = 1;
 
     /**
      * This method returns the Car current Odometer value. continuous change prop type
      * @return: It returns value ranges from 0 to 4294967293.
     */
-    float getCurrentMileage() = 3;
+    float getCurrentMileage() = 2;
 
     /**
      * This method returns the Car current signal indicator value. on_change prop type
@@ -66,7 +66,7 @@ interface IPartnerEnabler {
      * 1 - Right
      * 2 - Left
     */
-    int getTurnSignalIndicator() = 4;
+    int getTurnSignalIndicator() = 3;
 
     /**
      * This method returns the Car fog light state. on_change prop type
@@ -74,26 +74,27 @@ interface IPartnerEnabler {
      * 1 - ON
      * 2 - DAYLIGHT_RUNNING
     */
-    int getFogLightsState() = 5;
-
+    int getFogLightsState() = 4;
     /**
      * This method returns the Car steering angle in degrees. positive - right; negative - left. continuous change prop type.
      * @return: It returns value ranges from -1200 to 1200.
     */
-    float getSteeringAngle() = 6;
+    float getSteeringAngle() = 5;
 
     /**
      * This method returns the Car VIN Number.
     */
-    String getVehicleIdentityNumber() = 7;
+    String getVehicleIdentityNumber() = 6;
 
     /**
      * Registers a listener @link#ICarDataChangeListener to be called when the car data changes.
     */
-    void addCarDataChangeListener(in ICarDataChangeListener listener) = 8;
+    void addCarDataChangeListener(in ICarDataChangeListener listener) = 7;
 
     /**
     * Removes the provided listener from receiving the callbacks.
     */
-    void removeCarDataChangeListener(in ICarDataChangeListener listener) = 9;
+    void removeCarDataChangeListener(in ICarDataChangeListener listener) = 8;
+
+    IBinder getAPIService(in String serviceName) = 9;
 }
