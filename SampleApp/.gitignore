@@ -3,3 +3,7 @@
 /app/build/
 gradlew
 gradlew.bat
+<<<<<<< HEAD
+=======
+/app/release/
+>>>>>>> 2784caddad7210152b402f12011ce902490d3257

@@ -12,6 +12,10 @@
 /build
 /captures
 /gradle
+<<<<<<< HEAD
+=======
+/app/build/
+>>>>>>> 2784caddad7210152b402f12011ce902490d3257
 .externalNativeBuild
 .cxx
 local.properties

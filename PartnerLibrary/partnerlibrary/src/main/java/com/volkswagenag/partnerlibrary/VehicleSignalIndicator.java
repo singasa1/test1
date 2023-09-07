@@ -17,8 +17,11 @@
  * that it may describe in whole or in part.
  */
 
-package technology.cariad.partnerlibrary;
+package com.volkswagenag.partnerlibrary;
 
-public interface FogLightStateListener {
-    public abstract void onFogLightsChanged(VehicleLightState fogLightState);
+public enum VehicleSignalIndicator {
+    PERMISSION_DENIED,
+    NONE,
+    RIGHT,
+    LEFT,
 }
