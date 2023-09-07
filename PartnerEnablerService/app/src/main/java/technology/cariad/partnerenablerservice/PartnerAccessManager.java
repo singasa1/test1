@@ -67,9 +67,7 @@ class PartnerAccessManager {
      * Clean up cache and service connection.
      */
     public void cleanUp() {
-        synchronized (accessCache) {
-            accessCache = null;
-        }
+        accessCache = null;
         if (mServiceConnection != null) {
             mContext.unbindService(mServiceConnection);
             mServiceConnection = null;
@@ -92,17 +90,13 @@ class PartnerAccessManager {
         }
         checkAndUpdateCache(packageName);
         boolean accessAllowed = false;
-        synchronized (accessCache) {
-            accessAllowed = accessCache.get(packageName);
-        }
+        accessAllowed = accessCache.get(packageName);
         return accessAllowed;
     }
 
     private void checkAndUpdateCache(String packageName) throws RemoteException {
-        synchronized (accessCache) {
-            if (!accessCache.containsKey(packageName)) {
-                accessCache.put(packageName, mService.verifyDigitalSignature(packageName));
-            }
+        if (!accessCache.containsKey(packageName)) {
+            accessCache.put(packageName, mService.verifyDigitalSignature(packageName));
         }
     }
 
