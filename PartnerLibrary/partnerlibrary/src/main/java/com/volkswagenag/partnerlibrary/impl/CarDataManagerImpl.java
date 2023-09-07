@@ -57,10 +57,10 @@ public class CarDataManagerImpl implements CarDataManager {
 
     private ICarDataChangeListener mCarDataChangeListener = new CarDataChangeListener();
 
-    private HashSet<MileageListener> mMileageListeners = new HashSet<MileageListener>();
-    private HashSet<TurnSignalListener> mTurnSignalListener = new HashSet<TurnSignalListener>();
-    private HashSet<FogLightStateListener> mFogLightStateListener = new HashSet<FogLightStateListener>();
-    private HashSet<SteeringAngleListener> mSteeringAngleListener = new HashSet<SteeringAngleListener>();
+    private HashSet<MileageListener> mMileageListeners = new HashSet<>();
+    private HashSet<TurnSignalListener> mTurnSignalListener = new HashSet<>();
+    private HashSet<FogLightStateListener> mFogLightStateListener = new HashSet<>();
+    private HashSet<SteeringAngleListener> mSteeringAngleListener = new HashSet<>();
 
     public CarDataManagerImpl(IPartnerEnabler service) {
         Log.d(TAG,"CarDataManager");

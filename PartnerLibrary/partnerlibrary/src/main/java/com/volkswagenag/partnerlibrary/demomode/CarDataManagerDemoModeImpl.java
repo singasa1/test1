@@ -30,27 +30,29 @@ public class CarDataManagerDemoModeImpl implements CarDataManager {
 
     private final Context mContext;
     // listeners
-    private final HashSet<MileageListener> mMileageListeners = new HashSet<MileageListener>();
-    private final HashSet<TurnSignalListener> mTurnSignalListener = new HashSet<TurnSignalListener>();
-    private final HashSet<FogLightStateListener> mFogLightStateListener = new HashSet<FogLightStateListener>();
-    private final HashSet<SteeringAngleListener> mSteeringAngleListener = new HashSet<SteeringAngleListener>();
+    private final HashSet<MileageListener> mMileageListeners = new HashSet<>();
+    private final HashSet<TurnSignalListener> mTurnSignalListener = new HashSet<>();
+    private final HashSet<FogLightStateListener> mFogLightStateListener = new HashSet<>();
+    private final HashSet<SteeringAngleListener> mSteeringAngleListener = new HashSet<>();
     private final ScheduledExecutorService mSchedulerService;
-    //cache
-    private AtomicInteger mIndex = new AtomicInteger(0);
-    private int mMaxValueOfIndex;
-    private int mChangeFrequency;
-    private List<Integer> mMileageList;
-    private List<VehicleSignalIndicator> mTurnSignalIndicatorList;
-    private List<VehicleLightState> mFogLightsStateList;
-    private List<Integer> mSteeringAngleList;
     private final Runnable runnable = new Runnable() {
         @Override
         public void run() {
             updateIndexAndUpdateListenersIfNeeded();
         }
     };
-    private String mVehicleIdentityNumber;
+
     private ScheduledFuture<?> mChangeValuesAtFixedRateFuture;
+
+    //cache
+    private AtomicInteger mIndex = new AtomicInteger(0);
+    private int mMaxValueOfIndex;
+    private int mChangeFrequency;
+    private List<Float> mMileageList;
+    private List<VehicleSignalIndicator> mTurnSignalIndicatorList;
+    private List<VehicleLightState> mFogLightsStateList;
+    private List<Float> mSteeringAngleList;
+    private String mVehicleIdentityNumber;
 
     public CarDataManagerDemoModeImpl(Context context) {
         mContext = context;
@@ -67,7 +69,7 @@ public class CarDataManagerDemoModeImpl implements CarDataManager {
     }
 
     /**
-     * Starts freqeuncy scheduler runnable, that runs every {@link mChangeFrequency} seconds and
+     * Starts frequency scheduler runnable, that runs every {@link mChangeFrequency} seconds and
      * updates values and triggers listeners if necessary.
      */
     public void startScheduler() {
@@ -195,7 +197,7 @@ public class CarDataManagerDemoModeImpl implements CarDataManager {
 
         mChangeFrequency = carDataJSON.getInt("change_frequency_secs");
 
-        mMileageList = DemoModeUtils.getIntegerList(carDataJSON.getJSONArray("mileage_list"));
+        mMileageList = DemoModeUtils.getFloatList(carDataJSON.getJSONArray("mileage_list"));
         mMaxValueOfIndex = mMileageList.size();
 
         mTurnSignalIndicatorList = DemoModeUtils.getConvertedList(
@@ -209,7 +211,7 @@ public class CarDataManagerDemoModeImpl implements CarDataManager {
         mMaxValueOfIndex = Integer.max(mMaxValueOfIndex, mFogLightsStateList.size());
 
         mSteeringAngleList =
-                DemoModeUtils.getIntegerList(carDataJSON.getJSONArray("steering_angle_list"));
+                DemoModeUtils.getFloatList(carDataJSON.getJSONArray("steering_angle_list"));
         mMaxValueOfIndex = Integer.max(mMaxValueOfIndex, mSteeringAngleList.size());
 
         mVehicleIdentityNumber = carDataJSON.getString("vehicle_identity_number");
