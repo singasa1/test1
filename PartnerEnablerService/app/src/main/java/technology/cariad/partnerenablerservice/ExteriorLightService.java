@@ -31,6 +31,7 @@ import androidx.annotation.GuardedBy;
 
 import static android.car.VehicleAreaType.VEHICLE_AREA_TYPE_GLOBAL;
 import static android.car.VehiclePropertyIds.TURN_SIGNAL_STATE;
+import static android.car.VehiclePropertyIds.FOG_LIGHTS_STATE;
 
 import android.car.Car;
 import android.car.hardware.CarPropertyValue;
@@ -43,8 +44,12 @@ public class ExteriorLightService extends IExteriorLightService.Stub {
     private static final String TAG = "PartnerEnablerService.ExteriorLightService";
 
     private Context mContext;
-    /** List of clients listening to UX restriction events */
+    /** List of clients listening to TurnSignalState */
     private final RemoteCallbackList<ITurnSignalStateListener> mTurnSignalStateListener =
+            new RemoteCallbackList<>();
+
+    /** List of clients listening to FogLightsState */
+    private final RemoteCallbackList<IFogLightStateListener> mFogLightStateListener =
             new RemoteCallbackList<>();
 
     @GuardedBy("mLock")
@@ -102,7 +107,6 @@ public class ExteriorLightService extends IExteriorLightService.Stub {
         }
     }
 
-
     @Override
     public int getTurnSignalIndicator() throws RemoteException {
         // Permission check
@@ -111,8 +115,8 @@ public class ExteriorLightService extends IExteriorLightService.Stub {
 //                VWAE_CAR_MILEAGE_PERMISSION)) {
         if (PackageManager.PERMISSION_GRANTED != mContext.getPackageManager().checkPermission(
                 PartnerAPI.PERMISSION_RECEIVE_TURN_SIGNAL_INDICATOR, mContext.getPackageManager().getNameForUid(Binder.getCallingUid()))) {
-            Log.d(TAG,"VWAE permission not granted");
-            throw new SecurityException("getTurnSignalIndicator requires CAR_MILEAGE permission");
+            Log.e(TAG,"VWAE permission not granted");
+            throw new SecurityException("getTurnSignalIndicator requires TURN_SIGNAL_INDICATOR permission");
         }
         int turnSignalIndicator = (int)mCarPropertyManager.getProperty(TURN_SIGNAL_STATE, VEHICLE_AREA_TYPE_GLOBAL).getValue();
         Log.d(TAG,"TurnSignalState Value: " + turnSignalIndicator);
@@ -121,6 +125,12 @@ public class ExteriorLightService extends IExteriorLightService.Stub {
 
     @Override
     public void addTurnSignalStateListener(ITurnSignalStateListener listener) throws RemoteException {
+        Log.d(TAG,"getTurnSignalIndicator");
+        if (PackageManager.PERMISSION_GRANTED != mContext.getPackageManager().checkPermission(
+                PartnerAPI.PERMISSION_RECEIVE_TURN_SIGNAL_INDICATOR, mContext.getPackageManager().getNameForUid(Binder.getCallingUid()))) {
+            Log.e(TAG,"VWAE permission not granted");
+            throw new SecurityException("addTurnSignalStateListener requires TURN_SIGNAL_INDICATOR permission");
+        }
         if (listener == null) {
             throw new IllegalArgumentException("ITurnSignalStateListener is null");
         }
@@ -133,5 +143,41 @@ public class ExteriorLightService extends IExteriorLightService.Stub {
             throw new IllegalArgumentException("ITurnSignalStateListener is null");
         }
         mTurnSignalStateListener.unregister(listener);
+    }
+
+    @Override
+    public int getFogLightsState() throws RemoteException {
+        // Permission check
+        Log.d(TAG,"getFogLightsState");
+        if (PackageManager.PERMISSION_GRANTED != mContext.getPackageManager().checkPermission(
+                PartnerAPI.PERMISSION_RECEIVE_FOG_LIGHTS, mContext.getPackageManager().getNameForUid(Binder.getCallingUid()))) {
+            Log.d(TAG,"VWAE permission not granted");
+            throw new SecurityException("getFogLightsState requires FOG_LIGHTS permission");
+        }
+        int fogLightState = (int)mCarPropertyManager.getProperty(FOG_LIGHTS_STATE, VEHICLE_AREA_TYPE_GLOBAL).getValue();
+        Log.d(TAG,"FogLightsState Value: " + fogLightState);
+        return fogLightState;
+    }
+
+    @Override
+    public void addFogLightStateListener(IFogLightStateListener listener) throws RemoteException {
+        Log.d(TAG,"addFogLightStateListener");
+        if (PackageManager.PERMISSION_GRANTED != mContext.getPackageManager().checkPermission(
+                PartnerAPI.PERMISSION_RECEIVE_FOG_LIGHTS, mContext.getPackageManager().getNameForUid(Binder.getCallingUid()))) {
+            Log.d(TAG,"VWAE permission not granted");
+            throw new SecurityException("addFogLightStateListener requires FOG_LIGHTS permission");
+        }
+        if (listener == null) {
+            throw new IllegalArgumentException("IFogLightStateListener is null");
+        }
+        mFogLightStateListener.register(listener);
+    }
+
+    @Override
+    public void removeFogLightStateListener(IFogLightStateListener listener) throws RemoteException {
+        if (listener == null) {
+            throw new IllegalArgumentException("IFogLightStateListener is null");
+        }
+        mFogLightStateListener.unregister(listener);
     }
 }

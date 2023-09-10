@@ -20,6 +20,7 @@ package technology.cariad.partnerenablerservice;
 
 // Declare any non-default types here with import statements
 import technology.cariad.partnerenablerservice.ITurnSignalStateListener;
+import technology.cariad.partnerenablerservice.IFogLightStateListener;
 
 /**
  * Interface used to interact with the ExteriorLightService in PartnerEnablerService.  Mostly this is used by the
@@ -37,6 +38,14 @@ interface IExteriorLightService {
     const int VEHICLE_SIGNAL_INDICATOR_LEFT = 2;
 
     /**
+     * GetFogLisghState Binder calls may returns one of
+     * the following light state.
+    */
+    const int VEHICLE_LIGHT_STATE_OFF = 0;
+    const int VEHICLE_LIGHT_STATE_ON = 1;
+    const int VEHICLE_LIGHT_STATE_DAYTIME_RUNNING = 2;
+
+    /**
      * This method returns the Car current signal indicator value. on_change prop type
      * 0 - None
      * 1 - Right
@@ -45,12 +54,30 @@ interface IExteriorLightService {
     int getTurnSignalIndicator();
 
     /**
-     * Registers a listener @link#ICarDataChangeListener to be called when the car data changes.
+     * Registers a listener @link#ITurnSignalStateListener to be called when the turn signal state changes.
     */
     void addTurnSignalStateListener(in ITurnSignalStateListener listener);
 
     /**
-    * Removes the provided listener from receiving the callbacks.
+     * Removes the provided listener from receiving the callbacks.
     */
     void removeTurnSignalStateListener(in ITurnSignalStateListener listener);
+
+    /**
+     * This method returns the Car fog light state. on_change prop type
+     * 0 - OFF
+     * 1 - ON
+     * 2 - DAYLIGHT_RUNNING
+    */
+    int getFogLightsState();
+
+    /**
+     * Registers a listener @link#IFogLightStateListener to be called when the fog lights state changes.
+    */
+    void addFogLightStateListener(in IFogLightStateListener listener);
+
+    /**
+    * Removes the provided listener from receiving the callbacks.
+    */
+    void removeFogLightStateListener(in IFogLightStateListener listener);
 }
