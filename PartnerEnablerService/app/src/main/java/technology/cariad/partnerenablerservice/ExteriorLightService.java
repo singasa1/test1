@@ -43,7 +43,7 @@ public class ExteriorLightService extends IExteriorLightService.Stub {
     private static final String TAG = "PartnerEnablerService.ExteriorLightService";
 
     private Context mContext;
-    /** List of clients listening to UX restriction events */
+    /** List of clients listening to TurnSignalState */
     private final RemoteCallbackList<ITurnSignalStateListener> mTurnSignalStateListener =
             new RemoteCallbackList<>();
 
@@ -112,7 +112,7 @@ public class ExteriorLightService extends IExteriorLightService.Stub {
         if (PackageManager.PERMISSION_GRANTED != mContext.getPackageManager().checkPermission(
                 PartnerAPI.PERMISSION_RECEIVE_TURN_SIGNAL_INDICATOR, mContext.getPackageManager().getNameForUid(Binder.getCallingUid()))) {
             Log.d(TAG,"VWAE permission not granted");
-            throw new SecurityException("getTurnSignalIndicator requires CAR_MILEAGE permission");
+            throw new SecurityException("getTurnSignalIndicator requires TURN_SIGNAL_INDICATOR permission");
         }
         int turnSignalIndicator = (int)mCarPropertyManager.getProperty(TURN_SIGNAL_STATE, VEHICLE_AREA_TYPE_GLOBAL).getValue();
         Log.d(TAG,"TurnSignalState Value: " + turnSignalIndicator);
@@ -121,6 +121,13 @@ public class ExteriorLightService extends IExteriorLightService.Stub {
 
     @Override
     public void addTurnSignalStateListener(ITurnSignalStateListener listener) throws RemoteException {
+        Log.d(TAG,"addTurnSignalStateListener");
+        if (PackageManager.PERMISSION_GRANTED != mContext.getPackageManager().checkPermission(
+                PartnerAPI.PERMISSION_RECEIVE_TURN_SIGNAL_INDICATOR, mContext.getPackageManager().getNameForUid(Binder.getCallingUid()))) {
+            Log.e(TAG,"VWAE permission not granted");
+            throw new SecurityException("addTurnSignalStateListener requires TURN_SIGNAL_INDICATOR permission");
+        }
+
         if (listener == null) {
             throw new IllegalArgumentException("ITurnSignalStateListener is null");
         }

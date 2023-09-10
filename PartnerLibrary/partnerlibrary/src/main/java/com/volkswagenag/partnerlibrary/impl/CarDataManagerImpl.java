@@ -202,8 +202,6 @@ public class CarDataManagerImpl implements CarDataManager {
             status = Response.Status.SERVICE_COMMUNICATION_FAILURE;
             Log.e(TAG, "getExteriorLightService: throwable " + t);
         }
-        mTurnSignalListener.remove(turnSignalListener);
-//        removeCarDataListener();
         return status;
     }
 

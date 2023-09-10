@@ -45,12 +45,12 @@ interface IExteriorLightService {
     int getTurnSignalIndicator();
 
     /**
-     * Registers a listener @link#ICarDataChangeListener to be called when the car data changes.
+     * Registers a listener @link#ITurnSignalStateListener to be called when the turn signal state changes.
     */
     void addTurnSignalStateListener(in ITurnSignalStateListener listener);
 
     /**
-    * Removes the provided listener from receiving the callbacks.
+     * Removes the provided listener from receiving the callbacks.
     */
     void removeTurnSignalStateListener(in ITurnSignalStateListener listener);
 }
