@@ -76,6 +76,7 @@ public interface PartnerLibraryManager {
             "com.volkswagenag.restricted.permission.READ_PRIVILEGED_PHONE_STATE";
 
     public static final String EXTERIOR_LIGHT = "IExteriorLight";
+    public static final String NAVIGATION = "INavigation";
 
     /**
      * Returns the Singleton instance of {@link PartnerLibraryManager} to access Partner APIs

@@ -43,6 +43,7 @@ public class PartnerEnablerImpl extends IPartnerEnabler.Stub {
     private final Context mContext;
     private PartnerAccessManager mPartnerAccessManager;
     private ExteriorLightService mExteriorLightService;
+    private NavigationService mNavigationService;
 
     @GuardedBy("mLock")
     private Car mCar;
@@ -115,7 +116,8 @@ public class PartnerEnablerImpl extends IPartnerEnabler.Stub {
 //            return;
         }
 
-        mExteriorLightService= new ExteriorLightService(mContext, mCarPropertyManager);
+        mExteriorLightService = new ExteriorLightService(mContext, mCarPropertyManager);
+        mNavigationService = new NavigationService(mContext);
     }
 
     @Override
@@ -202,6 +204,9 @@ public class PartnerEnablerImpl extends IPartnerEnabler.Stub {
             case PartnerAPI.EXTERIOR_LIGHT:
                 Log.i(TAG, " getAPIService: mExteriorLightService=" + mExteriorLightService);
                 return mExteriorLightService;
+            case PartnerAPI.NAVIGATION:
+                Log.i(TAG, " getAPIService: mNavigationService=" + mNavigationService);
+                return mNavigationService;
             default:
                 Log.w(TAG, "getAPIService for unknown service:" + serviceName);
                 return null;
