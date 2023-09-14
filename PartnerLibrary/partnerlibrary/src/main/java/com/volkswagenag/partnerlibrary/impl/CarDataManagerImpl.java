@@ -60,6 +60,7 @@ import technology.cariad.partnerenablerservice.ITurnSignalStateListener;
  */
 public class CarDataManagerImpl implements CarDataManager {
     private static final String TAG = CarDataManagerImpl.class.getSimpleName();
+    private static final String VEHICLE_INFO_SERVICE = "VehicleInfoService";
 
     private final IPartnerEnabler mService;
 
@@ -287,7 +288,9 @@ public class CarDataManagerImpl implements CarDataManager {
     public Response<String> getVehicleIdentityNumber() {
         Response<String> response = new Response<>(Response.Status.VALUE_NOT_AVAILABLE, null);
         try {
-            response.value = mService.getVehicleIdentityNumber();
+            IBinder binder = mService.getAPIService(VEHICLE_INFO_SERVICE);
+            IVehicleInfoService vehicleInfoService = (IVehicleInfoService)IVehicleInfoService.Stub.asInterface(binder);
+            response.value = vehicleInfoService.getVehicleIdentityNumber();
             response.status = Response.Status.SUCCESS;
         } catch (IllegalStateException e) {
             e.printStackTrace();
