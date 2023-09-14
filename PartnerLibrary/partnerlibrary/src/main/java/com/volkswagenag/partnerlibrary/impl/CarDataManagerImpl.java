@@ -60,7 +60,7 @@ import technology.cariad.partnerenablerservice.ITurnSignalStateListener;
  */
 public class CarDataManagerImpl implements CarDataManager {
     private static final String TAG = CarDataManagerImpl.class.getSimpleName();
-    private static final String VEHICLE_INFO_SERVICE = "VehicleInfoService";
+    private static final String VEHICLE_INFO_SERVICE = "IVehicleInfoService";
 
     private final IPartnerEnabler mService;
 
