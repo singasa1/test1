@@ -4,6 +4,8 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.pm.PackageManager;
+import android.os.Binder;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
@@ -102,6 +104,43 @@ class PartnerAccessManager {
             accessAllowed = accessCache.get(packageName);
         }
         return accessAllowed;
+    }
+
+    /**
+     * Check if access is allowed and throw SecurityException if the access is not allowed for the
+     * package.
+     * @param packageName package name of the application to which access is verified.
+     * @throws SecurityException if the access is not allowed.
+     */
+    public void verifyAccess(String packageName) throws SecurityException {
+        Log.d(TAG, "Calling app is: " + packageName);
+        try {
+            if (!isAccessAllowed(packageName)) {
+                throw new SecurityException(
+                        "The app " + packageName +
+                                " doesn't have the permission to access Partner API's");
+            }
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Check if access is allowed and throw SecurityException if the access is not allowed for the
+     * package.
+     * @param packageName package name of the application to which access is verified.
+     * @throws SecurityException if the access is not allowed.
+     */
+    public void verifyAccessAndPermission(String packageName, String permission, String permissionFailureMessage) throws SecurityException {
+        Log.d(TAG, "Calling app is: " + packageName);
+
+        verifyAccess(packageName);
+
+        if (mContext.getPackageManager().checkPermission(
+                permission, mContext.getPackageManager().getNameForUid(Binder.getCallingUid())) != PackageManager.PERMISSION_GRANTED) {
+            Log.e(TAG, "VWAE permission not granted");
+            throw new SecurityException(permissionFailureMessage);
+        }
     }
 
     private void checkAndUpdateCache(String packageName) throws RemoteException {

@@ -41,7 +41,9 @@ import com.volkswagenag.partnerlibrary.TurnSignalListener;
 import com.volkswagenag.partnerlibrary.VehicleLightState;
 import com.volkswagenag.partnerlibrary.VehicleSignalIndicator;
 
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.Set;
 
 import technology.cariad.partnerenablerservice.ICarDataChangeListener;
 import technology.cariad.partnerenablerservice.IExteriorLightService;
@@ -66,11 +68,12 @@ public class CarDataManagerImpl implements CarDataManager {
 
     private final ICarDataChangeListener mCarDataChangeListener = new CarDataChangeListener();
     private final ITurnSignalStateListener mTurnSignalStateListener = new TurnSignalStateListener();
+    private final ISteeringAngleChangeListener mSteeringAngleChangeListener = new SteeringAngleChangeListener();
 
-    private final HashSet<MileageListener> mMileageListeners = new HashSet<MileageListener>();
-    private final HashSet<TurnSignalListener> mTurnSignalListener = new HashSet<TurnSignalListener>();
-    private final HashSet<FogLightStateListener> mFogLightStateListener = new HashSet<FogLightStateListener>();
-    private final HashSet<SteeringAngleListener> mSteeringAngleListener = new HashSet<SteeringAngleListener>();
+    private final Set<MileageListener> mMileageListeners = Collections.synchronizedSet(new HashSet<>());
+    private final Set<TurnSignalListener> mTurnSignalListener = Collections.synchronizedSet(new HashSet<>());
+    private final Set<FogLightStateListener> mFogLightStateListener = Collections.synchronizedSet(new HashSet<>());
+    private final Set<SteeringAngleListener> mSteeringAngleListener = Collections.synchronizedSet(new HashSet<>());
 
     public CarDataManagerImpl(IPartnerEnabler service) {
         Log.d(TAG,"CarDataManager");
@@ -381,6 +384,16 @@ public class CarDataManagerImpl implements CarDataManager {
             for(TurnSignalListener listener: mTurnSignalListener) {
                 VehicleSignalIndicator indicator = convertTurnSignalIndicator(signalIndicator);
                 listener.onTurnSignalStateChanged(indicator);
+            }
+        }
+    }
+
+    private class SteeringAngleChangeListener extends ISteeringAngleChangeListener.Stub {
+        @Override
+        public void onSteeringAngleChanged(float steeringAngle) throws RemoteException {
+            Log.d(TAG, "calling listener onSteeringAngleLisenter with value: " + steeringAngle);
+            for(SteeringAngleListener listener: mSteeringAngleListener) {
+                listener.onSteeringAngleChanged(steeringAngle);
             }
         }
     }

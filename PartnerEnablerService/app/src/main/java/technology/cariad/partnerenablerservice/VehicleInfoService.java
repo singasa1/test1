@@ -29,8 +29,8 @@ public class VehicleInfoService extends IVehicleInfoService.Stub {
     }
 
     public String getVehicleIdentityNumber() {
-        verifyAccessAndPermission(mContext.getPackageManager().getNameForUid(
-                Binder.getCallingUid()),
+        mPartnerAccessManager.verifyAccessAndPermission(
+                mContext.getPackageManager().getNameForUid(Binder.getCallingUid()),
                 PartnerAPI.PERMISSION_RECEIVE_CAR_INFO_VIN,
                 "getVehicleIdentityNumber requires READ_INFO_VIN permission");
 
@@ -42,31 +42,4 @@ public class VehicleInfoService extends IVehicleInfoService.Stub {
         Log.d(TAG, "VIN number: " + vin);
         return vin;
     }
-
-    /**
-     * Check if access is allowed and throw SecurityException if the access is not allowed for the
-     * package.
-     * @param packageName package name of the application to which access is verified.
-     * @throws SecurityException if the access is not allowed.
-     */
-    private void verifyAccessAndPermission(String packageName, String permission, String permissionFailureMessage) throws SecurityException {
-        Log.d(TAG, "Calling app is: " + packageName);
-        try {
-            if (!mPartnerAccessManager.isAccessAllowed(packageName)) {
-                throw new SecurityException(
-                        "The app " + packageName +
-                                " doesn't have the permission to access Partner API's");
-            }
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
-
-        if (mContext.getPackageManager().checkPermission(
-                permission, mContext.getPackageManager().getNameForUid(Binder.getCallingUid())) != PackageManager.PERMISSION_GRANTED) {
-            Log.e(TAG, "VWAE permission not granted");
-            throw new SecurityException(permissionFailureMessage);
-        }
-    }
-
-
 }

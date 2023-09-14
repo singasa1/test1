@@ -28,6 +28,7 @@ public interface PartnerAPI {
 
     public static final String EXTERIOR_LIGHT = "IExteriorLight";
     public static final String VEHICLE_INFO_SERVICE = "IVehicleInfoService";
+    public static final String VEHICLE_DRIVING_SERVICE = "IVehicleDrivingService";
 
     /**
      * Permission string to get the car current odomoter/mileage value through {@link }.

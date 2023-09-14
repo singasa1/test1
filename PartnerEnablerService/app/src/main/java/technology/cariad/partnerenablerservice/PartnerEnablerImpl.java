@@ -100,7 +100,7 @@ public class PartnerEnablerImpl extends IPartnerEnabler.Stub {
     @Override
     public void initialize() throws SecurityException {
         Log.d(TAG, "initialize");
-        verifyAccess(mContext.getPackageManager().getNameForUid(Binder.getCallingUid()));
+        mPartnerAccessManager.verifyAccess(mContext.getPackageManager().getNameForUid(Binder.getCallingUid()));
 
         mCarPropertyManager =
                 (CarPropertyManager) Car.createCar(mContext).getCarManager(Car.PROPERTY_SERVICE);
@@ -123,39 +123,16 @@ public class PartnerEnablerImpl extends IPartnerEnabler.Stub {
     @Override
     public void release() throws SecurityException {
         Log.d(TAG, "release");
-        verifyAccess(mContext.getPackageManager().getNameForUid(Binder.getCallingUid()));
-    }
-
-    /**
-     * Check if access is allowed and throw SecurityException if the access is not allowed for the
-     * package.
-     * @param packageName package name of the application to which access is verified.
-     * @throws SecurityException if the access is not allowed.
-     */
-    private void verifyAccess(String packageName) throws SecurityException {
-        Log.d(TAG, "Calling app is: " + packageName);
-        try {
-            if (!mPartnerAccessManager.isAccessAllowed(packageName)) {
-                throw new SecurityException(
-                        "The app " + packageName +
-                                " doesn't have the permission to access Partner API's");
-            }
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
+        mPartnerAccessManager.verifyAccess(mContext.getPackageManager().getNameForUid(Binder.getCallingUid()));
     }
 
     @Override
     public float getCurrentMileage() throws RemoteException {
-        // Permission check
         Log.d(TAG,"getCurrentMileage");
-//        if (PackageManager.PERMISSION_GRANTED != mContext.checkCallingOrSelfPermission(
-//                VWAE_CAR_MILEAGE_PERMISSION)) {
-        if (PackageManager.PERMISSION_GRANTED != mContext.getPackageManager().checkPermission(
-                VWAE_CAR_MILEAGE_PERMISSION, mContext.getPackageManager().getNameForUid(Binder.getCallingUid()))) {
-            Log.d(TAG,"VWAE permission not granted");
-            throw new SecurityException("getCurrentMileage requires CAR_MILEAGE permission");
-        }
+        mPartnerAccessManager.verifyAccessAndPermission(
+                mContext.getPackageManager().getNameForUid(Binder.getCallingUid()),
+                VWAE_CAR_MILEAGE_PERMISSION,
+                "getCurrentMileage requires CAR_MILEAGE permission");
         float odometerValue = (float)mCarPropertyManager.getProperty(PERF_ODOMETER, VEHICLE_AREA_TYPE_GLOBAL).getValue();
         Log.d(TAG,"Odometer Value: " + odometerValue);
         return odometerValue;
@@ -168,11 +145,6 @@ public class PartnerEnablerImpl extends IPartnerEnabler.Stub {
 
     @Override
     public int getFogLightsState() throws RemoteException {
-        return 0;
-    }
-
-    @Override
-    public float getSteeringAngle() throws RemoteException {
         return 0;
     }
 
