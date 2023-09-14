@@ -43,6 +43,7 @@ public class PartnerEnablerImpl extends IPartnerEnabler.Stub {
     private final Context mContext;
     private PartnerAccessManager mPartnerAccessManager;
     private ExteriorLightService mExteriorLightService;
+    private VehicleInfoService mVehicleInfoService;
 
     @GuardedBy("mLock")
     private Car mCar;
@@ -99,7 +100,7 @@ public class PartnerEnablerImpl extends IPartnerEnabler.Stub {
     @Override
     public void initialize() throws SecurityException {
         Log.d(TAG, "initialize");
-//        verifyAccess(mContext.getPackageManager().getNameForUid(Binder.getCallingUid()));
+        verifyAccess(mContext.getPackageManager().getNameForUid(Binder.getCallingUid()));
 
         mCarPropertyManager =
                 (CarPropertyManager) Car.createCar(mContext).getCarManager(Car.PROPERTY_SERVICE);
@@ -115,7 +116,8 @@ public class PartnerEnablerImpl extends IPartnerEnabler.Stub {
 //            return;
         }
 
-        mExteriorLightService= new ExteriorLightService(mContext, mCarPropertyManager);
+        mExteriorLightService = new ExteriorLightService(mContext, mCarPropertyManager);
+        mVehicleInfoService = new VehicleInfoService(mContext, mCarPropertyManager, mPartnerAccessManager);
     }
 
     @Override
@@ -175,11 +177,6 @@ public class PartnerEnablerImpl extends IPartnerEnabler.Stub {
     }
 
     @Override
-    public String getVehicleIdentityNumber() throws RemoteException {
-        return null;
-    }
-
-    @Override
     public void addCarDataChangeListener(ICarDataChangeListener listener) throws RemoteException{
         if (listener == null) {
             throw new IllegalArgumentException("ICarDataChaneListener is null");
@@ -202,6 +199,9 @@ public class PartnerEnablerImpl extends IPartnerEnabler.Stub {
             case PartnerAPI.EXTERIOR_LIGHT:
                 Log.i(TAG, " getAPIService: mExteriorLightService=" + mExteriorLightService);
                 return mExteriorLightService;
+            case PartnerAPI.VEHICLE_INFO_SERVICE:
+                Log.i(TAG, "getAPIService: mVehicleInfoService = " + mVehicleInfoService);
+                return mVehicleInfoService;
             default:
                 Log.w(TAG, "getAPIService for unknown service:" + serviceName);
                 return null;
