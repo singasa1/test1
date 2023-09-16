@@ -24,7 +24,6 @@ import android.content.pm.PackageManager;
 import android.os.Binder;
 import android.os.RemoteCallbackList;
 import android.os.RemoteException;
-import android.provider.Telephony;
 import android.util.Log;
 
 import androidx.annotation.GuardedBy;
@@ -36,19 +35,19 @@ import android.car.Car;
 import android.car.hardware.CarPropertyValue;
 import android.car.hardware.property.CarPropertyManager;
 
-import technology.cariad.partnerenablerservice.PartnerAPI;
-import technology.cariad.partnerenablerservice.ITurnSignalStateListener;
-
 public class ExteriorLightService extends IExteriorLightService.Stub {
     private static final String TAG = "PartnerEnablerService.ExteriorLightService";
 
     private Context mContext;
+
     /** List of clients listening to TurnSignalState */
     private final RemoteCallbackList<ITurnSignalStateListener> mTurnSignalStateListener =
             new RemoteCallbackList<>();
 
     @GuardedBy("mLock")
     private CarPropertyManager mCarPropertyManager;
+
+    private PartnerAccessManager mPartnerAccessManager;
 
     /**
      * {@link CarPropertyEvent} listener registered with the {@link CarPropertyManager} for getting
@@ -78,7 +77,6 @@ public class ExteriorLightService extends IExteriorLightService.Stub {
                         default:
                             break;
                     }
-
                 }
 
                 @Override
@@ -87,19 +85,10 @@ public class ExteriorLightService extends IExteriorLightService.Stub {
                 }
             };
 
-    public ExteriorLightService(Context context, CarPropertyManager carPropertyManager) {
+    public ExteriorLightService(Context context, CarPropertyManager carPropertyManager, PartnerAccessManager partnerAccessManager) {
         mContext = context;
         mCarPropertyManager = carPropertyManager;
-
-        if(mCarPropertyManager != null) {
-            if (!mCarPropertyManager.registerCallback(mCarPropertyEventCallback,
-                    TURN_SIGNAL_STATE,
-                    PartnerAPI.PROPERTY_UPDATE_RATE_HZ)) {
-                Log.e(TAG,
-                        "Failed to register callback for TURN_SIGNAL_STATE with CarPropertyManager");
-//            return;
-            }
-        }
+        mPartnerAccessManager = partnerAccessManager;
     }
 
 
@@ -107,13 +96,7 @@ public class ExteriorLightService extends IExteriorLightService.Stub {
     public int getTurnSignalIndicator() throws RemoteException {
         // Permission check
         Log.d(TAG,"getTurnSignalIndicator");
-//        if (PackageManager.PERMISSION_GRANTED != mContext.checkCallingOrSelfPermission(
-//                VWAE_CAR_MILEAGE_PERMISSION)) {
-        if (PackageManager.PERMISSION_GRANTED != mContext.getPackageManager().checkPermission(
-                PartnerAPI.PERMISSION_RECEIVE_TURN_SIGNAL_INDICATOR, mContext.getPackageManager().getNameForUid(Binder.getCallingUid()))) {
-            Log.d(TAG,"VWAE permission not granted");
-            throw new SecurityException("getTurnSignalIndicator requires TURN_SIGNAL_INDICATOR permission");
-        }
+        validatePermission(mContext.getPackageManager().getNameForUid(Binder.getCallingUid()), PartnerAPIConstants.PERMISSION_RECEIVE_TURN_SIGNAL_INDICATOR);
         int turnSignalIndicator = (int)mCarPropertyManager.getProperty(TURN_SIGNAL_STATE, VEHICLE_AREA_TYPE_GLOBAL).getValue();
         Log.d(TAG,"TurnSignalState Value: " + turnSignalIndicator);
         return turnSignalIndicator;
@@ -122,14 +105,30 @@ public class ExteriorLightService extends IExteriorLightService.Stub {
     @Override
     public void addTurnSignalStateListener(ITurnSignalStateListener listener) throws RemoteException {
         Log.d(TAG,"addTurnSignalStateListener");
-        if (PackageManager.PERMISSION_GRANTED != mContext.getPackageManager().checkPermission(
-                PartnerAPI.PERMISSION_RECEIVE_TURN_SIGNAL_INDICATOR, mContext.getPackageManager().getNameForUid(Binder.getCallingUid()))) {
-            Log.e(TAG,"VWAE permission not granted");
-            throw new SecurityException("addTurnSignalStateListener requires TURN_SIGNAL_INDICATOR permission");
-        }
+
+        validatePermission(mContext.getPackageManager().getNameForUid(Binder.getCallingUid()), PartnerAPIConstants.PERMISSION_RECEIVE_TURN_SIGNAL_INDICATOR);
 
         if (listener == null) {
             throw new IllegalArgumentException("ITurnSignalStateListener is null");
+        }
+
+        // check any client listener is registered before. If not registered, register the client listener
+        // and register callback with CarPropertyManager for specific VHAL Property id
+        if (mTurnSignalStateListener.getRegisteredCallbackCount() == 0) {
+            if (mCarPropertyManager == null) {
+                Log.e(TAG, "Failed to get CarPropertyManager");
+                throw new IllegalStateException("CAR Property Service not ready");
+            }
+
+            if(mCarPropertyManager != null) {
+                if (!mCarPropertyManager.registerCallback(mCarPropertyEventCallback,
+                        TURN_SIGNAL_STATE,
+                        PartnerAPIConstants.PROPERTY_UPDATE_RATE_HZ)) {
+                    Log.e(TAG,
+                            "Failed to register callback for TURN_SIGNAL_STATE with CarPropertyManager");
+                    throw new IllegalArgumentException("TurnSignalState callback registration failed");
+                }
+            }
         }
         mTurnSignalStateListener.register(listener);
     }
@@ -140,5 +139,27 @@ public class ExteriorLightService extends IExteriorLightService.Stub {
             throw new IllegalArgumentException("ITurnSignalStateListener is null");
         }
         mTurnSignalStateListener.unregister(listener);
+        if (mTurnSignalStateListener.getRegisteredCallbackCount() == 0) {
+            // unregister carpropertyevent callback
+            mCarPropertyManager.unregisterCallback(mCarPropertyEventCallback);
+        }
+    }
+
+    private void validatePermission(String packageName, String permission) throws SecurityException, RemoteException {
+        Log.d(TAG, "Calling app is: " + packageName);
+        //Check whether caller has requested needed permission
+        //        if (PackageManager.PERMISSION_GRANTED != mContext.checkCallingOrSelfPermission(
+//                VWAE_CAR_MILEAGE_PERMISSION)) {
+        if (PackageManager.PERMISSION_GRANTED != mContext.getPackageManager().checkPermission(
+                permission, packageName)) {
+            Log.e(TAG,"VWAE permission not granted");
+            throw new SecurityException("Requires " + permission + " permission");
+        }
+
+        // partner signature token verification.
+        //if (!mPartnerAccessManager.isAccessAllowed(packageName)) {
+        //    throw new SecurityException(
+        //            "The app " + packageName + " doesn't have the permission to access Partner API's");
+        //}
     }
 }
