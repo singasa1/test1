@@ -106,18 +106,19 @@ public class PartnerEnablerImpl extends IPartnerEnabler.Stub {
                 (CarPropertyManager) Car.createCar(mContext).getCarManager(Car.PROPERTY_SERVICE);
         if (mCarPropertyManager == null) {
             Log.e(TAG, "Failed to get CarPropertyManager");
-//            return;
-        }
-        if (!mCarPropertyManager.registerCallback(mCarPropertyEventCallback,
-                PERF_ODOMETER,
-                PartnerAPI.PROPERTY_UPDATE_RATE_HZ)) {
-            Log.e(TAG,
-                    "Failed to register callback for PERF_ODOMETER with CarPropertyManager");
-//            return;
+            throw new IllegalStateException("CAR Property Service not ready");
         }
 
-        mExteriorLightService = new ExteriorLightService(mContext, mCarPropertyManager);
+        mExteriorLightService= new ExteriorLightService(mContext, mCarPropertyManager, mPartnerAccessManager);
         mVehicleInfoService = new VehicleInfoService(mContext, mCarPropertyManager, mPartnerAccessManager);
+
+        if (!mCarPropertyManager.registerCallback(mCarPropertyEventCallback,
+                PERF_ODOMETER,
+                PartnerAPIConstants.PROPERTY_UPDATE_RATE_HZ)) {
+            Log.e(TAG,
+                    "Failed to register callback for PERF_ODOMETER with CarPropertyManager");
+            throw new IllegalArgumentException("Odometer callback registration failed");
+        }
     }
 
     @Override
@@ -196,10 +197,10 @@ public class PartnerEnablerImpl extends IPartnerEnabler.Stub {
     public IBinder getAPIService(String serviceName) throws RemoteException {
         Log.i(TAG, "calling getAPIService for service:" + serviceName);
         switch (serviceName) {
-            case PartnerAPI.EXTERIOR_LIGHT:
+            case PartnerAPIConstants.EXTERIOR_LIGHT_SERVICE:
                 Log.i(TAG, " getAPIService: mExteriorLightService=" + mExteriorLightService);
                 return mExteriorLightService;
-            case PartnerAPI.VEHICLE_INFO_SERVICE:
+            case PartnerAPIConstants.VEHICLE_INFO_SERVICE:
                 Log.i(TAG, "getAPIService: mVehicleInfoService = " + mVehicleInfoService);
                 return mVehicleInfoService;
             default:

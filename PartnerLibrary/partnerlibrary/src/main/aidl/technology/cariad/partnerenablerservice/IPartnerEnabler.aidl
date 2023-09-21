@@ -91,5 +91,9 @@ interface IPartnerEnabler {
     */
     void removeCarDataChangeListener(in ICarDataChangeListener listener) = 7;
 
+    /**
+    * Returns the IBinder for the given service name
+    * List of available ServiceName Strings are defined in @link#PartnerAPIConstants.
+    */
     IBinder getAPIService(in String serviceName) = 8;
 }
