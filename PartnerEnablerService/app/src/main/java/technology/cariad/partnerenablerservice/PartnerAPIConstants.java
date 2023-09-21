@@ -23,12 +23,12 @@ package technology.cariad.partnerenablerservice;
 /**
  * Partner API Constants for Java Applications
  */
-public interface PartnerAPI {
+class PartnerAPIConstants {
     public static final int PROPERTY_UPDATE_RATE_HZ = 5000;
 
-    public static final String EXTERIOR_LIGHT = "IExteriorLight";
-    public static final String VEHICLE_INFO_SERVICE = "IVehicleInfoService";
-    public static final String VEHICLE_DRIVING_SERVICE = "IVehicleDrivingService";
+    public static final String EXTERIOR_LIGHT = "EXTERIOR_LIGHT_SERVICE";
+    public static final String VEHICLE_INFO_SERVICE = "VEHICLE_INFO_SERVICE";
+    public static final String VEHICLE_DRIVING_SERVICE = "VEHICLE_DRIVING_SERVICE";
 
     /**
      * Permission string to get the car current odomoter/mileage value through {@link }.
