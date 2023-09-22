@@ -70,17 +70,17 @@ public class CarDataActivity extends AppCompatActivity implements MileageListene
 
         status = mCarDataManager.registerTurnSignalListener(CarDataActivity.this);
         if (status != Response.Status.SUCCESS) {
-            logAndShowError("registerMileageListener failed with ", status);
+            logAndShowError("registerTurnSignalListener failed with ", status);
         }
 
         status = mCarDataManager.registerFogLightStateListener(CarDataActivity.this);
         if (status != Response.Status.SUCCESS) {
-            logAndShowError("registerMileageListener failed with ", status);
+            logAndShowError("registerFogLightListener failed with ", status);
         }
 
         status = mCarDataManager.registerSteeringAngleListener(CarDataActivity.this);
         if (status != Response.Status.SUCCESS) {
-            logAndShowError("registerMileageListener failed with ", status);
+            logAndShowError("registerSteeringAngleListener failed with ", status);
         }
     }
 

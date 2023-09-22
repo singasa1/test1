@@ -73,6 +73,8 @@ public class CarDataManagerImpl implements CarDataManager {
     private final HashSet<FogLightStateListener> mFogLightListener = new HashSet<FogLightStateListener>();
     private final HashSet<SteeringAngleListener> mSteeringAngleListener = new HashSet<SteeringAngleListener>();
 
+    private IExteriorLightService mExteriorLightService;
+
     public CarDataManagerImpl(IPartnerEnabler service) {
         Log.d(TAG,"CarDataManager");
         mService = service;
@@ -147,12 +149,13 @@ public class CarDataManagerImpl implements CarDataManager {
     public Response<VehicleSignalIndicator> getTurnSignalIndicator() {
         Response<VehicleSignalIndicator> response = new Response<>(Response.Status.VALUE_NOT_AVAILABLE, VehicleSignalIndicator.NONE);
         try {
-            IBinder binder = mService.getAPIService(PartnerLibraryManager.EXTERIOR_LIGHT);
-            IExteriorLightService exteriorLightService = (IExteriorLightService)IExteriorLightService.Stub.asInterface(binder);
+            if (mExteriorLightService == null) {
+                initExteriorLightService();
+            }
 //            response.value = convertTurnSignalIndicator(mService.getTurnSignalIndicator());
-            response.value = convertTurnSignalIndicator(exteriorLightService.getTurnSignalIndicator());
+            response.value = convertTurnSignalIndicator(mExteriorLightService.getTurnSignalIndicator());
             response.status = Response.Status.SUCCESS;
-        } catch (IllegalStateException e) {
+        } catch (IllegalStateException | IllegalArgumentException e) {
             e.printStackTrace();
             response.status = Response.Status.INTERNAL_FAILURE;
         } catch (SecurityException e) {
@@ -171,18 +174,22 @@ public class CarDataManagerImpl implements CarDataManager {
     public Response.Status registerTurnSignalListener(TurnSignalListener turnSignalListener) {
         Response.Status status;
         try {
-            IBinder binder = mService.getAPIService(PartnerLibraryManager.EXTERIOR_LIGHT);
-            IExteriorLightService exteriorLightService = (IExteriorLightService)IExteriorLightService.Stub.asInterface(binder);
-            Log.i(TAG, "getExteriorLightService binder=" + binder);
-            exteriorLightService.addTurnSignalStateListener(mTurnSignalStateListener);
+            if (mExteriorLightService == null) {
+                initExteriorLightService();
+            }
+            mExteriorLightService.addTurnSignalStateListener(mTurnSignalStateListener);
             mTurnSignalListener.add(turnSignalListener);
             status = Response.Status.SUCCESS;
-        } catch (RemoteException re) {
+        } catch (IllegalStateException | IllegalArgumentException e) {
+            e.printStackTrace();
+            status = Response.Status.INTERNAL_FAILURE;
+        } catch (SecurityException e) {
+            e.printStackTrace();
+            Log.d(TAG, e.getMessage());
+            status = Response.Status.PERMISSION_DENIED;
+        } catch (RuntimeException | RemoteException re) {
             status = Response.Status.SERVICE_COMMUNICATION_FAILURE;
             Log.e(TAG, "getExteriorLightService: remoteException " + re);
-        } catch (Throwable t) {
-            status = Response.Status.SERVICE_COMMUNICATION_FAILURE;
-            Log.e(TAG, "getExteriorLightService: throwable " + t);
         }
         return status;
     }
@@ -191,18 +198,18 @@ public class CarDataManagerImpl implements CarDataManager {
     public Response.Status unregisterTurnSignalListener(TurnSignalListener turnSignalListener) {
         Response.Status status;
         try {
-            IBinder binder = mService.getAPIService(PartnerLibraryManager.EXTERIOR_LIGHT);
-            IExteriorLightService exteriorLightService = (IExteriorLightService)IExteriorLightService.Stub.asInterface(binder);
-            Log.i(TAG, "getExteriorLightService binder=" + binder);
-            exteriorLightService.removeTurnSignalStateListener(mTurnSignalStateListener);
+            if (mExteriorLightService == null) {
+                initExteriorLightService();
+            }
+            mExteriorLightService.removeTurnSignalStateListener(mTurnSignalStateListener);
             mTurnSignalListener.remove(turnSignalListener);
             status = Response.Status.SUCCESS;
-        } catch (RemoteException re) {
+        } catch (IllegalStateException | IllegalArgumentException e) {
+            e.printStackTrace();
+            status = Response.Status.INTERNAL_FAILURE;
+        } catch (RuntimeException | RemoteException re) {
             status = Response.Status.SERVICE_COMMUNICATION_FAILURE;
             Log.e(TAG, "getExteriorLightService: remoteException " + re);
-        } catch (Throwable t) {
-            status = Response.Status.SERVICE_COMMUNICATION_FAILURE;
-            Log.e(TAG, "getExteriorLightService: throwable " + t);
         }
         return status;
     }
@@ -212,12 +219,13 @@ public class CarDataManagerImpl implements CarDataManager {
     public Response<VehicleLightState> getFogLightsState() {
         Response<VehicleLightState> response = new Response<>(Response.Status.VALUE_NOT_AVAILABLE, VehicleLightState.OFF);
         try {
-            IBinder binder = mService.getAPIService(PartnerLibraryManager.EXTERIOR_LIGHT);
-            IExteriorLightService exteriorLightService = (IExteriorLightService)IExteriorLightService.Stub.asInterface(binder);
+            if (mExteriorLightService == null) {
+                initExteriorLightService();
+            }
 //            response.value = convertToVehicleLightState(mService.getFogLightsState());
-            response.value = convertToVehicleLightState(exteriorLightService.getFogLightsState());
+            response.value = convertToVehicleLightState(mExteriorLightService.getFogLightsState());
             response.status = Response.Status.SUCCESS;
-        } catch (IllegalStateException e) {
+        } catch (IllegalStateException | IllegalArgumentException e) {
             e.printStackTrace();
             response.status = Response.Status.INTERNAL_FAILURE;
         } catch (SecurityException e) {
@@ -236,18 +244,22 @@ public class CarDataManagerImpl implements CarDataManager {
     public Response.Status registerFogLightStateListener(FogLightStateListener lightStateListener) {
         Response.Status status;
         try {
-            IBinder binder = mService.getAPIService(PartnerLibraryManager.EXTERIOR_LIGHT);
-            IExteriorLightService exteriorLightService = (IExteriorLightService)IExteriorLightService.Stub.asInterface(binder);
-            Log.i(TAG, "getExteriorLightService binder=" + binder);
-            exteriorLightService.addFogLightStateListener(mFogLightStateListener);
+            if (mExteriorLightService == null) {
+                initExteriorLightService();
+            }
+            mExteriorLightService.addFogLightStateListener(mFogLightStateListener);
             mFogLightListener.add(lightStateListener);
             status = Response.Status.SUCCESS;
-        } catch (RemoteException re) {
+        } catch (IllegalStateException | IllegalArgumentException e) {
+            e.printStackTrace();
+            status = Response.Status.INTERNAL_FAILURE;
+        } catch (SecurityException e) {
+            e.printStackTrace();
+            Log.d(TAG, e.getMessage());
+            status = Response.Status.PERMISSION_DENIED;
+        } catch (RuntimeException | RemoteException re) {
             status = Response.Status.SERVICE_COMMUNICATION_FAILURE;
             Log.e(TAG, "getExteriorLightService: remoteException " + re);
-        } catch (Throwable t) {
-            status = Response.Status.SERVICE_COMMUNICATION_FAILURE;
-            Log.e(TAG, "getExteriorLightService: throwable " + t);
         }
         return status;
     }
@@ -256,18 +268,18 @@ public class CarDataManagerImpl implements CarDataManager {
     public Response.Status unregisterFogLightStateListener(FogLightStateListener lightStateListener) {
         Response.Status status;
         try {
-            IBinder binder = mService.getAPIService(PartnerLibraryManager.EXTERIOR_LIGHT);
-            IExteriorLightService exteriorLightService = (IExteriorLightService)IExteriorLightService.Stub.asInterface(binder);
-            Log.i(TAG, "getExteriorLightService binder=" + binder);
-            exteriorLightService.removeFogLightStateListener(mFogLightStateListener);
+            if (mExteriorLightService == null) {
+                initExteriorLightService();
+            }
+            mExteriorLightService.removeFogLightStateListener(mFogLightStateListener);
             mFogLightListener.remove(lightStateListener);
             status = Response.Status.SUCCESS;
-        } catch (RemoteException re) {
+        } catch (IllegalStateException | IllegalArgumentException e) {
+            e.printStackTrace();
+            status = Response.Status.INTERNAL_FAILURE;
+        } catch (RuntimeException | RemoteException re) {
             status = Response.Status.SERVICE_COMMUNICATION_FAILURE;
             Log.e(TAG, "getExteriorLightService: remoteException " + re);
-        } catch (Throwable t) {
-            status = Response.Status.SERVICE_COMMUNICATION_FAILURE;
-            Log.e(TAG, "getExteriorLightService: throwable " + t);
         }
         return status;
     }
@@ -410,6 +422,7 @@ public class CarDataManagerImpl implements CarDataManager {
         }
     }
 
+
     private class FogLightsStateListener extends IFogLightStateListener.Stub {
 
         @Override
@@ -421,4 +434,11 @@ public class CarDataManagerImpl implements CarDataManager {
             }
         }
     }
+
+    private void initExteriorLightService() throws RemoteException {
+        IBinder binder = mService.getAPIService(PartnerAPIConstants.EXTERIOR_LIGHT);
+        Log.i(TAG, "getExteriorLightService binder=" + binder);
+        mExteriorLightService = (IExteriorLightService) IExteriorLightService.Stub.asInterface(binder);
+    }
 }
+

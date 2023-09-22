@@ -79,8 +79,7 @@ public class PartnerLibraryManagerImpl implements PartnerLibraryManager {
             mService = IPartnerEnabler.Stub.asInterface((IBinder) boundService);
             Log.d(TAG, "onServiceConnected() connected");
             mIsPartnerEnablerServiceConnected = true;
-            mCarDataManager = new CarDataManagerImpl(mService);
-            mNavigationManager = new NavigationManagerImpl(mService);
+
             if (mClientListeners != null) {
                 try {
                     Log.d(TAG, "calling listener onLibStateReady with value: " + mIsPartnerEnablerServiceConnected);
@@ -137,9 +136,14 @@ public class PartnerLibraryManagerImpl implements PartnerLibraryManager {
         if (mIsPartnerEnablerServiceConnected) {
             try {
                 mService.initialize();
+                mCarDataManager = new CarDataManagerImpl(mService);
+                mNavigationManager = new NavigationManagerImpl(mService);
             } catch (SecurityException e) {
                 ret = Response.Status.PERMISSION_DENIED;
                 e.printStackTrace();
+            } catch (IllegalStateException | IllegalArgumentException e) {
+                e.printStackTrace();
+                ret = Response.Status.INTERNAL_FAILURE;
             } catch (RemoteException e) {
                 ret = Response.Status.SERVICE_COMMUNICATION_FAILURE;
                 e.printStackTrace();
@@ -158,6 +162,9 @@ public class PartnerLibraryManagerImpl implements PartnerLibraryManager {
             } catch (SecurityException e) {
                 ret = Response.Status.PERMISSION_DENIED;
                 e.printStackTrace();
+            } catch (IllegalStateException | IllegalArgumentException e) {
+                e.printStackTrace();
+                ret = Response.Status.INTERNAL_FAILURE;
             } catch (RemoteException e) {
                 ret = Response.Status.SERVICE_COMMUNICATION_FAILURE;
                 e.printStackTrace();

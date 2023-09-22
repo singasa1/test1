@@ -63,6 +63,7 @@ interface IExteriorLightService {
     */
     void removeTurnSignalStateListener(in ITurnSignalStateListener listener);
 
+
     /**
      * This method returns the Car fog light state. on_change prop type
      * 0 - OFF
