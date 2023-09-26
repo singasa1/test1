@@ -23,6 +23,9 @@ class PartnerAccessManager {
     private static final String TAG = PartnerAccessManager.class.getSimpleName();
     private static volatile PartnerAccessManager partnerAccessManagerInstance = null;
 
+    // This flag is only for testing purposes, to allow access without verification. This should be set to false in production.
+    private static final boolean DEBUG_MODE = true;
+
     private Context mContext;
 
     // This is a HashMap with Key as package names of the calling applications and
@@ -90,6 +93,9 @@ class PartnerAccessManager {
         if (!isServiceConnected || mService == null) {
             throw new IllegalStateException("Service is not connected to verify");
         }
+
+        if (DEBUG_MODE) return true;
+
         checkAndUpdateCache(packageName);
         boolean accessAllowed = false;
         synchronized (accessCache) {
