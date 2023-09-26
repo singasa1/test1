@@ -31,8 +31,7 @@ public class VehicleInfoService extends IVehicleInfoService.Stub {
     public String getVehicleIdentityNumber() {
         mPartnerAccessManager.verifyAccessAndPermission(mContext.getPackageManager().getNameForUid(
                 Binder.getCallingUid()),
-                PartnerAPIConstants.PERMISSION_RECEIVE_CAR_INFO_VIN,
-                "getVehicleIdentityNumber requires READ_INFO_VIN permission");
+                PartnerAPIConstants.PERMISSION_RECEIVE_CAR_INFO_VIN);
 
         if (mCarPropertyManager == null) {
             throw new IllegalStateException("Service not initialize properly");

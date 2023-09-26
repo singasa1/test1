@@ -51,7 +51,11 @@ import technology.cariad.partnerenablerservice.IVehicleInfoService;
 import technology.cariad.partnerenablerservice.IVehicleDrivingService;
 import technology.cariad.partnerenablerservice.IPartnerEnabler;
 import technology.cariad.partnerenablerservice.ITurnSignalStateListener;
+<<<<<<< HEAD
 import technology.cariad.partnerenablerservice.ISteeringAngleChangeListener;
+=======
+import technology.cariad.partnerenablerservice.IFogLightStateListener;
+>>>>>>> 1f3d38c3da3b2ec7403183516c07c09a7c596116
 
 /**
  * <h1>CarDataManagerImpl</h1>
@@ -74,10 +78,11 @@ public class CarDataManagerImpl implements CarDataManager {
     private final ICarDataChangeListener mCarDataChangeListener = new CarDataChangeListener();
     private final ITurnSignalStateListener mTurnSignalStateListener = new TurnSignalStateListener();
     private final ISteeringAngleChangeListener mSteeringAngleChangeListener = new SteeringAngleChangeListener();
+    private final IFogLightStateListener mFogLightStateListener = new FogLightsStateListener();
 
     private final Set<MileageListener> mMileageListeners = Collections.synchronizedSet(new HashSet<>());
     private final Set<TurnSignalListener> mTurnSignalListener = Collections.synchronizedSet(new HashSet<>());
-    private final Set<FogLightStateListener> mFogLightStateListener = Collections.synchronizedSet(new HashSet<>());
+    private final Set<FogLightStateListener> mFogLightListener = Collections.synchronizedSet(new HashSet<>());
     private final Set<SteeringAngleListener> mSteeringAngleListener = Collections.synchronizedSet(new HashSet<>());
 
     private IExteriorLightService mExteriorLightService;
@@ -110,7 +115,7 @@ public class CarDataManagerImpl implements CarDataManager {
 
     private boolean isClientListenerNotRegistered() {
         boolean retVal = mMileageListeners.isEmpty() && mTurnSignalListener.isEmpty() &&
-                mFogLightStateListener.isEmpty() && mSteeringAngleListener.isEmpty();
+                mFogLightListener.isEmpty() && mSteeringAngleListener.isEmpty();
         return retVal;
     }
 
@@ -228,9 +233,13 @@ public class CarDataManagerImpl implements CarDataManager {
     public Response<VehicleLightState> getFogLightsState() {
         Response<VehicleLightState> response = new Response<>(Response.Status.VALUE_NOT_AVAILABLE, VehicleLightState.OFF);
         try {
-            response.value = convertToVehicleLightState(mService.getFogLightsState());
+            if (mExteriorLightService == null) {
+                initExteriorLightService();
+            }
+//            response.value = convertToVehicleLightState(mService.getFogLightsState());
+            response.value = convertToVehicleLightState(mExteriorLightService.getFogLightsState());
             response.status = Response.Status.SUCCESS;
-        } catch (IllegalStateException e) {
+        } catch (IllegalStateException | IllegalArgumentException e) {
             e.printStackTrace();
             response.status = Response.Status.INTERNAL_FAILURE;
         } catch (SecurityException e) {
@@ -247,19 +256,46 @@ public class CarDataManagerImpl implements CarDataManager {
     @Override
     @RequiresPermission(PartnerLibraryManager.PERMISSION_RECEIVE_FOG_LIGHTS)
     public Response.Status registerFogLightStateListener(FogLightStateListener lightStateListener) {
-        Response.Status status = getFogLightsState().status;
-        // Add this client to listeners only if it has permission to access the fog light state value by calling getFogLightState
-        if (status == Response.Status.SUCCESS) {
-            mFogLightStateListener.add(lightStateListener);
+        Response.Status status;
+        try {
+            if (mExteriorLightService == null) {
+                initExteriorLightService();
+            }
+            mExteriorLightService.addFogLightStateListener(mFogLightStateListener);
+            mFogLightListener.add(lightStateListener);
+            status = Response.Status.SUCCESS;
+        } catch (IllegalStateException | IllegalArgumentException e) {
+            e.printStackTrace();
+            status = Response.Status.INTERNAL_FAILURE;
+        } catch (SecurityException e) {
+            e.printStackTrace();
+            Log.d(TAG, e.getMessage());
+            status = Response.Status.PERMISSION_DENIED;
+        } catch (RuntimeException | RemoteException re) {
+            status = Response.Status.SERVICE_COMMUNICATION_FAILURE;
+            Log.e(TAG, "getExteriorLightService: remoteException " + re);
         }
         return status;
     }
 
     @Override
     public Response.Status unregisterFogLightStateListener(FogLightStateListener lightStateListener) {
-        mFogLightStateListener.remove(lightStateListener);
-        removeCarDataListener();
-        return Response.Status.SUCCESS;
+        Response.Status status;
+        try {
+            if (mExteriorLightService == null) {
+                initExteriorLightService();
+            }
+            mExteriorLightService.removeFogLightStateListener(mFogLightStateListener);
+            mFogLightListener.remove(lightStateListener);
+            status = Response.Status.SUCCESS;
+        } catch (IllegalStateException | IllegalArgumentException e) {
+            e.printStackTrace();
+            status = Response.Status.INTERNAL_FAILURE;
+        } catch (RuntimeException | RemoteException re) {
+            status = Response.Status.SERVICE_COMMUNICATION_FAILURE;
+            Log.e(TAG, "getExteriorLightService: remoteException " + re);
+        }
+        return status;
     }
 
     @Override
@@ -408,7 +444,7 @@ public class CarDataManagerImpl implements CarDataManager {
 
         public void onFogLightsChanged(int fogLightState) {
             Log.d(TAG, "calling listener onFogLightStateChange with value: " + fogLightState);
-            for(FogLightStateListener listener: mFogLightStateListener) {
+            for(FogLightStateListener listener: mFogLightListener) {
                 VehicleLightState lightState = convertToVehicleLightState(fogLightState);
                 listener.onFogLightsChanged(lightState);
             }
@@ -451,4 +487,16 @@ public class CarDataManagerImpl implements CarDataManager {
             }
         }
     }
+    private class FogLightsStateListener extends IFogLightStateListener.Stub {
+
+        @Override
+        public void onFogLightsChanged(int fogLightState) throws RemoteException {
+            Log.d(TAG, "calling listener onFogLightStateChange with value: " + fogLightState);
+            for(com.volkswagenag.partnerlibrary.FogLightStateListener listener: mFogLightListener) {
+                VehicleLightState lightState = convertToVehicleLightState(fogLightState);
+                listener.onFogLightsChanged(lightState);
+            }
+        }
+    }
 }
+

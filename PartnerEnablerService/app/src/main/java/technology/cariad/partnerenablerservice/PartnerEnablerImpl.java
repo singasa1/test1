@@ -134,8 +134,7 @@ public class PartnerEnablerImpl extends IPartnerEnabler.Stub {
         Log.d(TAG,"getCurrentMileage");
         mPartnerAccessManager.verifyAccessAndPermission(
                 mContext.getPackageManager().getNameForUid(Binder.getCallingUid()),
-                VWAE_CAR_MILEAGE_PERMISSION,
-                "getCurrentMileage requires CAR_MILEAGE permission");
+                VWAE_CAR_MILEAGE_PERMISSION);
         float odometerValue = (float)mCarPropertyManager.getProperty(PERF_ODOMETER, VEHICLE_AREA_TYPE_GLOBAL).getValue();
         Log.d(TAG,"Odometer Value: " + odometerValue);
         return odometerValue;

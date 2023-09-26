@@ -106,8 +106,7 @@ public class VehicleDrivingService extends IVehicleDrivingService.Stub {
     public float getSteeringAngle() {
         mPartnerAccessManager.verifyAccessAndPermission(
                 mContext.getPackageManager().getNameForUid(Binder.getCallingUid()),
-                PartnerAPIConstants.PERMISSION_RECEIVE_STEERING_ANGLE_INFO,
-                "getSteeringAngle requires READ_STEERING_ANGLE permission");
+                PartnerAPIConstants.PERMISSION_RECEIVE_STEERING_ANGLE_INFO);
 
         if (mCarPropertyManager == null) {
             throw new IllegalStateException("Service not initialize properly");
@@ -121,8 +120,7 @@ public class VehicleDrivingService extends IVehicleDrivingService.Stub {
     public void addSteeringAngleChangeListener(ISteeringAngleChangeListener listener) {
         mPartnerAccessManager.verifyAccessAndPermission(mContext.getPackageManager().getNameForUid(
                         Binder.getCallingUid()),
-                PartnerAPIConstants.PERMISSION_RECEIVE_STEERING_ANGLE_INFO,
-                "addSteeringAngleChangeListener requires READ_STEERING_ANGLE permission");
+                PartnerAPIConstants.PERMISSION_RECEIVE_STEERING_ANGLE_INFO);
 
         if (listener == null) {
             throw new IllegalArgumentException("ISteeringAngleChangeListener is null");

@@ -30,6 +30,7 @@ import androidx.annotation.GuardedBy;
 
 import static android.car.VehicleAreaType.VEHICLE_AREA_TYPE_GLOBAL;
 import static android.car.VehiclePropertyIds.TURN_SIGNAL_STATE;
+import static android.car.VehiclePropertyIds.FOG_LIGHTS_STATE;
 
 import android.car.Car;
 import android.car.hardware.CarPropertyValue;
@@ -42,6 +43,10 @@ public class ExteriorLightService extends IExteriorLightService.Stub {
 
     /** List of clients listening to TurnSignalState */
     private final RemoteCallbackList<ITurnSignalStateListener> mTurnSignalStateListener =
+            new RemoteCallbackList<>();
+
+    /** List of clients listening to FogLightsState */
+    private final RemoteCallbackList<IFogLightStateListener> mFogLightStateListener =
             new RemoteCallbackList<>();
 
     @GuardedBy("mLock")
@@ -58,6 +63,7 @@ public class ExteriorLightService extends IExteriorLightService.Stub {
                 @Override
                 public void onChangeEvent(CarPropertyValue value) {
                     if (value == null || value.getStatus() != CarPropertyValue.STATUS_AVAILABLE) {
+                        Log.e(TAG, "Property not available for property " + value.getPropertyId());
                         return;
                     }
                     switch(value.getPropertyId()) {
@@ -73,6 +79,19 @@ public class ExteriorLightService extends IExteriorLightService.Stub {
                                 }
                             }
                             mTurnSignalStateListener.finishBroadcast();
+                            break;
+                        case FOG_LIGHTS_STATE:
+                            Log.d(TAG,"Dispatching Fog Light State values changed to clients: " + value);
+                            int fogClients = mFogLightStateListener.beginBroadcast();
+                            for (int i = 0; i < fogClients; i++) {
+                                IFogLightStateListener callback = mFogLightStateListener.getBroadcastItem(i);
+                                try {
+                                    callback.onFogLightsChanged((int)value.getValue());
+                                } catch (RemoteException ignores) {
+                                    // ignore
+                                }
+                            }
+                            mFogLightStateListener.finishBroadcast();
                             break;
                         default:
                             break;
@@ -91,13 +110,11 @@ public class ExteriorLightService extends IExteriorLightService.Stub {
         mPartnerAccessManager = partnerAccessManager;
     }
 
-
     @Override
     public int getTurnSignalIndicator() throws RemoteException {
         Log.d(TAG,"getTurnSignalIndicator");
         mPartnerAccessManager.verifyAccessAndPermission(mContext.getPackageManager().getNameForUid(Binder.getCallingUid()),
-                PartnerAPIConstants.PERMISSION_RECEIVE_TURN_SIGNAL_INDICATOR,
-                "getTurnSignalIndicator requires READ_SIGNAL_INDICATOR permission");
+                PartnerAPIConstants.PERMISSION_RECEIVE_TURN_SIGNAL_INDICATOR);
 
         int turnSignalIndicator = (int)mCarPropertyManager.getProperty(TURN_SIGNAL_STATE, VEHICLE_AREA_TYPE_GLOBAL).getValue();
         Log.d(TAG,"TurnSignalState Value: " + turnSignalIndicator);
@@ -108,8 +125,7 @@ public class ExteriorLightService extends IExteriorLightService.Stub {
     public void addTurnSignalStateListener(ITurnSignalStateListener listener) throws RemoteException {
         Log.d(TAG,"addTurnSignalStateListener");
         mPartnerAccessManager.verifyAccessAndPermission(mContext.getPackageManager().getNameForUid(Binder.getCallingUid()),
-                PartnerAPIConstants.PERMISSION_RECEIVE_TURN_SIGNAL_INDICATOR,
-                "addTurnSignalStateListener requires READ_SIGNAL_INDICATOR permission");
+                PartnerAPIConstants.PERMISSION_RECEIVE_TURN_SIGNAL_INDICATOR);
 
         if (listener == null) {
             throw new IllegalArgumentException("ITurnSignalStateListener is null");
@@ -142,7 +158,62 @@ public class ExteriorLightService extends IExteriorLightService.Stub {
             throw new IllegalArgumentException("ITurnSignalStateListener is null");
         }
         mTurnSignalStateListener.unregister(listener);
-        if (mTurnSignalStateListener.getRegisteredCallbackCount() == 0) {
+        unregisterCarPropertyCallback();
+    }
+
+    @Override
+    public int getFogLightsState() throws RemoteException {
+        // Permission check
+        Log.d(TAG,"getFogLightsState");
+        mPartnerAccessManager.verifyAccessAndPermission(mContext.getPackageManager().getNameForUid(Binder.getCallingUid()),
+                PartnerAPIConstants.PERMISSION_RECEIVE_FOG_LIGHTS);
+
+        int fogLightState = (int)mCarPropertyManager.getProperty(FOG_LIGHTS_STATE, VEHICLE_AREA_TYPE_GLOBAL).getValue();
+        Log.d(TAG,"FogLightsState Value: " + fogLightState);
+        return fogLightState;
+    }
+
+    @Override
+    public void addFogLightStateListener(IFogLightStateListener listener) throws RemoteException {
+        Log.d(TAG,"addFogLightStateListener");
+        mPartnerAccessManager.verifyAccessAndPermission(mContext.getPackageManager().getNameForUid(Binder.getCallingUid()), PartnerAPIConstants.PERMISSION_RECEIVE_FOG_LIGHTS);
+
+        if (listener == null) {
+            throw new IllegalArgumentException("IFogLightStateListener is null");
+        }
+
+        // check any client listener is registered before. If not registered, register the client listener
+        // and register callback with CarPropertyManager for specific VHAL Property id
+        if (mFogLightStateListener.getRegisteredCallbackCount() == 0) {
+            if (mCarPropertyManager == null) {
+                Log.e(TAG, "Failed to get CarPropertyManager");
+                throw new IllegalStateException("CAR Property Service not ready");
+            }
+
+            if(mCarPropertyManager != null) {
+                if (!mCarPropertyManager.registerCallback(mCarPropertyEventCallback,
+                        FOG_LIGHTS_STATE,
+                        PartnerAPIConstants.PROPERTY_UPDATE_RATE_HZ)) {
+                    Log.e(TAG,
+                            "Failed to register callback for FOG_LIGHTS_STATE with CarPropertyManager");
+                    throw new IllegalArgumentException("FogLightState callback registration failed");
+                }
+            }
+        }
+        mFogLightStateListener.register(listener);
+    }
+
+    @Override
+    public void removeFogLightStateListener(IFogLightStateListener listener) throws RemoteException {
+        if (listener == null) {
+            throw new IllegalArgumentException("IFogLightStateListener is null");
+        }
+        mFogLightStateListener.unregister(listener);
+        unregisterCarPropertyCallback();
+    }
+
+    private void unregisterCarPropertyCallback() {
+        if ((mTurnSignalStateListener.getRegisteredCallbackCount() == 0) && (mFogLightStateListener.getRegisteredCallbackCount() == 0)) {
             // unregister carpropertyevent callback
             mCarPropertyManager.unregisterCallback(mCarPropertyEventCallback);
         }

@@ -131,7 +131,7 @@ class PartnerAccessManager {
      * @param packageName package name of the application to which access is verified.
      * @throws SecurityException if the access is not allowed.
      */
-    public void verifyAccessAndPermission(String packageName, String permission, String permissionFailureMessage) throws SecurityException {
+    public void verifyAccessAndPermission(String packageName, String permission) throws SecurityException {
         Log.d(TAG, "Calling app is: " + packageName);
 
         verifyAccess(packageName);
@@ -139,7 +139,7 @@ class PartnerAccessManager {
         if (mContext.getPackageManager().checkPermission(
                 permission, mContext.getPackageManager().getNameForUid(Binder.getCallingUid())) != PackageManager.PERMISSION_GRANTED) {
             Log.e(TAG, "VWAE permission not granted");
-            throw new SecurityException(permissionFailureMessage);
+            throw new SecurityException("Permission" + permission + " is required to access API");
         }
     }
 
