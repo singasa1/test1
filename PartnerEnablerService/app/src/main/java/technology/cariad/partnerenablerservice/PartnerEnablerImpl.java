@@ -43,6 +43,7 @@ public class PartnerEnablerImpl extends IPartnerEnabler.Stub {
     private final Context mContext;
     private PartnerAccessManager mPartnerAccessManager;
     private ExteriorLightService mExteriorLightService;
+    private VehicleInfoService mVehicleInfoService;
 
     @GuardedBy("mLock")
     private Car mCar;
@@ -99,7 +100,7 @@ public class PartnerEnablerImpl extends IPartnerEnabler.Stub {
     @Override
     public void initialize() throws SecurityException {
         Log.d(TAG, "initialize");
-//        verifyAccess(mContext.getPackageManager().getNameForUid(Binder.getCallingUid()));
+        verifyAccess(mContext.getPackageManager().getNameForUid(Binder.getCallingUid()));
 
         mCarPropertyManager =
                 (CarPropertyManager) Car.createCar(mContext).getCarManager(Car.PROPERTY_SERVICE);
@@ -109,6 +110,7 @@ public class PartnerEnablerImpl extends IPartnerEnabler.Stub {
         }
 
         mExteriorLightService= new ExteriorLightService(mContext, mCarPropertyManager, mPartnerAccessManager);
+        mVehicleInfoService = new VehicleInfoService(mContext, mCarPropertyManager, mPartnerAccessManager);
 
         if (!mCarPropertyManager.registerCallback(mCarPropertyEventCallback,
                 PERF_ODOMETER,
@@ -176,11 +178,6 @@ public class PartnerEnablerImpl extends IPartnerEnabler.Stub {
     }
 
     @Override
-    public String getVehicleIdentityNumber() throws RemoteException {
-        return null;
-    }
-
-    @Override
     public void addCarDataChangeListener(ICarDataChangeListener listener) throws RemoteException{
         if (listener == null) {
             throw new IllegalArgumentException("ICarDataChaneListener is null");
@@ -200,9 +197,12 @@ public class PartnerEnablerImpl extends IPartnerEnabler.Stub {
     public IBinder getAPIService(String serviceName) throws RemoteException {
         Log.i(TAG, "calling getAPIService for service:" + serviceName);
         switch (serviceName) {
-            case PartnerAPIConstants.EXTERIOR_LIGHT:
+            case PartnerAPIConstants.EXTERIOR_LIGHT_SERVICE:
                 Log.i(TAG, " getAPIService: mExteriorLightService=" + mExteriorLightService);
                 return mExteriorLightService;
+            case PartnerAPIConstants.VEHICLE_INFO_SERVICE:
+                Log.i(TAG, "getAPIService: mVehicleInfoService = " + mVehicleInfoService);
+                return mVehicleInfoService;
             default:
                 Log.w(TAG, "getAPIService for unknown service:" + serviceName);
                 return null;

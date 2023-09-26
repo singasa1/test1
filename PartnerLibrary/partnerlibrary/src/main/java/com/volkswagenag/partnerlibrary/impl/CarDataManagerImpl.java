@@ -45,6 +45,7 @@ import java.util.HashSet;
 
 import technology.cariad.partnerenablerservice.ICarDataChangeListener;
 import technology.cariad.partnerenablerservice.IExteriorLightService;
+import technology.cariad.partnerenablerservice.IVehicleInfoService;
 import technology.cariad.partnerenablerservice.IPartnerEnabler;
 import technology.cariad.partnerenablerservice.ITurnSignalStateListener;
 import technology.cariad.partnerenablerservice.IFogLightStateListener;
@@ -61,6 +62,8 @@ import technology.cariad.partnerenablerservice.IFogLightStateListener;
  */
 public class CarDataManagerImpl implements CarDataManager {
     private static final String TAG = CarDataManagerImpl.class.getSimpleName();
+    private static final String EXTERIOR_LIGHT_SERVICE = "EXTERIOR_LIGHT_SERVICE";
+    private static final String VEHICLE_INFO_SERVICE = "VEHICLE_INFO_SERVICE";
 
     private final IPartnerEnabler mService;
 
@@ -74,6 +77,7 @@ public class CarDataManagerImpl implements CarDataManager {
     private final HashSet<SteeringAngleListener> mSteeringAngleListener = new HashSet<SteeringAngleListener>();
 
     private IExteriorLightService mExteriorLightService;
+    private IVehicleInfoService mVehicleInfoService;
 
     public CarDataManagerImpl(IPartnerEnabler service) {
         Log.d(TAG,"CarDataManager");
@@ -327,7 +331,10 @@ public class CarDataManagerImpl implements CarDataManager {
     public Response<String> getVehicleIdentityNumber() {
         Response<String> response = new Response<>(Response.Status.VALUE_NOT_AVAILABLE, null);
         try {
-            response.value = mService.getVehicleIdentityNumber();
+            if (mVehicleInfoService == null) {
+                initVehicleInfoService();
+            }
+            response.value = mVehicleInfoService.getVehicleIdentityNumber();
             response.status = Response.Status.SUCCESS;
         } catch (IllegalStateException e) {
             e.printStackTrace();
@@ -378,6 +385,18 @@ public class CarDataManagerImpl implements CarDataManager {
         return turnSignalIndicator;
     }
 
+    private void initExteriorLightService() throws RemoteException {
+        IBinder binder = mService.getAPIService(EXTERIOR_LIGHT_SERVICE);
+        Log.i(TAG, "getExteriorLightService binder=" + binder);
+        mExteriorLightService = (IExteriorLightService) IExteriorLightService.Stub.asInterface(binder);
+    }
+
+    private void initVehicleInfoService() throws RemoteException {
+        IBinder binder = mService.getAPIService(VEHICLE_INFO_SERVICE);
+        Log.i(TAG, "VehicleInfoService binder=" + binder);
+        mVehicleInfoService = (IVehicleInfoService)IVehicleInfoService.Stub.asInterface(binder);
+    }
+
     private class CarDataChangeListener extends ICarDataChangeListener.Stub {
         public void onMileageValueChanged(float mileageValue) {
             Log.d(TAG, "calling listener onMileageValueChanged with value: " + mileageValue);
@@ -422,7 +441,6 @@ public class CarDataManagerImpl implements CarDataManager {
         }
     }
 
-
     private class FogLightsStateListener extends IFogLightStateListener.Stub {
 
         @Override
@@ -433,12 +451,6 @@ public class CarDataManagerImpl implements CarDataManager {
                 listener.onFogLightsChanged(lightState);
             }
         }
-    }
-
-    private void initExteriorLightService() throws RemoteException {
-        IBinder binder = mService.getAPIService(PartnerAPIConstants.EXTERIOR_LIGHT);
-        Log.i(TAG, "getExteriorLightService binder=" + binder);
-        mExteriorLightService = (IExteriorLightService) IExteriorLightService.Stub.asInterface(binder);
     }
 }
 
