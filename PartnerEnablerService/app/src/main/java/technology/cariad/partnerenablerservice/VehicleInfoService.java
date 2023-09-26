@@ -29,9 +29,9 @@ public class VehicleInfoService extends IVehicleInfoService.Stub {
     }
 
     public String getVehicleIdentityNumber() {
-        mPartnerAccessManager.verifyAccessAndPermission(
-                mContext.getPackageManager().getNameForUid(Binder.getCallingUid()),
-                PartnerAPI.PERMISSION_RECEIVE_CAR_INFO_VIN,
+        mPartnerAccessManager.verifyAccessAndPermission(mContext.getPackageManager().getNameForUid(
+                Binder.getCallingUid()),
+                PartnerAPIConstants.PERMISSION_RECEIVE_CAR_INFO_VIN,
                 "getVehicleIdentityNumber requires READ_INFO_VIN permission");
 
         if (mCarPropertyManager == null) {

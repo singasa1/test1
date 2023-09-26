@@ -32,7 +32,7 @@ import android.car.Car;
 import android.car.hardware.CarPropertyValue;
 import android.car.hardware.property.CarPropertyManager;
 
-import technology.cariad.partnerenablerservice.PartnerAPI;
+import technology.cariad.partnerenablerservice.PartnerAPIConstants;
 import technology.cariad.partnerenablerservice.ISteeringAngleChangeListener;
 
 
@@ -95,7 +95,7 @@ public class VehicleDrivingService extends IVehicleDrivingService.Stub {
         if(mCarPropertyManager != null) {
             if (!mCarPropertyManager.registerCallback(mCarPropertyEventCallback,
                     PERF_STEERING_ANGLE,
-                    PartnerAPI.PROPERTY_UPDATE_RATE_HZ)) {
+                    PartnerAPIConstants.PROPERTY_UPDATE_RATE_HZ)) {
                 Log.e(TAG,
                         "Failed to register callback for TURN_SIGNAL_STATE with CarPropertyManager");
             return;
@@ -106,7 +106,7 @@ public class VehicleDrivingService extends IVehicleDrivingService.Stub {
     public float getSteeringAngle() {
         mPartnerAccessManager.verifyAccessAndPermission(
                 mContext.getPackageManager().getNameForUid(Binder.getCallingUid()),
-                PartnerAPI.PERMISSION_RECEIVE_STEERING_ANGLE_INFO,
+                PartnerAPIConstants.PERMISSION_RECEIVE_STEERING_ANGLE_INFO,
                 "getSteeringAngle requires READ_STEERING_ANGLE permission");
 
         if (mCarPropertyManager == null) {
@@ -121,7 +121,7 @@ public class VehicleDrivingService extends IVehicleDrivingService.Stub {
     public void addSteeringAngleChangeListener(ISteeringAngleChangeListener listener) {
         mPartnerAccessManager.verifyAccessAndPermission(mContext.getPackageManager().getNameForUid(
                         Binder.getCallingUid()),
-                PartnerAPI.PERMISSION_RECEIVE_STEERING_ANGLE_INFO,
+                PartnerAPIConstants.PERMISSION_RECEIVE_STEERING_ANGLE_INFO,
                 "addSteeringAngleChangeListener requires READ_STEERING_ANGLE permission");
 
         if (listener == null) {

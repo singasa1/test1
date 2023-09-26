@@ -47,8 +47,11 @@ import java.util.Set;
 
 import technology.cariad.partnerenablerservice.ICarDataChangeListener;
 import technology.cariad.partnerenablerservice.IExteriorLightService;
+import technology.cariad.partnerenablerservice.IVehicleInfoService;
+import technology.cariad.partnerenablerservice.IVehicleDrivingService;
 import technology.cariad.partnerenablerservice.IPartnerEnabler;
 import technology.cariad.partnerenablerservice.ITurnSignalStateListener;
+import technology.cariad.partnerenablerservice.ISteeringAngleChangeListener;
 
 /**
  * <h1>CarDataManagerImpl</h1>
@@ -62,7 +65,9 @@ import technology.cariad.partnerenablerservice.ITurnSignalStateListener;
  */
 public class CarDataManagerImpl implements CarDataManager {
     private static final String TAG = CarDataManagerImpl.class.getSimpleName();
-    private static final String VEHICLE_INFO_SERVICE = "VehicleInfoService";
+    private static final String EXTERIOR_LIGHT_SERVICE = "EXTERIOR_LIGHT_SERVICE";
+    private static final String VEHICLE_INFO_SERVICE = "VEHICLE_INFO_SERVICE";
+    private static final String VEHICLE_DRIVING_SERVICE = "VEHICLE_DRIVING_SERVICE";
 
     private final IPartnerEnabler mService;
 
@@ -76,6 +81,8 @@ public class CarDataManagerImpl implements CarDataManager {
     private final Set<SteeringAngleListener> mSteeringAngleListener = Collections.synchronizedSet(new HashSet<>());
 
     private IExteriorLightService mExteriorLightService;
+    private IVehicleInfoService mVehicleInfoService;
+    private IVehicleDrivingService mVehicleDrivingService;
 
     public CarDataManagerImpl(IPartnerEnabler service) {
         Log.d(TAG,"CarDataManager");
@@ -260,7 +267,10 @@ public class CarDataManagerImpl implements CarDataManager {
     public Response<Float> getSteeringAngle() {
         Response<Float> response = new Response<>(Response.Status.VALUE_NOT_AVAILABLE, 0.0f);
         try {
-            response.value = mService.getSteeringAngle();
+            if (mVehicleDrivingService == null) {
+                initVehicleDrivingService();
+            }
+            response.value = mVehicleDrivingService.getSteeringAngle();
             response.status = Response.Status.SUCCESS;
         } catch (IllegalStateException e) {
             e.printStackTrace();
@@ -282,6 +292,15 @@ public class CarDataManagerImpl implements CarDataManager {
         Response.Status status = getSteeringAngle().status;
         // Add this client to listeners only if it has permission to access the steering angle value by calling getSteeringAngle
         if (status == Response.Status.SUCCESS) {
+            if (mVehicleDrivingService == null) {
+                try {
+                    initVehicleDrivingService();
+                    mVehicleDrivingService.addSteeringAngleChangeListener(mSteeringAngleChangeListener);
+                } catch (RemoteException e) {
+                    return Response.Status.SERVICE_COMMUNICATION_FAILURE;
+                }
+            }
+
             mSteeringAngleListener.add(steeringAngleListener);
         }
         return status;
@@ -289,7 +308,16 @@ public class CarDataManagerImpl implements CarDataManager {
     @Override
     public Response.Status unregisterSteeringAngleListener(SteeringAngleListener steeringAngleListener) {
         mSteeringAngleListener.remove(steeringAngleListener);
-        removeCarDataListener();
+        if (mSteeringAngleListener.isEmpty()) {
+            if (mVehicleDrivingService == null) {
+                try {
+                    initVehicleDrivingService();
+                    mVehicleDrivingService.removeSteeringAngleChangeListener(mSteeringAngleChangeListener);
+                } catch (RemoteException e) {
+                    return Response.Status.SERVICE_COMMUNICATION_FAILURE;
+                }
+            }
+        }
         return Response.Status.SUCCESS;
     }
 
@@ -298,9 +326,10 @@ public class CarDataManagerImpl implements CarDataManager {
     public Response<String> getVehicleIdentityNumber() {
         Response<String> response = new Response<>(Response.Status.VALUE_NOT_AVAILABLE, null);
         try {
-            IBinder binder = mService.getAPIService(VEHICLE_INFO_SERVICE);
-            IVehicleInfoService vehicleInfoService = (IVehicleInfoService)IVehicleInfoService.Stub.asInterface(binder);
-            response.value = vehicleInfoService.getVehicleIdentityNumber();
+            if (mVehicleInfoService == null) {
+                initVehicleInfoService();
+            }
+            response.value = mVehicleInfoService.getVehicleIdentityNumber();
             response.status = Response.Status.SUCCESS;
         } catch (IllegalStateException e) {
             e.printStackTrace();
@@ -349,6 +378,24 @@ public class CarDataManagerImpl implements CarDataManager {
                 break;
         }
         return turnSignalIndicator;
+    }
+
+    private void initExteriorLightService() throws RemoteException {
+        IBinder binder = mService.getAPIService(EXTERIOR_LIGHT_SERVICE);
+        Log.i(TAG, "getExteriorLightService binder=" + binder);
+        mExteriorLightService = (IExteriorLightService) IExteriorLightService.Stub.asInterface(binder);
+    }
+
+    private void initVehicleInfoService() throws RemoteException {
+        IBinder binder = mService.getAPIService(VEHICLE_INFO_SERVICE);
+        Log.i(TAG, "VehicleInfoService binder=" + binder);
+        mVehicleInfoService = (IVehicleInfoService)IVehicleInfoService.Stub.asInterface(binder);
+    }
+
+    private void initVehicleDrivingService() throws RemoteException {
+        IBinder binder = mService.getAPIService(VEHICLE_DRIVING_SERVICE);
+        Log.i(TAG, "VehicleDrivingService binder=" + binder);
+        mVehicleDrivingService = (IVehicleDrivingService)IVehicleDrivingService.Stub.asInterface(binder);
     }
 
     private class CarDataChangeListener extends ICarDataChangeListener.Stub {
@@ -403,10 +450,5 @@ public class CarDataManagerImpl implements CarDataManager {
                 listener.onSteeringAngleChanged(steeringAngle);
             }
         }
-    }
-    private void initExteriorLightService() throws RemoteException {
-        IBinder binder = mService.getAPIService("EXTERIOR_LIGHT_SERVICE");
-        Log.i(TAG, "getExteriorLightService binder=" + binder);
-        mExteriorLightService = (IExteriorLightService) IExteriorLightService.Stub.asInterface(binder);
     }
 }

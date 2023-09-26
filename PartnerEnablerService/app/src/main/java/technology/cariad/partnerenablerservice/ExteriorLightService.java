@@ -94,9 +94,11 @@ public class ExteriorLightService extends IExteriorLightService.Stub {
 
     @Override
     public int getTurnSignalIndicator() throws RemoteException {
-        // Permission check
         Log.d(TAG,"getTurnSignalIndicator");
-        validatePermission(mContext.getPackageManager().getNameForUid(Binder.getCallingUid()), PartnerAPIConstants.PERMISSION_RECEIVE_TURN_SIGNAL_INDICATOR);
+        mPartnerAccessManager.verifyAccessAndPermission(mContext.getPackageManager().getNameForUid(Binder.getCallingUid()),
+                PartnerAPIConstants.PERMISSION_RECEIVE_TURN_SIGNAL_INDICATOR,
+                "getTurnSignalIndicator requires READ_SIGNAL_INDICATOR permission");
+
         int turnSignalIndicator = (int)mCarPropertyManager.getProperty(TURN_SIGNAL_STATE, VEHICLE_AREA_TYPE_GLOBAL).getValue();
         Log.d(TAG,"TurnSignalState Value: " + turnSignalIndicator);
         return turnSignalIndicator;
@@ -105,8 +107,9 @@ public class ExteriorLightService extends IExteriorLightService.Stub {
     @Override
     public void addTurnSignalStateListener(ITurnSignalStateListener listener) throws RemoteException {
         Log.d(TAG,"addTurnSignalStateListener");
-
-        validatePermission(mContext.getPackageManager().getNameForUid(Binder.getCallingUid()), PartnerAPIConstants.PERMISSION_RECEIVE_TURN_SIGNAL_INDICATOR);
+        mPartnerAccessManager.verifyAccessAndPermission(mContext.getPackageManager().getNameForUid(Binder.getCallingUid()),
+                PartnerAPIConstants.PERMISSION_RECEIVE_TURN_SIGNAL_INDICATOR,
+                "addTurnSignalStateListener requires READ_SIGNAL_INDICATOR permission");
 
         if (listener == null) {
             throw new IllegalArgumentException("ITurnSignalStateListener is null");
@@ -143,23 +146,5 @@ public class ExteriorLightService extends IExteriorLightService.Stub {
             // unregister carpropertyevent callback
             mCarPropertyManager.unregisterCallback(mCarPropertyEventCallback);
         }
-    }
-
-    private void validatePermission(String packageName, String permission) throws SecurityException, RemoteException {
-        Log.d(TAG, "Calling app is: " + packageName);
-        //Check whether caller has requested needed permission
-        //        if (PackageManager.PERMISSION_GRANTED != mContext.checkCallingOrSelfPermission(
-//                VWAE_CAR_MILEAGE_PERMISSION)) {
-        if (PackageManager.PERMISSION_GRANTED != mContext.getPackageManager().checkPermission(
-                permission, packageName)) {
-            Log.e(TAG,"VWAE permission not granted");
-            throw new SecurityException("Requires " + permission + " permission");
-        }
-
-        // partner signature token verification.
-        //if (!mPartnerAccessManager.isAccessAllowed(packageName)) {
-        //    throw new SecurityException(
-        //            "The app " + packageName + " doesn't have the permission to access Partner API's");
-        //}
     }
 }

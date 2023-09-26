@@ -171,7 +171,7 @@ public class PartnerEnablerImpl extends IPartnerEnabler.Stub {
     public IBinder getAPIService(String serviceName) throws RemoteException {
         Log.i(TAG, "calling getAPIService for service:" + serviceName);
         switch (serviceName) {
-            case PartnerAPIConstants.EXTERIOR_LIGHT:
+            case PartnerAPIConstants.EXTERIOR_LIGHT_SERVICE:
                 Log.i(TAG, " getAPIService: mExteriorLightService=" + mExteriorLightService);
                 return mExteriorLightService;
             case PartnerAPIConstants.VEHICLE_INFO_SERVICE:

@@ -26,7 +26,7 @@ package technology.cariad.partnerenablerservice;
 class PartnerAPIConstants {
     public static final int PROPERTY_UPDATE_RATE_HZ = 5000;
 
-    public static final String EXTERIOR_LIGHT = "EXTERIOR_LIGHT_SERVICE";
+    public static final String EXTERIOR_LIGHT_SERVICE = "EXTERIOR_LIGHT_SERVICE";
     public static final String VEHICLE_INFO_SERVICE = "VEHICLE_INFO_SERVICE";
     public static final String VEHICLE_DRIVING_SERVICE = "VEHICLE_DRIVING_SERVICE";
 
