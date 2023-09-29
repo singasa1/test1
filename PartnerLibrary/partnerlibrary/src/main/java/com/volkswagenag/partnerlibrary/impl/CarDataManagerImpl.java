@@ -51,11 +51,8 @@ import technology.cariad.partnerenablerservice.IVehicleInfoService;
 import technology.cariad.partnerenablerservice.IVehicleDrivingService;
 import technology.cariad.partnerenablerservice.IPartnerEnabler;
 import technology.cariad.partnerenablerservice.ITurnSignalStateListener;
-<<<<<<< HEAD
 import technology.cariad.partnerenablerservice.ISteeringAngleChangeListener;
-=======
 import technology.cariad.partnerenablerservice.IFogLightStateListener;
->>>>>>> 1f3d38c3da3b2ec7403183516c07c09a7c596116
 
 /**
  * <h1>CarDataManagerImpl</h1>
