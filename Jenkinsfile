@@ -24,7 +24,7 @@ node(cariad.DEFAULT_NODE) {
                     url: 'https://devstack.vwgroup.com/bitbucket/scm/g21c/vendor-cariad-inc-partnerapi.git'
             }
             stage('Build') {
-                sh """
+                #sh """
                 ls -la
                 echo "Build command(s)"
                 root=$(pwd)
