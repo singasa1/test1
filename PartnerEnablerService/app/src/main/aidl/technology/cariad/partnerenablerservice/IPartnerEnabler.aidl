@@ -22,7 +22,7 @@ package technology.cariad.partnerenablerservice;
 import technology.cariad.partnerenablerservice.ICarDataChangeListener;
 
 /**
- * Interface used to interact with the PartnerEnablerService.  Mostly this is used by the
+ * Interface used to interact with the PartnerEnablerService. Mostly this is used by the
  * PartnerLibrary class.
  * {@hide}
  */
@@ -82,19 +82,18 @@ interface IPartnerEnabler {
     float getSteeringAngle() = 5;
 
     /**
-     * This method returns the Car VIN Number.
-    */
-    String getVehicleIdentityNumber() = 6;
-
-    /**
      * Registers a listener @link#ICarDataChangeListener to be called when the car data changes.
     */
-    void addCarDataChangeListener(in ICarDataChangeListener listener) = 7;
+    void addCarDataChangeListener(in ICarDataChangeListener listener) = 6;
 
     /**
     * Removes the provided listener from receiving the callbacks.
     */
-    void removeCarDataChangeListener(in ICarDataChangeListener listener) = 8;
+    void removeCarDataChangeListener(in ICarDataChangeListener listener) = 7;
 
-    IBinder getAPIService(in String serviceName) = 9;
+    /**
+     * Returns the IBinder for the given service name
+     * List of available ServiceName Strings are defined in @link#PartnerAPIConstants.
+    */
+    IBinder getAPIService(in String serviceName) = 8;
 }

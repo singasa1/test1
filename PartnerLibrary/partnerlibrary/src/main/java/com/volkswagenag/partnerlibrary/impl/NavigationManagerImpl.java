@@ -30,7 +30,9 @@ import com.volkswagenag.partnerlibrary.ActiveRouteUpdateListener;
 import com.volkswagenag.partnerlibrary.PartnerLibraryManager;
 import com.volkswagenag.partnerlibrary.Response;
 
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.Set;
 
 import technology.cariad.partnerenablerservice.INavAppStateListener;
 import technology.cariad.partnerenablerservice.INavigationService;
@@ -51,9 +53,11 @@ public class NavigationManagerImpl implements NavigationManager {
 
     private IPartnerEnabler mService;
 
-    //private INavigationChangeListener mNavigationListener = new Navigation();
+    private static final String NAVIGATION_SERVICE = "NAVIGATION_SERVICE";
 
-    private HashSet<NavAppStateListener> mNavAppStateListeners = new HashSet<>();
+    private INavigationService mNavigationService;
+
+    private final Set<NavAppStateListener> mNavAppStateListenersList = Collections.synchronizedSet(new HashSet<>());
     private final INavAppStateListener mNavAppStateListener = new NavApplicationStateListener();
     private HashSet<ActiveRouteUpdateListener> mActiveRouteListener = new HashSet<>();
 
@@ -67,9 +71,11 @@ public class NavigationManagerImpl implements NavigationManager {
     public Response<Boolean> isNavAppStarted() {
         Response<Boolean> response = new Response<>(Response.Status.SUCCESS, new Boolean(false));
         try {
-            IBinder binder = mService.getAPIService(PartnerLibraryManager.NAVIGATION);
-            INavigationService navigationService = (INavigationService) INavigationService.Stub.asInterface(binder);
-            int state = navigationService.getNavigationApplicationState();
+            if (mNavigationService == null) {
+                initNavigationService();
+            }
+
+            int state = mNavigationService.getNavigationApplicationState();
 
             response.value = (state == INavigationService.NAV_APP_STATE_READY) ? true : false;
             response.status = Response.Status.SUCCESS;
@@ -92,11 +98,12 @@ public class NavigationManagerImpl implements NavigationManager {
     public Response.Status registerNavAppStateListener(NavAppStateListener navAppStateListener) {
         Response.Status status;
         try {
-            IBinder binder = mService.getAPIService(PartnerLibraryManager.NAVIGATION);
-            INavigationService navigationService = (INavigationService) INavigationService.Stub.asInterface(binder);
-            Log.i(TAG, "getNavigationService binder=" + binder);
-            navigationService.addNavAppStateListener(mNavAppStateListener);
-            mNavAppStateListeners.add(navAppStateListener);
+            if (mNavigationService == null) {
+                initNavigationService();
+            }
+
+            mNavigationService.addNavAppStateListener(mNavAppStateListener);
+            mNavAppStateListenersList.add(navAppStateListener);
             status = Response.Status.SUCCESS;
         } catch (RemoteException re) {
             status = Response.Status.SERVICE_COMMUNICATION_FAILURE;
@@ -110,22 +117,25 @@ public class NavigationManagerImpl implements NavigationManager {
 
     @Override
     public Response.Status unregisterNavAppStateListener(NavAppStateListener navAppStateListener) {
-        Response.Status status;
-        try {
-            IBinder binder = mService.getAPIService(PartnerLibraryManager.NAVIGATION);
-            INavigationService navigationService = (INavigationService) INavigationService.Stub.asInterface(binder);
-            Log.i(TAG, "getNavigationService binder=" + binder);
-            navigationService.removeNavAppStateListener(mNavAppStateListener);
-            mNavAppStateListeners.remove(navAppStateListener);
-            status = Response.Status.SUCCESS;
-        } catch (RemoteException re) {
-            status = Response.Status.SERVICE_COMMUNICATION_FAILURE;
-            Log.e(TAG, "getNavigationService: remoteException " + re);
-        } catch (Throwable t) {
-            status = Response.Status.SERVICE_COMMUNICATION_FAILURE;
-            Log.e(TAG, "getNavigationService: throwable " + t);
+        mNavAppStateListenersList.remove(navAppStateListener);
+        if (mNavAppStateListenersList.isEmpty()) {
+            Response.Status status;
+            try {
+                if (mNavigationService == null) {
+                    initNavigationService();
+                }
+                mNavigationService.removeNavAppStateListener(mNavAppStateListener);
+                status = Response.Status.SUCCESS;
+            } catch (IllegalStateException | IllegalArgumentException e) {
+                e.printStackTrace();
+                status = Response.Status.INTERNAL_FAILURE;
+            } catch (RuntimeException | RemoteException re) {
+                status = Response.Status.SERVICE_COMMUNICATION_FAILURE;
+                Log.e(TAG, "getNavigationService: remoteException " + re);
+            }
+            return status;
         }
-        return status;
+        return Response.Status.SUCCESS;
     }
 
     @Override
@@ -133,7 +143,7 @@ public class NavigationManagerImpl implements NavigationManager {
     public Response<String> getActiveRoute() {
         Response<String> response = new Response<>(Response.Status.SUCCESS, null);
         try {
-            IBinder binder = mService.getAPIService(PartnerLibraryManager.NAVIGATION);
+            IBinder binder = mService.getAPIService(NAVIGATION_SERVICE);
             INavigationService navigationService = (INavigationService) INavigationService.Stub.asInterface(binder);
             Log.d(TAG,"Route: " + navigationService.getActiveRoute());
             response.value = navigationService.getActiveRoute();
@@ -167,13 +177,22 @@ public class NavigationManagerImpl implements NavigationManager {
         return Response.Status.SUCCESS;
     }
 
+    private void initNavigationService() throws RemoteException {
+        IBinder binder = mService.getAPIService(NAVIGATION_SERVICE);
+        Log.i(TAG, "getNavigationService binder=" + binder);
+        mNavigationService = (INavigationService) INavigationService.Stub.asInterface(binder);
+    }
+
+
     private class NavApplicationStateListener extends INavAppStateListener.Stub {
         @Override
         public void onNavAppStateChanged(int appState) throws RemoteException {
             Log.d(TAG, "calling listener onNavAppStateChanged with value: " + appState);
-            for(NavAppStateListener listener: mNavAppStateListeners) {
-                boolean started = (appState == INavigationService.NAV_APP_STATE_READY) ? true : false;
-                listener.onNavAppStateChanged(started);
+            synchronized (mNavAppStateListenersList) {
+                for(NavAppStateListener listener: mNavAppStateListenersList) {
+                    boolean started = (appState == INavigationService.NAV_APP_STATE_READY) ? true : false;
+                    listener.onNavAppStateChanged(started);
+                }
             }
         }
     }

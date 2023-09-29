@@ -53,6 +53,9 @@ public class NavigationService extends INavigationService.Stub {
     private static final String NAV_APP_PACKAGE_NAME = "technology.cariad.navi.audi";
 
     private Context mContext;
+
+    private PartnerAccessManager mPartnerAccessManager;
+
     /** List of clients listening to Navigation Application State */
     private final RemoteCallbackList<INavAppStateListener> mNavAppStateListeners =
             new RemoteCallbackList<>();
@@ -170,8 +173,9 @@ public class NavigationService extends INavigationService.Stub {
         }
     }
 
-    public NavigationService(Context context) {
+    public NavigationService(Context context, PartnerAccessManager partnerAccessManager) {
         mContext = context;
+        mPartnerAccessManager = partnerAccessManager;
 
         mNavAppStateServiceConnection = new NavAppStateServiceConnection();
         initApplicationStateConnection();
@@ -186,7 +190,7 @@ public class NavigationService extends INavigationService.Stub {
         Log.d(TAG,"getNavigationApplicationState");
 
         if (PackageManager.PERMISSION_GRANTED != mContext.getPackageManager().checkPermission(
-                PartnerAPI.PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE, mContext.getPackageManager().getNameForUid(Binder.getCallingUid()))) {
+                PartnerAPIConstants.PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE, mContext.getPackageManager().getNameForUid(Binder.getCallingUid()))) {
             Log.e(TAG,"VWAE permission not granted");
             throw new SecurityException("getNavigationApplicationState requires PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE permission");
         }
@@ -201,7 +205,7 @@ public class NavigationService extends INavigationService.Stub {
         Log.d(TAG,"addNavAppStateListener");
 
         if (PackageManager.PERMISSION_GRANTED != mContext.getPackageManager().checkPermission(
-                PartnerAPI.PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE, mContext.getPackageManager().getNameForUid(Binder.getCallingUid()))) {
+                PartnerAPIConstants.PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE, mContext.getPackageManager().getNameForUid(Binder.getCallingUid()))) {
             Log.e(TAG,"VWAE permission not granted");
             throw new SecurityException("getNavigationApplicationState requires PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE permission");
         }
@@ -222,7 +226,7 @@ public class NavigationService extends INavigationService.Stub {
     @Override
     public String getActiveRoute() {
         if (PackageManager.PERMISSION_GRANTED != mContext.getPackageManager().checkPermission(
-                PartnerAPI.PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE, mContext.getPackageManager().getNameForUid(Binder.getCallingUid()))) {
+                PartnerAPIConstants.PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE, mContext.getPackageManager().getNameForUid(Binder.getCallingUid()))) {
             Log.e(TAG,"VWAE permission not granted");
             throw new SecurityException("getNavigationApplicationState requires PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE permission");
         }
@@ -280,78 +284,4 @@ public class NavigationService extends INavigationService.Stub {
 
         Log.d(TAG,"Return value of NavApp RouteSimplifier service Start: " + ret);
     }
-
-    /*@Override
-    public int getTurnSignalIndicator() throws RemoteException {
-        // Permission check
-        Log.d(TAG,"getTurnSignalIndicator");
-//        if (PackageManager.PERMISSION_GRANTED != mContext.checkCallingOrSelfPermission(
-//                VWAE_CAR_MILEAGE_PERMISSION)) {
-        if (PackageManager.PERMISSION_GRANTED != mContext.getPackageManager().checkPermission(
-                PartnerAPI.PERMISSION_RECEIVE_TURN_SIGNAL_INDICATOR, mContext.getPackageManager().getNameForUid(Binder.getCallingUid()))) {
-            Log.e(TAG,"VWAE permission not granted");
-            throw new SecurityException("getTurnSignalIndicator requires TURN_SIGNAL_INDICATOR permission");
-        }
-        int turnSignalIndicator = (int)mCarPropertyManager.getProperty(TURN_SIGNAL_STATE, VEHICLE_AREA_TYPE_GLOBAL).getValue();
-        Log.d(TAG,"TurnSignalState Value: " + turnSignalIndicator);
-        return turnSignalIndicator;
-    }
-
-    @Override
-    public void addTurnSignalStateListener(ITurnSignalStateListener listener) throws RemoteException {
-        Log.d(TAG,"getTurnSignalIndicator");
-        if (PackageManager.PERMISSION_GRANTED != mContext.getPackageManager().checkPermission(
-                PartnerAPI.PERMISSION_RECEIVE_TURN_SIGNAL_INDICATOR, mContext.getPackageManager().getNameForUid(Binder.getCallingUid()))) {
-            Log.e(TAG,"VWAE permission not granted");
-            throw new SecurityException("addTurnSignalStateListener requires TURN_SIGNAL_INDICATOR permission");
-        }
-        if (listener == null) {
-            throw new IllegalArgumentException("ITurnSignalStateListener is null");
-        }
-        mTurnSignalStateListener.register(listener);
-    }
-
-    @Override
-    public void removeTurnSignalStateListener(ITurnSignalStateListener listener) throws RemoteException {
-        if (listener == null) {
-            throw new IllegalArgumentException("ITurnSignalStateListener is null");
-        }
-        mTurnSignalStateListener.unregister(listener);
-    }
-
-    @Override
-    public int getFogLightsState() throws RemoteException {
-        // Permission check
-        Log.d(TAG,"getFogLightsState");
-        if (PackageManager.PERMISSION_GRANTED != mContext.getPackageManager().checkPermission(
-                PartnerAPI.PERMISSION_RECEIVE_FOG_LIGHTS, mContext.getPackageManager().getNameForUid(Binder.getCallingUid()))) {
-            Log.d(TAG,"VWAE permission not granted");
-            throw new SecurityException("getFogLightsState requires FOG_LIGHTS permission");
-        }
-        int fogLightState = (int)mCarPropertyManager.getProperty(FOG_LIGHTS_STATE, VEHICLE_AREA_TYPE_GLOBAL).getValue();
-        Log.d(TAG,"FogLightsState Value: " + fogLightState);
-        return fogLightState;
-    }
-
-    @Override
-    public void addFogLightStateListener(IFogLightStateListener listener) throws RemoteException {
-        Log.d(TAG,"addFogLightStateListener");
-        if (PackageManager.PERMISSION_GRANTED != mContext.getPackageManager().checkPermission(
-                PartnerAPI.PERMISSION_RECEIVE_FOG_LIGHTS, mContext.getPackageManager().getNameForUid(Binder.getCallingUid()))) {
-            Log.d(TAG,"VWAE permission not granted");
-            throw new SecurityException("addFogLightStateListener requires FOG_LIGHTS permission");
-        }
-        if (listener == null) {
-            throw new IllegalArgumentException("IFogLightStateListener is null");
-        }
-        mFogLightStateListener.register(listener);
-    }
-
-    @Override
-    public void removeFogLightStateListener(IFogLightStateListener listener) throws RemoteException {
-        if (listener == null) {
-            throw new IllegalArgumentException("IFogLightStateListener is null");
-        }
-        mFogLightStateListener.unregister(listener);
-    }*/
 }
