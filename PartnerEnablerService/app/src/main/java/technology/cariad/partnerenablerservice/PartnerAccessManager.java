@@ -134,13 +134,13 @@ class PartnerAccessManager {
     public void verifyAccessAndPermission(String packageName, String permission) throws SecurityException {
         Log.d(TAG, "Calling app is: " + packageName);
 
-        verifyAccess(packageName);
-
         if (mContext.getPackageManager().checkPermission(
                 permission, mContext.getPackageManager().getNameForUid(Binder.getCallingUid())) != PackageManager.PERMISSION_GRANTED) {
             Log.e(TAG, "VWAE permission not granted");
             throw new SecurityException("Permission" + permission + " is required to access API");
         }
+
+        verifyAccess(packageName);
     }
 
     private void checkAndUpdateCache(String packageName) throws RemoteException {

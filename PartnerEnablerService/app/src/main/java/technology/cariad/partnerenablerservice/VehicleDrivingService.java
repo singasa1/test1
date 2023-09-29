@@ -39,20 +39,22 @@ import technology.cariad.partnerenablerservice.ISteeringAngleChangeListener;
 public class VehicleDrivingService extends IVehicleDrivingService.Stub {
     private static final String TAG = "PartnerEnablerService.VehicleInfoService";
 
-    /** List of clients listening to TurnSignalState */
-    private final RemoteCallbackList<ISteeringAngleChangeListener> mSteeringAngleChangeListeners =
-            new RemoteCallbackList<>();
-
-    private Context mContext;
 
     @GuardedBy("mCarPropertyManagerLock")
     private final CarPropertyManager mCarPropertyManager;
     private final PartnerAccessManager mPartnerAccessManager;
 
+    /** List of clients listening to SteeringAngle Changes. */
+    private final RemoteCallbackList<ISteeringAngleChangeListener> mSteeringAngleChangeListeners =
+            new RemoteCallbackList<>();
+
+    private Context mContext;
+    private boolean isSteeringAngleCallbackRegistered;
+
 
     /**
      * {@link CarPropertyEvent} listener registered with the {@link CarPropertyManager} for getting
-     * speed change notifications.
+     * registered car property change notifications.
      */
     private final CarPropertyManager.CarPropertyEventCallback mCarPropertyEventCallback =
             new CarPropertyManager.CarPropertyEventCallback() {
@@ -91,16 +93,7 @@ public class VehicleDrivingService extends IVehicleDrivingService.Stub {
         mContext = context;
         mCarPropertyManager = carPropertyManager;
         mPartnerAccessManager = partnerAccessManager;
-
-        if(mCarPropertyManager != null) {
-            if (!mCarPropertyManager.registerCallback(mCarPropertyEventCallback,
-                    PERF_STEERING_ANGLE,
-                    PartnerAPIConstants.PROPERTY_UPDATE_RATE_HZ)) {
-                Log.e(TAG,
-                        "Failed to register callback for TURN_SIGNAL_STATE with CarPropertyManager");
-            return;
-            }
-        }
+        isSteeringAngleCallbackRegistered = false;
     }
 
     public float getSteeringAngle() {
@@ -109,7 +102,7 @@ public class VehicleDrivingService extends IVehicleDrivingService.Stub {
                 PartnerAPIConstants.PERMISSION_RECEIVE_STEERING_ANGLE_INFO);
 
         if (mCarPropertyManager == null) {
-            throw new IllegalStateException("Service not initialize properly");
+            throw new IllegalStateException("Service not initialized properly");
         }
 
         float steeringAngle = (float) mCarPropertyManager.getProperty(PERF_STEERING_ANGLE, VEHICLE_AREA_TYPE_GLOBAL).getValue();
@@ -125,15 +118,47 @@ public class VehicleDrivingService extends IVehicleDrivingService.Stub {
         if (listener == null) {
             throw new IllegalArgumentException("ISteeringAngleChangeListener is null");
         }
+
         mSteeringAngleChangeListeners.register(listener);
 
+        if (!isSteeringAngleCallbackRegistered) {
+            registerSteeringAngleCallback();
+        }
     }
 
     public void removeSteeringAngleChangeListener(ISteeringAngleChangeListener listener) {
         if (listener == null) {
             throw new IllegalArgumentException("ISteeringAngleChangeListener is null");
         }
+
         mSteeringAngleChangeListeners.unregister(listener);
 
+        if (mSteeringAngleChangeListeners.getRegisteredCallbackCount() < 1 && isSteeringAngleCallbackRegistered) {
+            unregisterSteeringAngleCallback();
+        }
+    }
+
+    private void registerSteeringAngleCallback() {
+        if(mCarPropertyManager != null) {
+            if (!mCarPropertyManager.registerCallback(mCarPropertyEventCallback,
+                    PERF_STEERING_ANGLE,
+                    PartnerAPIConstants.PROPERTY_UPDATE_RATE_HZ)) {
+                Log.e(TAG,
+                        "Failed to register callback for PERF_STEERING_ANGLE with CarPropertyManager");
+                return;
+            }
+            isSteeringAngleCallbackRegistered = true;
+        }
+    }
+
+    private void unregisterSteeringAngleCallback() {
+        if(mCarPropertyManager != null) {
+            if (!mCarPropertyManager.unregisterCallback(mCarPropertyEventCallback, PERF_STEERING_ANGLE)) {
+                Log.e(TAG,
+                        "Failed to unregister callback for PERF_STEERING_ANGLE with CarPropertyManager");
+                return;
+            }
+            isSteeringAngleCallbackRegistered = false;
+        }
     }
 }

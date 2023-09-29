@@ -21,11 +21,11 @@ package technology.cariad.partnerenablerservice;
 
 // Declare any non-default types here with import statements
 /**
- * Exterior Turn Light Signal Indicator change service callback interface
+ * Listener interface for Steering Angle changes
  */
 oneway interface ISteeringAngleChangeListener {
     /**
-     * Binder callback for changes to the TurnSignalIndicator
+     * Binder callback for changes to the Steering Angle
      * @hide
     */
     void onSteeringAngleChanged(in float steeringAngle);
