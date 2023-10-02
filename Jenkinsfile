@@ -35,7 +35,6 @@ node(cariad.DEFAULT_NODE) {
                 partnerenablerservicepath=$root/PartnerEnablerService
                 cd $partnerenablerservicepath
                 ./gradlew assembleDebug
-                """
             }
         } catch (err) {
             currentBuild.result = "FAILURE"
