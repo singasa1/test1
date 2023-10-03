@@ -24,6 +24,7 @@ node(cariad.DEFAULT_NODE) {
                     url: 'https://devstack.vwgroup.com/bitbucket/scm/g21c/vendor-cariad-inc-partnerapi.git'
             }
             stage('Build') {
+                sh """
                 ls -la
                 echo "Build command(s)"
                 root=$(pwd)
@@ -35,6 +36,7 @@ node(cariad.DEFAULT_NODE) {
                 partnerenablerservicepath=$root/PartnerEnablerService
                 cd $partnerenablerservicepath
                 ./gradlew assembleDebug
+                """
             }
         } catch (err) {
             currentBuild.result = "FAILURE"
