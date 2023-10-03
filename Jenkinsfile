@@ -27,15 +27,6 @@ node(cariad.DEFAULT_NODE) {
                 sh """
                 ls -la
                 echo "Build command(s)"
-                root=$(pwd)
-                partnerlibrarypath=$root/PartnerLibrary
-                cd $partnerlibrarypath
-                ./gradlew assembleDebug
-                
-                cd $root
-                partnerenablerservicepath=$root/PartnerEnablerService
-                cd $partnerenablerservicepath
-                ./gradlew assembleDebug
                 """
             }
         } catch (err) {
@@ -44,6 +35,5 @@ node(cariad.DEFAULT_NODE) {
         } finally {
 
         }
-    }
+     }
 }
-
