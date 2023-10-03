@@ -28,7 +28,7 @@ node(cariad.DEFAULT_NODE) {
                 ls -la
                 echo "Build command(s)"
                 echo "$PWD"
-                dir="$(pwd)"
+                dir="$PWD"
                 """
             }
         } catch (err) {
