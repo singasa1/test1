@@ -30,6 +30,9 @@ node(cariad.DEFAULT_NODE) {
                 echo "$PWD"
                 dir="$PWD"
                 partnerlibrarypath=$PWD/PartnerLibrary
+                echo "$partnerlibrarypath"
+                cd $partnerlibrarypath
+                echo "$PWD"
                 """
             }
         } catch (err) {
