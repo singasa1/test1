@@ -112,9 +112,9 @@ public class ExteriorLightService extends IExteriorLightService.Stub {
 
     @Override
     public int getTurnSignalIndicator() throws RemoteException {
-        // Permission check
         Log.d(TAG,"getTurnSignalIndicator");
-        validatePermission(mContext.getPackageManager().getNameForUid(Binder.getCallingUid()), PartnerAPIConstants.PERMISSION_RECEIVE_TURN_SIGNAL_INDICATOR);
+        mPartnerAccessManager.verifyAccessAndPermission(mContext.getPackageManager().getNameForUid(Binder.getCallingUid()),
+                PartnerAPIConstants.PERMISSION_RECEIVE_TURN_SIGNAL_INDICATOR);
 
         int turnSignalIndicator = (int)mCarPropertyManager.getProperty(TURN_SIGNAL_STATE, VEHICLE_AREA_TYPE_GLOBAL).getValue();
         Log.d(TAG,"TurnSignalState Value: " + turnSignalIndicator);
@@ -124,8 +124,8 @@ public class ExteriorLightService extends IExteriorLightService.Stub {
     @Override
     public void addTurnSignalStateListener(ITurnSignalStateListener listener) throws RemoteException {
         Log.d(TAG,"addTurnSignalStateListener");
-
-        validatePermission(mContext.getPackageManager().getNameForUid(Binder.getCallingUid()), PartnerAPIConstants.PERMISSION_RECEIVE_TURN_SIGNAL_INDICATOR);
+        mPartnerAccessManager.verifyAccessAndPermission(mContext.getPackageManager().getNameForUid(Binder.getCallingUid()),
+                PartnerAPIConstants.PERMISSION_RECEIVE_TURN_SIGNAL_INDICATOR);
 
         if (listener == null) {
             throw new IllegalArgumentException("ITurnSignalStateListener is null");
@@ -165,7 +165,8 @@ public class ExteriorLightService extends IExteriorLightService.Stub {
     public int getFogLightsState() throws RemoteException {
         // Permission check
         Log.d(TAG,"getFogLightsState");
-        validatePermission(mContext.getPackageManager().getNameForUid(Binder.getCallingUid()), PartnerAPIConstants.PERMISSION_RECEIVE_FOG_LIGHTS);
+        mPartnerAccessManager.verifyAccessAndPermission(mContext.getPackageManager().getNameForUid(Binder.getCallingUid()),
+                PartnerAPIConstants.PERMISSION_RECEIVE_FOG_LIGHTS);
 
         int fogLightState = (int)mCarPropertyManager.getProperty(FOG_LIGHTS_STATE, VEHICLE_AREA_TYPE_GLOBAL).getValue();
         Log.d(TAG,"FogLightsState Value: " + fogLightState);
@@ -175,7 +176,7 @@ public class ExteriorLightService extends IExteriorLightService.Stub {
     @Override
     public void addFogLightStateListener(IFogLightStateListener listener) throws RemoteException {
         Log.d(TAG,"addFogLightStateListener");
-        validatePermission(mContext.getPackageManager().getNameForUid(Binder.getCallingUid()), PartnerAPIConstants.PERMISSION_RECEIVE_FOG_LIGHTS);
+        mPartnerAccessManager.verifyAccessAndPermission(mContext.getPackageManager().getNameForUid(Binder.getCallingUid()), PartnerAPIConstants.PERMISSION_RECEIVE_FOG_LIGHTS);
 
         if (listener == null) {
             throw new IllegalArgumentException("IFogLightStateListener is null");
@@ -209,24 +210,6 @@ public class ExteriorLightService extends IExteriorLightService.Stub {
         }
         mFogLightStateListener.unregister(listener);
         unregisterCarPropertyCallback();
-    }
-
-    private void validatePermission(String packageName, String permission) throws SecurityException, RemoteException {
-        Log.d(TAG, "Calling app is: " + packageName);
-        //Check whether caller has requested needed permission
-        //        if (PackageManager.PERMISSION_GRANTED != mContext.checkCallingOrSelfPermission(
-//                VWAE_CAR_MILEAGE_PERMISSION)) {
-        if (PackageManager.PERMISSION_GRANTED != mContext.getPackageManager().checkPermission(
-                permission, packageName)) {
-            Log.e(TAG,"VWAE permission not granted");
-            throw new SecurityException("Requires " + permission + " permission");
-        }
-
-        // partner signature token verification.
-        //if (!mPartnerAccessManager.isAccessAllowed(packageName)) {
-        //    throw new SecurityException(
-        //            "The app " + packageName + " doesn't have the permission to access Partner API's");
-        //}
     }
 
     private void unregisterCarPropertyCallback() {
