@@ -29,6 +29,7 @@ class PartnerAPIConstants {
     public static final String EXTERIOR_LIGHT_SERVICE = "EXTERIOR_LIGHT_SERVICE";
     public static final String NAVIGATION_SERVICE = "NAVIGATION_SERVICE";
     public static final String VEHICLE_INFO_SERVICE = "VEHICLE_INFO_SERVICE";
+    public static final String VEHICLE_DRIVING_SERVICE = "VEHICLE_DRIVING_SERVICE";
 
     /**
      * Permission string to get the car current odomoter/mileage value through {@link }.

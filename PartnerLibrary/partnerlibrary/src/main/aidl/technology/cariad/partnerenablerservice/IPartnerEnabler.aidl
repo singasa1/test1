@@ -75,25 +75,20 @@ interface IPartnerEnabler {
      * 2 - DAYLIGHT_RUNNING
     */
     int getFogLightsState() = 4;
-    /**
-     * This method returns the Car steering angle in degrees. positive - right; negative - left. continuous change prop type.
-     * @return: It returns value ranges from -1200 to 1200.
-    */
-    float getSteeringAngle() = 5;
 
     /**
      * Registers a listener @link#ICarDataChangeListener to be called when the car data changes.
     */
-    void addCarDataChangeListener(in ICarDataChangeListener listener) = 6;
+    void addCarDataChangeListener(in ICarDataChangeListener listener) = 5;
 
     /**
     * Removes the provided listener from receiving the callbacks.
     */
-    void removeCarDataChangeListener(in ICarDataChangeListener listener) = 7;
+    void removeCarDataChangeListener(in ICarDataChangeListener listener) = 6;
 
     /**
     * Returns the IBinder for the given service name
     * List of available ServiceName Strings are defined in @link#PartnerAPIConstants.
     */
-    IBinder getAPIService(in String serviceName) = 8;
+    IBinder getAPIService(in String serviceName) = 7;
 }

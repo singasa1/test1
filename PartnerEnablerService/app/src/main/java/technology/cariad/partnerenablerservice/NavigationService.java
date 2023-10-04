@@ -49,7 +49,6 @@ public class NavigationService extends INavigationService.Stub {
     private static final String NAV_APPSTATE_ACTION_NAME = "com.volkswagenag.nav.service.ApplicationState.BIND";
     private static final String NAV_ROUTE_ACTION_NAME = "com.volkswagenag.nav.cloud.truffles.RouteSimplifierService.BIND";
 
-    //    private static final String NAV_APP_PACKAGE_NAME = "technology.cariad.navi.oi.volkswagen";
     private static final String NAV_APP_PACKAGE_NAME = "technology.cariad.navi.audi";
 
     private Context mContext;
@@ -82,18 +81,14 @@ public class NavigationService extends INavigationService.Stub {
 
         public void onServiceConnected(ComponentName name, IBinder boundService) {
             Log.d(TAG, "onServiceConnected() connected");
-//            mApplicationState =  com.volkswagenag.nav.applicationstate.v2.IApplicationState.Stub.asInterface((IBinder) boundService);
+
             if (boundService != null) {
                 // Map to the correct interface version
-                //if (mTargetVersion == 2) {
-                //  mApplicationState =   com.volkswagenag.nav.applicationstate.v2.IApplicationState.Stub.asInterface((IBinder) boundService);
-                //}
                 mIsNavAppStateServiceConnected = true;
                 mApplicationState = com.volkswagenag.nav.applicationstate.IApplicationState.Stub.asInterface((IBinder) boundService);
                 try {
                     int version = mApplicationState.getIfcVersion();
                     Log.d(TAG, "IFCVersion from api : " + version + ", ifcversion from aidl const " + mApplicationState.VERSION);
-                    //initRouteSimplifierConnection();
                     mApplicationState.registerCallback(mNavAppStateListener);
                 } catch (RemoteException e) {
                     throw new RuntimeException(e);
@@ -189,11 +184,10 @@ public class NavigationService extends INavigationService.Stub {
         // Permission check
         Log.d(TAG,"getNavigationApplicationState");
 
-        if (PackageManager.PERMISSION_GRANTED != mContext.getPackageManager().checkPermission(
-                PartnerAPIConstants.PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE, mContext.getPackageManager().getNameForUid(Binder.getCallingUid()))) {
-            Log.e(TAG,"VWAE permission not granted");
-            throw new SecurityException("getNavigationApplicationState requires PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE permission");
-        }
+        mPartnerAccessManager.verifyAccessAndPermission(
+                mContext.getPackageManager().getNameForUid(Binder.getCallingUid()),
+                PartnerAPIConstants.PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE);
+
         if ((!mIsNavAppStateServiceConnected) || (mApplicationStateType != ApplicationStateType.OPERABLE)) {
             return NAV_APP_STATE_NOT_READY;
         }
@@ -204,11 +198,9 @@ public class NavigationService extends INavigationService.Stub {
     public void addNavAppStateListener(INavAppStateListener listener) {
         Log.d(TAG,"addNavAppStateListener");
 
-        if (PackageManager.PERMISSION_GRANTED != mContext.getPackageManager().checkPermission(
-                PartnerAPIConstants.PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE, mContext.getPackageManager().getNameForUid(Binder.getCallingUid()))) {
-            Log.e(TAG,"VWAE permission not granted");
-            throw new SecurityException("getNavigationApplicationState requires PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE permission");
-        }
+        mPartnerAccessManager.verifyAccessAndPermission(
+                mContext.getPackageManager().getNameForUid(Binder.getCallingUid()),
+                PartnerAPIConstants.PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE);
         if (listener == null) {
             throw new IllegalArgumentException("INavAppStateListener is null");
         }
@@ -225,11 +217,9 @@ public class NavigationService extends INavigationService.Stub {
 
     @Override
     public String getActiveRoute() {
-        if (PackageManager.PERMISSION_GRANTED != mContext.getPackageManager().checkPermission(
-                PartnerAPIConstants.PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE, mContext.getPackageManager().getNameForUid(Binder.getCallingUid()))) {
-            Log.e(TAG,"VWAE permission not granted");
-            throw new SecurityException("getNavigationApplicationState requires PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE permission");
-        }
+        mPartnerAccessManager.verifyAccessAndPermission(
+                mContext.getPackageManager().getNameForUid(Binder.getCallingUid()),
+                PartnerAPIConstants.PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE);
         if ((!mIsRouteSimplifierServiceConnected) || (mApplicationStateType != ApplicationStateType.OPERABLE)) {
             return null;
         }
@@ -258,20 +248,7 @@ public class NavigationService extends INavigationService.Stub {
         // complete intent with package name
         intent.setPackage(si.packageName);
 
-        /*int[] supportedVersions = Arrays.stream(si.metaData
-                .getString("supportedVersions", "0, 0")
-                .split(","))
-                .mapToInt(s->Integer.parseInt(s.trim()))
-                .toArray();
 
-        // example: v2 is the highest version we can handle otherwise the default value of the variable is v1.
-        if (Arrays.asList(supportedVersions).contains(2)) {
-            mTargetVersion = 2;
-        }
-
-        // Build data with the pattern : service://<name>.BIND#<version>
-        intent.setData(Uri.fromParts("service", NAV_APPSTATE_ACTION_NAME,
-                                     String.format("%d", mTargetVersion)));*/
         boolean ret = false;
         ret = mContext.bindService(intent, mNavAppStateServiceConnection, Service.BIND_AUTO_CREATE);
         Log.d(TAG,"Return value of NavApplicationState service Start: " + ret);

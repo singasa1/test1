@@ -48,8 +48,10 @@ import java.util.Set;
 import technology.cariad.partnerenablerservice.ICarDataChangeListener;
 import technology.cariad.partnerenablerservice.IExteriorLightService;
 import technology.cariad.partnerenablerservice.IVehicleInfoService;
+import technology.cariad.partnerenablerservice.IVehicleDrivingService;
 import technology.cariad.partnerenablerservice.IPartnerEnabler;
 import technology.cariad.partnerenablerservice.ITurnSignalStateListener;
+import technology.cariad.partnerenablerservice.ISteeringAngleChangeListener;
 import technology.cariad.partnerenablerservice.IFogLightStateListener;
 
 /**
@@ -66,11 +68,13 @@ public class CarDataManagerImpl implements CarDataManager {
     private static final String TAG = CarDataManagerImpl.class.getSimpleName();
     private static final String EXTERIOR_LIGHT_SERVICE = "EXTERIOR_LIGHT_SERVICE";
     private static final String VEHICLE_INFO_SERVICE = "VEHICLE_INFO_SERVICE";
+    private static final String VEHICLE_DRIVING_SERVICE = "VEHICLE_DRIVING_SERVICE";
 
     private final IPartnerEnabler mService;
 
     private final ICarDataChangeListener mCarDataChangeListener = new CarDataChangeListener();
     private final ITurnSignalStateListener mTurnSignalStateListener = new TurnSignalStateListener();
+    private final ISteeringAngleChangeListener mSteeringAngleChangeListener = new SteeringAngleChangeListener();
     private final IFogLightStateListener mFogLightStateListener = new FogLightsStateListener();
 
     private final Set<MileageListener> mMileageListenersList = Collections.synchronizedSet(new HashSet<>());
@@ -80,6 +84,7 @@ public class CarDataManagerImpl implements CarDataManager {
 
     private IExteriorLightService mExteriorLightService;
     private IVehicleInfoService mVehicleInfoService;
+    private IVehicleDrivingService mVehicleDrivingService;
 
     public CarDataManagerImpl(IPartnerEnabler service) {
         Log.d(TAG,"CarDataManager");
@@ -302,7 +307,10 @@ public class CarDataManagerImpl implements CarDataManager {
     public Response<Float> getSteeringAngle() {
         Response<Float> response = new Response<>(Response.Status.VALUE_NOT_AVAILABLE, 0.0f);
         try {
-            response.value = mService.getSteeringAngle();
+            if (mVehicleDrivingService == null) {
+                initVehicleDrivingService();
+            }
+            response.value = mVehicleDrivingService.getSteeringAngle();
             response.status = Response.Status.SUCCESS;
         } catch (IllegalStateException e) {
             e.printStackTrace();
@@ -324,14 +332,31 @@ public class CarDataManagerImpl implements CarDataManager {
         Response.Status status = getSteeringAngle().status;
         // Add this client to listeners only if it has permission to access the steering angle value by calling getSteeringAngle
         if (status == Response.Status.SUCCESS) {
+            if (mVehicleDrivingService == null) {
+                try {
+                    initVehicleDrivingService();                    mVehicleDrivingService.addSteeringAngleChangeListener(mSteeringAngleChangeListener);
+                } catch (RemoteException e) {
+                    return Response.Status.SERVICE_COMMUNICATION_FAILURE;
+                }
+            }
             mSteeringAngleListenersList.add(steeringAngleListener);
         }
         return status;
     }
+    
     @Override
     public Response.Status unregisterSteeringAngleListener(SteeringAngleListener steeringAngleListener) {
         mSteeringAngleListenersList.remove(steeringAngleListener);
-        removeCarDataListener();
+
+        if (mSteeringAngleListenersList.isEmpty()) {
+            if (mVehicleDrivingService == null) {
+                try {
+                    initVehicleDrivingService();                     mVehicleDrivingService.removeSteeringAngleChangeListener(mSteeringAngleChangeListener);
+                } catch (RemoteException e) {
+                    return Response.Status.SERVICE_COMMUNICATION_FAILURE;
+                }
+            }
+        }
         return Response.Status.SUCCESS;
     }
 
@@ -406,6 +431,12 @@ public class CarDataManagerImpl implements CarDataManager {
         mVehicleInfoService = (IVehicleInfoService)IVehicleInfoService.Stub.asInterface(binder);
     }
 
+    private void initVehicleDrivingService() throws RemoteException {
+        IBinder binder = mService.getAPIService(VEHICLE_DRIVING_SERVICE);
+        Log.i(TAG, "VehicleDrivingService binder=" + binder);
+        mVehicleDrivingService = (IVehicleDrivingService)IVehicleDrivingService.Stub.asInterface(binder);
+    }
+
     private class CarDataChangeListener extends ICarDataChangeListener.Stub {
         public void onMileageValueChanged(float mileageValue) {
             Log.d(TAG, "calling listener onMileageValueChanged with value: " + mileageValue);
@@ -416,7 +447,8 @@ public class CarDataManagerImpl implements CarDataManager {
 
         public void onFogLightsChanged(int fogLightState) {
             Log.d(TAG, "calling listener onFogLightStateChange with value: " + fogLightState);
-            synchronized (mTurnSignalListenersList) {
+
+            synchronized (mFogLightListenersList) {
                 for(FogLightStateListener listener: mFogLightListenersList) {
                     VehicleLightState lightState = convertToVehicleLightState(fogLightState);
                     listener.onFogLightsChanged(lightState);
@@ -449,6 +481,7 @@ public class CarDataManagerImpl implements CarDataManager {
         @Override
         public void onTurnSignalStateChanged(int signalIndicator) throws RemoteException {
             Log.d(TAG, "calling listener onTurnSignalStateChangedListener with value: " + signalIndicator);
+
             synchronized (mTurnSignalListenersList) {
                 for(TurnSignalListener listener: mTurnSignalListenersList) {
                     VehicleSignalIndicator indicator = convertTurnSignalIndicator(signalIndicator);
@@ -458,11 +491,24 @@ public class CarDataManagerImpl implements CarDataManager {
         }
     }
 
+    private class SteeringAngleChangeListener extends ISteeringAngleChangeListener.Stub {
+        @Override
+        public void onSteeringAngleChanged(float steeringAngle) throws RemoteException {
+            Log.d(TAG, "calling listener onSteeringAngleLisenter with value: " + steeringAngle);
+            synchronized ((mSteeringAngleListenersList)) {
+                for (SteeringAngleListener listener : mSteeringAngleListenersList) {
+                    listener.onSteeringAngleChanged(steeringAngle);
+                }
+            }
+        }
+    }
+    
     private class FogLightsStateListener extends IFogLightStateListener.Stub {
 
         @Override
         public void onFogLightsChanged(int fogLightState) throws RemoteException {
             Log.d(TAG, "calling listener onFogLightStateChange with value: " + fogLightState);
+
             synchronized (mFogLightListenersList) {
                 for(FogLightStateListener listener: mFogLightListenersList) {
                     VehicleLightState lightState = convertToVehicleLightState(fogLightState);
