@@ -85,6 +85,7 @@ public class NavigationService extends INavigationService.Stub {
             if (boundService != null) {
                 // Map to the correct interface version
                 mIsNavAppStateServiceConnected = true;
+                // TODO: Currently by default casting it to v1 version because of issue in casting to v2 api version when tried it in HCP3 system. Will do v2 casting in future.
                 mApplicationState = com.volkswagenag.nav.applicationstate.IApplicationState.Stub.asInterface((IBinder) boundService);
                 try {
                     int version = mApplicationState.getIfcVersion();
