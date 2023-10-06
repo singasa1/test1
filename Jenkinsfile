@@ -27,12 +27,9 @@ node(cariad.DEFAULT_NODE) {
                 sh """
                 ls -la
                 echo "Build command(s)"
-                echo "$PWD"
-                dir="$PWD"
-                partnerlibrarypath=$PWD/PartnerLibrary
-                echo "$partnerlibrarypath"
-                cd $partnerlibrarypath
-                echo "$PWD"
+                pwd
+                current_pwd=\$(pwd)
+                cd \$current_pwd/partnerlibrarypath
                 """
             }
         } catch (err) {
