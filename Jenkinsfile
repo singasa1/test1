@@ -25,12 +25,34 @@ node(cariad.DEFAULT_NODE) {
             }
             stage('Build') {
                 sh """
-                ls -la
-                echo "Build command(s)"
-                pwd
-                current_pwd=\$(pwd)
-                cd \$current_pwd/partnerlibrarypath
+                    export ANDROID_HOME=$HOME/android
+                    ls -la
+                    echo "Build command(s)"
+                    pwd
+                    current_pwd=\$(pwd)
+
+                    cd \$current_pwd/PartnerLibrary
+                    ./gradlew assembleDebug
+                    ./gradlew assembleRelease
+                    
+                    cd \$current_pwd/PartnerEnablerService
+                    ./gradlew assembleDebug
+                    ./gradlew assembleRelease
                 """
+            }
+            stage('Publish Debug AAR') {
+                def name = "partnerlibrary-debug.aar"
+                sh """
+                    cp PartnerLibrary/partnerlibrary/build/outputs/aar/${name} .
+                """
+                cariad.uploadArtifact(name, cariad.ARTIFACTORY_INTERNAL, "partner_api/${env.BUILD_NUMBER}")
+            }
+            stage('Publish Release AAR') {
+                def name = "partnerlibrary-release.aar"
+                sh """
+                    cp PartnerLibrary/partnerlibrary/build/outputs/aar/${name} .
+                """
+                cariad.uploadArtifact(name, cariad.ARTIFACTORY_INTERNAL, "partner_api/${env.BUILD_NUMBER}")
             }
         } catch (err) {
             currentBuild.result = "FAILURE"
