@@ -153,11 +153,12 @@ public class VehicleDrivingService extends IVehicleDrivingService.Stub {
 
     private void unregisterSteeringAngleCallback() {
         if(mCarPropertyManager != null) {
-            if (!mCarPropertyManager.unregisterCallback(mCarPropertyEventCallback, PERF_STEERING_ANGLE)) {
+            /*if (!mCarPropertyManager.unregisterCallback(mCarPropertyEventCallback)) {
                 Log.e(TAG,
                         "Failed to unregister callback for PERF_STEERING_ANGLE with CarPropertyManager");
                 return;
-            }
+            }*/
+            mCarPropertyManager.unregisterCallback(mCarPropertyEventCallback);
             isSteeringAngleCallbackRegistered = false;
         }
     }
