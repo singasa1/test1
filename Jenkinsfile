@@ -55,6 +55,20 @@ node(cariad.DEFAULT_NODE) {
                 """
                 cariad.uploadArtifact(name, cariad.ARTIFACTORY_INTERNAL, "partner_api/${env.BUILD_NUMBER}")
             }
+            /*stage('Publish Debug APK') {
+                def name = "technology.cariad.partnerenablerservice.apk"
+                sh """
+                    cp PartnerEnablerService/app/build/outputs/apk/debug/${name} .
+                """
+                cariad.uploadArtifact(name, cariad.ARTIFACTORY_INTERNAL, "partner_api/${env.BUILD_NUMBER}")
+            }*/
+            stage('Publish Release APK') {
+                def name = "technology.cariad.partnerenablerservice.apk"
+                sh """
+                    PartnerEnablerService/app/build/outputs/apk/release/${name} .
+                """
+                cariad.uploadArtifact(name, cariad.ARTIFACTORY_INTERNAL, "partner_api/${env.BUILD_NUMBER}")
+            }
         } catch (err) {
             currentBuild.result = "FAILURE"
             throw err
