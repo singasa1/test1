@@ -35,6 +35,7 @@ node(cariad.DEFAULT_NODE) {
                     ./gradlew assembleDebug
                     ./gradlew assembleRelease
                     
+                    echo "Build command(s) for PartnerEnablerService"                    
                     cd \$current_pwd/PartnerEnablerService
                     ./gradlew assembleDebug
                     ./gradlew assembleRelease
