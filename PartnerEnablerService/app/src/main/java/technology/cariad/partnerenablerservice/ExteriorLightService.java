@@ -116,6 +116,9 @@ public class ExteriorLightService extends IExteriorLightService.Stub {
         mPartnerAccessManager.verifyAccessAndPermission(mContext.getPackageManager().getNameForUid(Binder.getCallingUid()),
                 PartnerAPIConstants.PERMISSION_RECEIVE_TURN_SIGNAL_INDICATOR);
 
+        if (mCarPropertyManager == null) {
+            throw new IllegalStateException("CAR Property Service not ready");
+        }
         int turnSignalIndicator = (int)mCarPropertyManager.getProperty(TURN_SIGNAL_STATE, VEHICLE_AREA_TYPE_GLOBAL).getValue();
         Log.d(TAG,"TurnSignalState Value: " + turnSignalIndicator);
         return turnSignalIndicator;
@@ -167,6 +170,10 @@ public class ExteriorLightService extends IExteriorLightService.Stub {
         Log.d(TAG,"getFogLightsState");
         mPartnerAccessManager.verifyAccessAndPermission(mContext.getPackageManager().getNameForUid(Binder.getCallingUid()),
                 PartnerAPIConstants.PERMISSION_RECEIVE_FOG_LIGHTS);
+
+        if (mCarPropertyManager == null) {
+            throw new IllegalStateException("CAR Property Service not ready");
+        }
 
         int fogLightState = (int)mCarPropertyManager.getProperty(FOG_LIGHTS_STATE, VEHICLE_AREA_TYPE_GLOBAL).getValue();
         Log.d(TAG,"FogLightsState Value: " + fogLightState);

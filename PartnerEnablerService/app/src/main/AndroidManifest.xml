@@ -18,45 +18,45 @@
 
     <permission android:name="com.volkswagenag.restricted.permission.READ_INFO_VIN"
         android:permissionGroup="com.volkswagenag.restricted.permission-group.CAR_INFO"
-        android:protectionLevel="normal"
+        android:protectionLevel="dangerous"
         android:label="@string/car_permission_label_info_vin"
         android:description="@string/car_permission_desc_info_vin"/>
 
     <permission android:name="com.volkswagenag.restricted.permission.READ_CAR_MILEAGE"
         android:permissionGroup="com.volkswagenag.restricted.permission-group.CAR_INFO"
-        android:protectionLevel="normal"
+        android:protectionLevel="dangerous"
         android:label="@string/car_permission_label_odometer"
         android:description="@string/car_permission_desc_odometer"/>
 
     <permission android:name="com.volkswagenag.restricted.permission.READ_SIGNAL_INDICATOR"
         android:permissionGroup="com.volkswagenag.restricted.permission-group.CAR_INFO"
-        android:protectionLevel="normal"
+        android:protectionLevel="dangerous"
         android:label="@string/car_permission_label_signal_indicator"
         android:description="@string/car_permission_desc_signal_indicator"/>
 
     <permission android:name="com.volkswagenag.restricted.permission.READ_FOG_LIGHTS"
         android:permissionGroup="com.volkswagenag.restricted.permission-group.CAR_INFO"
-        android:protectionLevel="normal"
+        android:protectionLevel="dangerous"
         android:label="@string/car_permission_label_fog_lights"
         android:description="@string/car_permission_desc_fog_lights"/>
 
     <permission android:name="com.volkswagenag.restricted.permission.READ_STEERING_ANGLE"
         android:permissionGroup="com.volkswagenag.restricted.permission-group.CAR_INFO"
-        android:protectionLevel="normal"
+        android:protectionLevel="dangerous"
         android:label="@string/car_permission_label_steering_angle"
         android:description="@string/car_permission_desc_steering_angle"/>
 
     <!-- permission defined for accessing navigation info-->
     <permission android:name="com.volkswagenag.restricted.permission.READ_NAV_ACTIVE_ROUTE"
         android:permissionGroup="com.volkswagenag.restricted.permission-group.NAV_INFO"
-        android:protectionLevel="normal"
+        android:protectionLevel="dangerous"
         android:label="@string/nav_permission_label_route"
         android:description="@string/nav_permission_desc_route"/>
 
     <!-- permission defined for accessing privileged phone info-->
     <permission android:name="com.volkswagenag.restricted.permission.READ_PRIVILEGED_PHONE_STATE"
         android:permissionGroup="com.volkswagenag.restricted.permission-group.PHONE_INFO"
-        android:protectionLevel="normal"
+        android:protectionLevel="dangerous"
         android:label="@string/phone_permission_label"
         android:description="@string/phone_permission_desc"/>
 

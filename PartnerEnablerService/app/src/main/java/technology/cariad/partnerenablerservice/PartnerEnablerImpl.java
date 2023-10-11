@@ -43,6 +43,7 @@ public class PartnerEnablerImpl extends IPartnerEnabler.Stub {
     private final Context mContext;
     private PartnerAccessManager mPartnerAccessManager;
     private ExteriorLightService mExteriorLightService;
+    private NavigationService mNavigationService;
     private VehicleInfoService mVehicleInfoService;
     private VehicleDrivingService mVehicleDrivingService;
 
@@ -112,6 +113,7 @@ public class PartnerEnablerImpl extends IPartnerEnabler.Stub {
 
         mExteriorLightService= new ExteriorLightService(mContext, mCarPropertyManager, mPartnerAccessManager);
         mVehicleInfoService = new VehicleInfoService(mContext, mCarPropertyManager, mPartnerAccessManager);
+        mNavigationService = new NavigationService(mContext, mPartnerAccessManager);
         mVehicleDrivingService = new VehicleDrivingService(mContext, mCarPropertyManager, mPartnerAccessManager);
 
         if (!mCarPropertyManager.registerCallback(mCarPropertyEventCallback,
@@ -173,6 +175,9 @@ public class PartnerEnablerImpl extends IPartnerEnabler.Stub {
             case PartnerAPIConstants.EXTERIOR_LIGHT_SERVICE:
                 Log.i(TAG, " getAPIService: mExteriorLightService=" + mExteriorLightService);
                 return mExteriorLightService;
+            case PartnerAPIConstants.NAVIGATION_SERVICE:
+                Log.i(TAG, " getAPIService: mNavigationService=" + mNavigationService);
+                return mNavigationService;
             case PartnerAPIConstants.VEHICLE_INFO_SERVICE:
                 Log.i(TAG, "getAPIService: mVehicleInfoService = " + mVehicleInfoService);
                 return mVehicleInfoService;
