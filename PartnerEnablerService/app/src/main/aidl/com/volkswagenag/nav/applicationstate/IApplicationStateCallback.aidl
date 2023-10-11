@@ -22,7 +22,7 @@ interface IApplicationStateCallback {
     /**
      * Returns the current loading state of navigation application.
      *
-     * @param loadingState The oadingState represents the bargraph 
+     * @param loadingState The LoadingState represents the bargraph
      *                     which indicates the state of initialization and 
      *                     loading of the navigation application. It is 
      *                     valid for the applicationState INIT_LOADING, 
