@@ -32,14 +32,18 @@ import android.car.Car;
 import android.car.hardware.CarPropertyValue;
 import android.car.hardware.property.CarPropertyManager;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import dagger.hilt.android.qualifiers.ApplicationContext;
 import technology.cariad.partnerenablerservice.PartnerAPIConstants;
 import technology.cariad.partnerenablerservice.ISteeringAngleChangeListener;
 
-
-public class VehicleDrivingService extends IVehicleDrivingService.Stub {
+@Singleton
+class VehicleDrivingService extends IVehicleDrivingService.Stub {
     private static final String TAG = "PartnerEnablerService.VehicleInfoService";
 
-
+    private final Context mContext;
     @GuardedBy("mCarPropertyManagerLock")
     private final CarPropertyManager mCarPropertyManager;
     private final PartnerAccessManager mPartnerAccessManager;
@@ -47,8 +51,6 @@ public class VehicleDrivingService extends IVehicleDrivingService.Stub {
     /** List of clients listening to SteeringAngle Changes. */
     private final RemoteCallbackList<ISteeringAngleChangeListener> mSteeringAngleChangeListeners =
             new RemoteCallbackList<>();
-
-    private Context mContext;
     private boolean isSteeringAngleCallbackRegistered;
 
 
@@ -89,7 +91,8 @@ public class VehicleDrivingService extends IVehicleDrivingService.Stub {
                 }
             };
 
-    public VehicleDrivingService(Context context, CarPropertyManager carPropertyManager, PartnerAccessManager partnerAccessManager) {
+    @Inject
+    VehicleDrivingService(@ApplicationContext Context context, CarPropertyManager carPropertyManager, PartnerAccessManager partnerAccessManager) {
         mContext = context;
         mCarPropertyManager = carPropertyManager;
         mPartnerAccessManager = partnerAccessManager;
@@ -153,12 +156,7 @@ public class VehicleDrivingService extends IVehicleDrivingService.Stub {
 
     private void unregisterSteeringAngleCallback() {
         if(mCarPropertyManager != null) {
-            /*if (!mCarPropertyManager.unregisterCallback(mCarPropertyEventCallback)) {
-                Log.e(TAG,
-                        "Failed to unregister callback for PERF_STEERING_ANGLE with CarPropertyManager");
-                return;
-            }*/
-            mCarPropertyManager.unregisterCallback(mCarPropertyEventCallback);
+            mCarPropertyManager.unregisterCallback(mCarPropertyEventCallback, PERF_STEERING_ANGLE);
             isSteeringAngleCallbackRegistered = false;
         }
     }
