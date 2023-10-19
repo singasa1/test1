@@ -90,11 +90,6 @@ public class PartnerLibraryDemoModeImpl implements PartnerLibrary {
     }
 
     @Override
-    public boolean verifyDigitalSignature(String packageName) {
-        return true;
-    }
-
-    @Override
     public CarDataManager getCarDataManager() {
         Log.d(TAG, "getCarDataManager");
         return mCarDataManagerDemoMode;
