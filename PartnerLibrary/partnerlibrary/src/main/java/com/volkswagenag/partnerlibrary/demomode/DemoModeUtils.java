@@ -30,8 +30,8 @@ public class DemoModeUtils {
 
     private static final String TAG = DemoModeUtils.class.getSimpleName();
 
-    private static final String DEMO_MODE_PROPERTY = "volkswagenag.parterapi.demomode";
-    private static final String PERSIST_DEMO_MODE_PROPERTY = "persist.volkswagenag.parterapi.demomode";
+    private static final String DEMO_MODE_PROPERTY = "volkswagenag.partnerapi.demomode";
+    private static final String PERSIST_DEMO_MODE_PROPERTY = "persist.volkswagenag.partnerapi.demomode";
     private static final String GET_PROP_LOCATION = "/system/bin/getprop";
 
     /**

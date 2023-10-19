@@ -47,7 +47,7 @@ public class CarDataManagerDemoModeImpl implements CarDataManager {
     //cache
     private AtomicInteger mIndex = new AtomicInteger(0);
     private int mMaxValueOfIndex;
-    private int mChangeFrequency;
+    private int mChangeFrequencySecs;
     private List<Float> mMileageList;
     private List<VehicleSignalIndicator> mTurnSignalIndicatorList;
     private List<VehicleLightState> mFogLightsStateList;
@@ -57,7 +57,6 @@ public class CarDataManagerDemoModeImpl implements CarDataManager {
     public CarDataManagerDemoModeImpl(Context context) {
         mContext = context;
         mSchedulerService = Executors.newScheduledThreadPool(1);
-
         try {
             initializeCache();
         } catch (JSONException e) {
@@ -69,17 +68,17 @@ public class CarDataManagerDemoModeImpl implements CarDataManager {
     }
 
     /**
-     * Starts frequency scheduler runnable, that runs every {@link mChangeFrequency} seconds and
+     * Starts frequency scheduler runnable, that runs every {@link mChangeFrequencySecs} seconds and
      * updates values and triggers listeners if necessary.
      */
     public void startScheduler() {
         mIndex.set(0);
         mChangeValuesAtFixedRateFuture =
-                mSchedulerService.scheduleAtFixedRate(runnable, mChangeFrequency, mChangeFrequency, TimeUnit.SECONDS);
+                mSchedulerService.scheduleAtFixedRate(runnable, mChangeFrequencySecs, mChangeFrequencySecs, TimeUnit.SECONDS);
     }
 
     /**
-     * Stops the future that runs every {@link mChangeFrequency} seconds to update values.
+     * Stops the future that runs every {@link mChangeFrequencySecs} seconds to update values.
      */
     public void stopScheduler() {
         mChangeValuesAtFixedRateFuture.cancel(true);
@@ -195,7 +194,7 @@ public class CarDataManagerDemoModeImpl implements CarDataManager {
     private void initializeCache() throws JSONException, IOException {
         JSONObject carDataJSON = DemoModeUtils.readFromFile(mContext, CAR_DATA_FILE_NAME);
 
-        mChangeFrequency = carDataJSON.getInt("change_frequency_secs");
+        mChangeFrequencySecs = carDataJSON.getInt("change_frequency_secs");
 
         mMileageList = DemoModeUtils.getFloatList(carDataJSON.getJSONArray("mileage_list"));
         mMaxValueOfIndex = mMileageList.size();
@@ -220,7 +219,7 @@ public class CarDataManagerDemoModeImpl implements CarDataManager {
     private void logCache() {
         Log.d(TAG, "Index: " + mIndex.get() + " \n"
                 + "MaxValueOfIndex: " + mMaxValueOfIndex + "\n"
-                + "Change Frequency: " + mChangeFrequency + "\n"
+                + "Change Frequency: " + mChangeFrequencySecs + "\n"
                 + "Mileage List: " + mMileageList + "\n"
                 + "TurnSignalIndicator List: " + mTurnSignalIndicatorList + "\n"
                 + "FogLightsState List: " + mFogLightsStateList + "\n"

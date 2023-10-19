@@ -18,14 +18,8 @@
  */
 package com.volkswagenag.partnerlibrary;
 
-import android.content.ComponentName;
 import android.content.Context;
-import com.volkswagenag.partnerlibrary.demomode.DemoModeUtils;
-import com.volkswagenag.partnerlibrary.demomode.PartnerLibraryDemoModeImpl;
-import com.volkswagenag.partnerlibrary.impl.PartnerLibraryImpl;
-
-import com.volkswagenag.partnerlibrary.ILibStateChangeListener;
-import technology.cariad.partnerenablerservice.IPartnerEnabler;
+import com.volkswagenag.partnerlibrary.impl.PartnerLibraryFactory;
 
 /**
  * <h1>Partner Library</h1>
@@ -46,12 +40,9 @@ public interface PartnerLibrary {
      * @return {@link PartnerLibrary} instance
      */
     static PartnerLibrary getInstance(Context context) {
-        if (ENABLE_DEMO_MODE_CODE && DemoModeUtils.isDemoModeEnabled()) {
-            return PartnerLibraryDemoModeImpl.getInstance(context);
-        } else {
-            return PartnerLibraryImpl.getInstance(context);
-        }
+        return PartnerLibraryFactory.getPartnerLibraryInstance(context);
     }
+
     /**
      * This method binds to the PartnerEnabler service.
      */
