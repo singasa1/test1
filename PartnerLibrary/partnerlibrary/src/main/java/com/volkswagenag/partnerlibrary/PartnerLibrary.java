@@ -18,19 +18,19 @@
  */
 package com.volkswagenag.partnerlibrary;
 
+import android.content.ComponentName;
 import android.content.Context;
-
 import com.volkswagenag.partnerlibrary.demomode.DemoModeUtils;
 import com.volkswagenag.partnerlibrary.demomode.PartnerLibraryDemoModeImpl;
 import com.volkswagenag.partnerlibrary.impl.PartnerLibraryImpl;
 
 import com.volkswagenag.partnerlibrary.ILibStateChangeListener;
-
+import technology.cariad.partnerenablerservice.IPartnerEnabler;
 
 /**
  * <h1>Partner Library</h1>
  * Partner Library provides wrapper apis for different app developers.
- * It has signature verification apis and other apis for getting the Active Route, Interior/Exterior Light status.
+ * It has apis for getting the Active Route, Interior/Exterior Light status.
  *
  * @author Sathya Singaravelu
  * @version 1.0
@@ -71,6 +71,7 @@ public interface PartnerLibrary {
      * This method uninitializes the PartnerEnabler service components
      */
     void stop();
+
     /**
      * This method is to add the listener to get PartnerEnablerServiceConnection status.
      * @param listener ILibStateChangeListener object from client/app.
@@ -81,14 +82,6 @@ public interface PartnerLibrary {
      * This method is to remove the listener.
      */
     void removeListener(ILibStateChangeListener listener);
-
-    /**
-     * This method verifies the provided package signature
-     * matches with signed config provided by the SignatureGenerator tool.
-     * @param packageName Package name of the 3rd party app.
-     * @return true - if signature verification succeeds. False - if signature verification fails.
-     */
-    boolean verifyDigitalSignature(String packageName);
 
     /**
      * Get {@link CarDataManager} instance to get car related data/information
