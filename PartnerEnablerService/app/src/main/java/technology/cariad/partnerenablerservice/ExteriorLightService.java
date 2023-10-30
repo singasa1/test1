@@ -46,7 +46,6 @@ class ExteriorLightService extends IExteriorLightService.Stub {
     private static final String TAG = "PartnerEnablerService.ExteriorLightService";
 
     private final Context mContext;
-    @GuardedBy("mLock")
     private final CarPropertyManager mCarPropertyManager;
     private final PartnerAccessManager mPartnerAccessManager;
 

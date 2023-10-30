@@ -37,11 +37,13 @@ import androidx.annotation.GuardedBy;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
+import javax.inject.Singleton;
 
 import dagger.hilt.InstallIn;
 import dagger.hilt.android.components.ServiceComponent;
 import dagger.hilt.android.qualifiers.ApplicationContext;
 
+@Singleton
 class PartnerEnablerImpl extends IPartnerEnabler.Stub {
 
     private static final String TAG = "PartnerEnablerService:" + PartnerEnablerImpl.class.getSimpleName();
@@ -53,7 +55,6 @@ class PartnerEnablerImpl extends IPartnerEnabler.Stub {
     private final Provider<NavigationService> mNavigationServiceProvider;
     private final Provider<VehicleInfoService> mVehicleInfoServiceProvider;
     private final Provider<VehicleDrivingService> mVehicleDrivingServiceProvider;
-    @GuardedBy("mLock")
     private final CarPropertyManager mCarPropertyManager;
 
     /** List of clients listening to UX restriction events */
