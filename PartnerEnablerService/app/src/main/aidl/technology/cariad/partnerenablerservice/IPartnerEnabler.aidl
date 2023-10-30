@@ -29,6 +29,11 @@ import technology.cariad.partnerenablerservice.ICarDataChangeListener;
 interface IPartnerEnabler {
 
     /**
+    * Version number of the aidl interface
+    */
+    const int VERSION = 1;
+
+    /**
      * GetVehicleSignalIndicator Binder calls returns one of
      * the following signal indicator value.
     */
@@ -45,20 +50,25 @@ interface IPartnerEnabler {
     const int VEHICLE_LIGHT_STATE_DAYTIME_RUNNING = 2;
 
     /**
+    * Get the AIDL interface version number
+    */
+    int getIfcVersion() = 0;
+
+    /**
      * This method initializes the required components in the PartnerEnablerService.
     */
-    void initialize() = 0;
+    void initialize() = 1;
 
     /**
      * This method releases/destroy the components created in the PartnerEnablerService.
     */
-    void release() = 1;
+    void release() = 2;
 
     /**
      * This method returns the Car current Odometer value. continuous change prop type
      * @return: It returns value ranges from 0 to 4294967293.
     */
-    float getCurrentMileage() = 2;
+    float getCurrentMileage() = 3;
 
     /**
      * This method returns the Car current signal indicator value. on_change prop type
@@ -66,7 +76,7 @@ interface IPartnerEnabler {
      * 1 - Right
      * 2 - Left
     */
-    int getTurnSignalIndicator() = 3;
+    int getTurnSignalIndicator() = 4;
 
     /**
      * This method returns the Car fog light state. on_change prop type
@@ -74,21 +84,21 @@ interface IPartnerEnabler {
      * 1 - ON
      * 2 - DAYLIGHT_RUNNING
     */
-    int getFogLightsState() = 4;
+    int getFogLightsState() = 5;
 
     /**
      * Registers a listener @link#ICarDataChangeListener to be called when the car data changes.
     */
-    void addCarDataChangeListener(in ICarDataChangeListener listener) = 5;
+    void addCarDataChangeListener(in ICarDataChangeListener listener) = 6;
 
     /**
     * Removes the provided listener from receiving the callbacks.
     */
-    void removeCarDataChangeListener(in ICarDataChangeListener listener) = 6;
+    void removeCarDataChangeListener(in ICarDataChangeListener listener) = 7;
 
     /**
      * Returns the IBinder for the given service name
      * List of available ServiceName Strings are defined in @link#PartnerAPIConstants.
     */
-    IBinder getAPIService(in String serviceName) = 7;
+    IBinder getAPIService(in String serviceName) = 8;
 }

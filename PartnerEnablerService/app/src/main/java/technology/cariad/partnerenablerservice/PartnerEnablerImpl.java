@@ -100,6 +100,11 @@ public class PartnerEnablerImpl extends IPartnerEnabler.Stub {
             };
 
     @Override
+    public int getIfcVersion() {
+        return IPartnerEnabler.VERSION;
+    }
+
+    @Override
     public void initialize() throws SecurityException {
         Log.d(TAG, "initialize");
         mPartnerAccessManager.verifyAccess(mContext.getPackageManager().getNameForUid(Binder.getCallingUid()));

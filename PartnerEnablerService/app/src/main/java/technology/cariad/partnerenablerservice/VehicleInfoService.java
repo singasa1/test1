@@ -28,6 +28,12 @@ public class VehicleInfoService extends IVehicleInfoService.Stub {
         mPartnerAccessManager = partnerAccessManager;
     }
 
+    @Override
+    public int getIfcVersion() {
+        return IVehicleInfoService.VERSION;
+    }
+
+    @Override
     public String getVehicleIdentityNumber() {
         mPartnerAccessManager.verifyAccessAndPermission(mContext.getPackageManager().getNameForUid(
                 Binder.getCallingUid()),
