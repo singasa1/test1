@@ -30,6 +30,16 @@ import technology.cariad.partnerenablerservice.ISteeringAngleChangeListener;
 interface IVehicleDrivingService {
 
     /**
+    * Version number of the aidl interface
+    */
+    const int VERSION = 1;
+
+    /**
+    * Get the AIDL interface version number
+    */
+    int getIfcVersion();
+
+    /**
      * This method returns the Car steering angle in degrees. positive - right; negative - left. continuous change prop type.
      * @return: It returns value ranges from -1200 to 1200.
     */

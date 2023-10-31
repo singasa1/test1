@@ -115,6 +115,11 @@ class ExteriorLightService extends IExteriorLightService.Stub {
     }
 
     @Override
+    public int getIfcVersion() {
+        return IExteriorLightService.VERSION;
+    }
+
+    @Override
     public int getTurnSignalIndicator() throws RemoteException {
         Log.d(TAG,"getTurnSignalIndicator");
         mPartnerAccessManager.verifyAccessAndPermission(mContext.getPackageManager().getNameForUid(Binder.getCallingUid()),

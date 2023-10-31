@@ -186,6 +186,11 @@ class NavigationService extends INavigationService.Stub {
     }
 
     @Override
+    public int getIfcVersion() {
+        return INavigationService.VERSION;
+    }
+
+    @Override
     public int getNavigationApplicationState() {
         // Permission check
         Log.d(TAG,"getNavigationApplicationState");

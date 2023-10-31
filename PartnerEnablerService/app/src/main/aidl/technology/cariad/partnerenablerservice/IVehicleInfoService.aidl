@@ -27,6 +27,16 @@ package technology.cariad.partnerenablerservice;
 interface IVehicleInfoService {
 
     /**
+    * Version number of the aidl interface
+    */
+    const int VERSION = 1;
+
+    /**
+    * Get the AIDL interface version number
+    */
+    int getIfcVersion();
+
+    /**
      * This method returns the Car VIN Number.
     */
     String getVehicleIdentityNumber();

@@ -99,6 +99,12 @@ class VehicleDrivingService extends IVehicleDrivingService.Stub {
         isSteeringAngleCallbackRegistered = false;
     }
 
+    @Override
+    public int getIfcVersion() {
+        return IVehicleDrivingService.VERSION;
+    }
+
+    @Override
     public float getSteeringAngle() {
         mPartnerAccessManager.verifyAccessAndPermission(
                 mContext.getPackageManager().getNameForUid(Binder.getCallingUid()),
@@ -113,6 +119,7 @@ class VehicleDrivingService extends IVehicleDrivingService.Stub {
         return steeringAngle;
     }
 
+    @Override
     public void addSteeringAngleChangeListener(ISteeringAngleChangeListener listener) {
         mPartnerAccessManager.verifyAccessAndPermission(mContext.getPackageManager().getNameForUid(
                         Binder.getCallingUid()),
@@ -129,6 +136,7 @@ class VehicleDrivingService extends IVehicleDrivingService.Stub {
         }
     }
 
+    @Override
     public void removeSteeringAngleChangeListener(ISteeringAngleChangeListener listener) {
         if (listener == null) {
             throw new IllegalArgumentException("ISteeringAngleChangeListener is null");

@@ -116,6 +116,11 @@ class PartnerEnablerImpl extends IPartnerEnabler.Stub {
         mCarPropertyManager = carPropertyManager;
     }
     @Override
+    public int getIfcVersion() {
+        return IPartnerEnabler.VERSION;
+    }
+
+    @Override
     public void initialize() throws SecurityException {
         Log.d(TAG, "initialize");
         mPartnerAccessManager.verifyAccess(mContext.getPackageManager().getNameForUid(Binder.getCallingUid()));
