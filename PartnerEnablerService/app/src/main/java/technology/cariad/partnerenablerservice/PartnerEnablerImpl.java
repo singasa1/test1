@@ -35,32 +35,32 @@ import android.util.Log;
 
 import androidx.annotation.GuardedBy;
 
-public class PartnerEnablerImpl extends IPartnerEnabler.Stub {
+import javax.inject.Inject;
+import javax.inject.Provider;
+import javax.inject.Singleton;
+
+import dagger.hilt.InstallIn;
+import dagger.hilt.android.components.ServiceComponent;
+import dagger.hilt.android.qualifiers.ApplicationContext;
+
+@Singleton
+class PartnerEnablerImpl extends IPartnerEnabler.Stub {
 
     private static final String TAG = "PartnerEnablerService:" + PartnerEnablerImpl.class.getSimpleName();
     private static final String VWAE_CAR_MILEAGE_PERMISSION = "com.volkswagenag.restricted.permission.READ_CAR_MILEAGE";
 
     private final Context mContext;
-    private PartnerAccessManager mPartnerAccessManager;
-    private ExteriorLightService mExteriorLightService;
-    private NavigationService mNavigationService;
-    private VehicleInfoService mVehicleInfoService;
-    private VehicleDrivingService mVehicleDrivingService;
-
-    @GuardedBy("mLock")
-    private Car mCar;
-
-    @GuardedBy("mLock")
-    private CarPropertyManager mCarPropertyManager;
+    private final PartnerAccessManager mPartnerAccessManager;
+    private final Provider<ExteriorLightService> mExteriorLightServiceProvider;
+    private final Provider<NavigationService> mNavigationServiceProvider;
+    private final Provider<VehicleInfoService> mVehicleInfoServiceProvider;
+    private final Provider<VehicleDrivingService> mVehicleDrivingServiceProvider;
+    private final CarPropertyManager mCarPropertyManager;
 
     /** List of clients listening to UX restriction events */
     private final RemoteCallbackList<ICarDataChangeListener> mCarDataChangeListeners =
             new RemoteCallbackList<>();
 
-    PartnerEnablerImpl(Context context, PartnerAccessManager partnerAccessManager) {
-        mContext = context;
-        mPartnerAccessManager = partnerAccessManager;
-    }
 
     /**
      * {@link CarPropertyEvent} listener registered with the {@link CarPropertyManager} for getting
@@ -99,22 +99,31 @@ public class PartnerEnablerImpl extends IPartnerEnabler.Stub {
                 }
             };
 
+    @Inject
+    PartnerEnablerImpl(@ApplicationContext Context context,
+                       PartnerAccessManager partnerAccessManager,
+                       Provider<ExteriorLightService> exteriorLightServiceProvider,
+                       Provider<NavigationService> navigationServiceProvider,
+                       Provider<VehicleInfoService> vehicleInfoServiceProvider,
+                       Provider<VehicleDrivingService> vehicleDrivingServiceProvider,
+                       CarPropertyManager carPropertyManager) {
+        mContext = context;
+        mPartnerAccessManager = partnerAccessManager;
+        mExteriorLightServiceProvider = exteriorLightServiceProvider;
+        mNavigationServiceProvider = navigationServiceProvider;
+        mVehicleInfoServiceProvider = vehicleInfoServiceProvider;
+        mVehicleDrivingServiceProvider = vehicleDrivingServiceProvider;
+        mCarPropertyManager = carPropertyManager;
+    }
     @Override
     public void initialize() throws SecurityException {
         Log.d(TAG, "initialize");
         mPartnerAccessManager.verifyAccess(mContext.getPackageManager().getNameForUid(Binder.getCallingUid()));
 
-        mCarPropertyManager =
-                (CarPropertyManager) Car.createCar(mContext).getCarManager(Car.PROPERTY_SERVICE);
         if (mCarPropertyManager == null) {
             Log.e(TAG, "Failed to get CarPropertyManager");
             throw new IllegalStateException("CAR Property Service not ready");
         }
-
-        mExteriorLightService= new ExteriorLightService(mContext, mCarPropertyManager, mPartnerAccessManager);
-        mVehicleInfoService = new VehicleInfoService(mContext, mCarPropertyManager, mPartnerAccessManager);
-        mNavigationService = new NavigationService(mContext, mPartnerAccessManager);
-        mVehicleDrivingService = new VehicleDrivingService(mContext, mCarPropertyManager, mPartnerAccessManager);
 
         if (!mCarPropertyManager.registerCallback(mCarPropertyEventCallback,
                 PERF_ODOMETER,
@@ -173,17 +182,17 @@ public class PartnerEnablerImpl extends IPartnerEnabler.Stub {
         Log.i(TAG, "calling getAPIService for service:" + serviceName);
         switch (serviceName) {
             case PartnerAPIConstants.EXTERIOR_LIGHT_SERVICE:
-                Log.i(TAG, " getAPIService: mExteriorLightService=" + mExteriorLightService);
-                return mExteriorLightService;
+                Log.i(TAG, " getAPIService: mExteriorLightService=" + mExteriorLightServiceProvider.get());
+                return mExteriorLightServiceProvider.get();
             case PartnerAPIConstants.NAVIGATION_SERVICE:
-                Log.i(TAG, " getAPIService: mNavigationService=" + mNavigationService);
-                return mNavigationService;
+                Log.i(TAG, " getAPIService: mNavigationService=" + mNavigationServiceProvider.get());
+                return mNavigationServiceProvider.get();
             case PartnerAPIConstants.VEHICLE_INFO_SERVICE:
-                Log.i(TAG, "getAPIService: mVehicleInfoService = " + mVehicleInfoService);
-                return mVehicleInfoService;
+                Log.i(TAG, "getAPIService: mVehicleInfoService = " + mVehicleInfoServiceProvider.get());
+                return mVehicleInfoServiceProvider.get();
             case PartnerAPIConstants.VEHICLE_DRIVING_SERVICE:
-                Log.i(TAG, "getAPIService: mVehicleDrivingService = " + mVehicleDrivingService);
-                return mVehicleDrivingService;
+                Log.i(TAG, "getAPIService: mVehicleDrivingService = " + mVehicleDrivingServiceProvider.get());
+                return mVehicleDrivingServiceProvider.get();
             default:
                 Log.w(TAG, "getAPIService for unknown service:" + serviceName);
                 return null;

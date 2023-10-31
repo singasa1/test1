@@ -13,16 +13,23 @@ import android.os.Binder;
 import android.os.RemoteException;
 import android.util.Log;
 
-public class VehicleInfoService extends IVehicleInfoService.Stub {
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import dagger.hilt.android.qualifiers.ApplicationContext;
+
+@Singleton
+class VehicleInfoService extends IVehicleInfoService.Stub {
     private static final String TAG = "PartnerEnablerService.VehicleInfoService";
 
-    private Context mContext;
+    private final Context mContext;
 
     @GuardedBy("mCarPropertyManagerLock")
     private final CarPropertyManager mCarPropertyManager;
     private final PartnerAccessManager mPartnerAccessManager;
 
-    public VehicleInfoService(Context context, CarPropertyManager carPropertyManager, PartnerAccessManager partnerAccessManager) {
+    @Inject
+    VehicleInfoService(@ApplicationContext Context context, CarPropertyManager carPropertyManager, PartnerAccessManager partnerAccessManager) {
         mContext = context;
         mCarPropertyManager = carPropertyManager;
         mPartnerAccessManager = partnerAccessManager;

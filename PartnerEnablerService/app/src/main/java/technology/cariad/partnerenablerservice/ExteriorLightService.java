@@ -36,10 +36,18 @@ import android.car.Car;
 import android.car.hardware.CarPropertyValue;
 import android.car.hardware.property.CarPropertyManager;
 
-public class ExteriorLightService extends IExteriorLightService.Stub {
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import dagger.hilt.android.qualifiers.ApplicationContext;
+
+@Singleton
+class ExteriorLightService extends IExteriorLightService.Stub {
     private static final String TAG = "PartnerEnablerService.ExteriorLightService";
 
-    private Context mContext;
+    private final Context mContext;
+    private final CarPropertyManager mCarPropertyManager;
+    private final PartnerAccessManager mPartnerAccessManager;
 
     /** List of clients listening to TurnSignalState */
     private final RemoteCallbackList<ITurnSignalStateListener> mTurnSignalStateListener =
@@ -48,11 +56,6 @@ public class ExteriorLightService extends IExteriorLightService.Stub {
     /** List of clients listening to FogLightsState */
     private final RemoteCallbackList<IFogLightStateListener> mFogLightStateListener =
             new RemoteCallbackList<>();
-
-    @GuardedBy("mLock")
-    private CarPropertyManager mCarPropertyManager;
-
-    private PartnerAccessManager mPartnerAccessManager;
 
     /**
      * {@link CarPropertyEvent} listener registered with the {@link CarPropertyManager} for getting
@@ -104,7 +107,8 @@ public class ExteriorLightService extends IExteriorLightService.Stub {
                 }
             };
 
-    public ExteriorLightService(Context context, CarPropertyManager carPropertyManager, PartnerAccessManager partnerAccessManager) {
+    @Inject
+    ExteriorLightService(@ApplicationContext Context context, CarPropertyManager carPropertyManager, PartnerAccessManager partnerAccessManager) {
         mContext = context;
         mCarPropertyManager = carPropertyManager;
         mPartnerAccessManager = partnerAccessManager;
