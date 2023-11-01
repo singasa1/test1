@@ -20,29 +20,13 @@
 package technology.cariad.partnerenablerservice;
 
 // Declare any non-default types here with import statements
-
-interface ICarDataChangeListener {
+/**
+ * Listener interface for Odometer/Mileage value changes
+ */
+oneway interface IOdometerValueChangeListener {
     /**
      * Binder callback for changes to the Mileage/Odometer
      * @hide
      */
-    void onMileageValueChanged(float mileageValue) = 0;
-
-    /**
-     * Binder callback for changes to the FogLights
-     * @hide
-     */
-    void onFogLightsChanged(int fogLightState) = 1;
-
-    /**
-     * Binder callback for changes to Steering Angle
-     * @hide
-    */
-    void onSteeringAngleChanged(float steeringAngle) = 2;
-
-    /**
-     * Binder callback for changes to the TurnSignalIndicator
-     * @hide
-    */
-    void onTurnSignalStateChanged(int signalIndicator) = 3;
+    void onMileageValueChanged(in float mileageValue);
 }

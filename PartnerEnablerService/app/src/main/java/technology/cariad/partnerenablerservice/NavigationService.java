@@ -243,16 +243,20 @@ public class NavigationService extends INavigationService.Stub {
         Intent intent = new Intent(NAV_APPSTATE_ACTION_NAME);
 
         // only one navigation service matches
-        ResolveInfo ri = mContext.getPackageManager().resolveService(intent, PackageManager.GET_META_DATA);
-        ServiceInfo si = ri.serviceInfo;
+        try {
+            ResolveInfo ri = mContext.getPackageManager().resolveService(intent, PackageManager.GET_META_DATA);
+            ServiceInfo si = ri.serviceInfo;
 
-        // complete intent with package name
-        intent.setPackage(si.packageName);
+            // complete intent with package name
+            intent.setPackage(si.packageName);
 
 
-        boolean ret = false;
-        ret = mContext.bindService(intent, mNavAppStateServiceConnection, Service.BIND_AUTO_CREATE);
-        Log.d(TAG,"Return value of NavApplicationState service Start: " + ret);
+            boolean ret = false;
+            ret = mContext.bindService(intent, mNavAppStateServiceConnection, Service.BIND_AUTO_CREATE);
+            Log.d(TAG, "Return value of NavApplicationState service Start: " + ret);
+        } catch (NullPointerException e) {
+            Log.e(TAG,"Exception: " + e.getMessage() + ", cant initiate bind service to navappstate");
+        }
     }
 
     private void initRouteSimplifierConnection() {

@@ -20,6 +20,7 @@ package technology.cariad.partnerenablerservice;
 
 // Declare any non-default types here with import statements
 import technology.cariad.partnerenablerservice.ISteeringAngleChangeListener;
+import technology.cariad.partnerenablerservice.IOdometerValueChangeListener;
 
 /**
  * Interface used to interact with the VehicleDrivingService in PartnerEnablerService. This interface supports
@@ -28,6 +29,22 @@ import technology.cariad.partnerenablerservice.ISteeringAngleChangeListener;
  * {@hide}
  */
 interface IVehicleDrivingService {
+
+    /**
+     * This method returns the Car current Odometer value. continuous change prop type
+     * @return: It returns value ranges from 0 to 4294967293.
+    */
+    float getCurrentMileage();
+
+    /**
+     * Registers a listener @link#IOdometerValueChangeListener to be called when the odometer value changes.
+    */
+    void addOdometerValueChangeListener(in IOdometerValueChangeListener listener);
+
+    /**
+     * Removes the provided listener from receiving the callbacks.
+    */
+    void removeOdometerValueChangeListener(in IOdometerValueChangeListener listener);
 
     /**
      * This method returns the Car steering angle in degrees. positive - right; negative - left. continuous change prop type.

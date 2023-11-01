@@ -19,7 +19,7 @@
 package technology.cariad.partnerenablerservice;
 
 // Declare any non-default types here with import statements
-import technology.cariad.partnerenablerservice.ICarDataChangeListener;
+
 
 /**
  * Interface used to interact with the PartnerEnablerService. Mostly this is used by the
@@ -47,48 +47,16 @@ interface IPartnerEnabler {
     /**
      * This method initializes the required components in the PartnerEnablerService.
     */
-    void initialize() = 0;
+    void initialize();
 
     /**
      * This method releases/destroy the components created in the PartnerEnablerService.
     */
-    void release() = 1;
-
-    /**
-     * This method returns the Car current Odometer value. continuous change prop type
-     * @return: It returns value ranges from 0 to 4294967293.
-    */
-    float getCurrentMileage() = 2;
-
-    /**
-     * This method returns the Car current signal indicator value. on_change prop type
-     * 0 - None
-     * 1 - Right
-     * 2 - Left
-    */
-    int getTurnSignalIndicator() = 3;
-
-    /**
-     * This method returns the Car fog light state. on_change prop type
-     * 0 - OFF
-     * 1 - ON
-     * 2 - DAYLIGHT_RUNNING
-    */
-    int getFogLightsState() = 4;
-
-    /**
-     * Registers a listener @link#ICarDataChangeListener to be called when the car data changes.
-    */
-    void addCarDataChangeListener(in ICarDataChangeListener listener) = 5;
-
-    /**
-    * Removes the provided listener from receiving the callbacks.
-    */
-    void removeCarDataChangeListener(in ICarDataChangeListener listener) = 6;
+    void release();
 
     /**
     * Returns the IBinder for the given service name
     * List of available ServiceName Strings are defined in @link#PartnerAPIConstants.
     */
-    IBinder getAPIService(in String serviceName) = 7;
+    IBinder getAPIService(in String serviceName);
 }

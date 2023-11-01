@@ -92,11 +92,11 @@ class PartnerAccessManager {
      * @throws IllegalStateException
      */
     public boolean isAccessAllowed(String packageName) throws RemoteException, IllegalStateException {
+        if (DEBUG_MODE) return true;
+
         if (!isServiceConnected || mService == null) {
             throw new IllegalStateException("Service is not connected to verify");
         }
-
-        if (DEBUG_MODE) return true;
 
         checkAndUpdateCache(packageName);
         boolean accessAllowed = false;
