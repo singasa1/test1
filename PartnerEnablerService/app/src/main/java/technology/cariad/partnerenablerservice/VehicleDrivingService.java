@@ -33,16 +33,20 @@ import android.car.Car;
 import android.car.hardware.CarPropertyValue;
 import android.car.hardware.property.CarPropertyManager;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import dagger.hilt.android.qualifiers.ApplicationContext;
 import technology.cariad.partnerenablerservice.PartnerAPIConstants;
 import technology.cariad.partnerenablerservice.ISteeringAngleChangeListener;
 import technology.cariad.partnerenablerservice.IOdometerValueChangeListener;
 
-
-public class VehicleDrivingService extends IVehicleDrivingService.Stub {
+@Singleton
+class VehicleDrivingService extends IVehicleDrivingService.Stub {
     private static final String TAG = "PartnerEnablerService.VehicleDrivingService";
 
+    private final Context mContext;
 
-    @GuardedBy("mCarPropertyManagerLock")
     private final CarPropertyManager mCarPropertyManager;
     private final PartnerAccessManager mPartnerAccessManager;
 
@@ -53,9 +57,6 @@ public class VehicleDrivingService extends IVehicleDrivingService.Stub {
     /** List of clients listening to SteeringAngle Changes. */
     private final RemoteCallbackList<ISteeringAngleChangeListener> mSteeringAngleChangeListeners =
             new RemoteCallbackList<>();
-
-    private Context mContext;
-
 
     /**
      * {@link CarPropertyEvent} listener registered with the {@link CarPropertyManager} for getting
@@ -107,10 +108,16 @@ public class VehicleDrivingService extends IVehicleDrivingService.Stub {
                 }
             };
 
-    public VehicleDrivingService(Context context, CarPropertyManager carPropertyManager, PartnerAccessManager partnerAccessManager) {
+    @Inject
+    VehicleDrivingService(@ApplicationContext Context context, CarPropertyManager carPropertyManager, PartnerAccessManager partnerAccessManager) {
         mContext = context;
         mCarPropertyManager = carPropertyManager;
         mPartnerAccessManager = partnerAccessManager;
+    }
+
+    @Override
+    public int getIfcVersion() {
+        return IVehicleDrivingService.VERSION;
     }
 
     public float getCurrentMileage() {
@@ -167,6 +174,7 @@ public class VehicleDrivingService extends IVehicleDrivingService.Stub {
         unregisterCarPropertyCallback();
     }
 
+    @Override
     public float getSteeringAngle() {
         mPartnerAccessManager.verifyAccessAndPermission(
                 mContext.getPackageManager().getNameForUid(Binder.getCallingUid()),
@@ -181,6 +189,7 @@ public class VehicleDrivingService extends IVehicleDrivingService.Stub {
         return steeringAngle;
     }
 
+    @Override
     public void addSteeringAngleChangeListener(ISteeringAngleChangeListener listener) {
         Log.d(TAG,"registerSteeringAngleChangeListener");
         mPartnerAccessManager.verifyAccessAndPermission(mContext.getPackageManager().getNameForUid(
@@ -212,6 +221,7 @@ public class VehicleDrivingService extends IVehicleDrivingService.Stub {
         mSteeringAngleChangeListeners.register(listener);
     }
 
+    @Override
     public void removeSteeringAngleChangeListener(ISteeringAngleChangeListener listener) {
         if (listener == null) {
             throw new IllegalArgumentException("ISteeringAngleChangeListener is null");

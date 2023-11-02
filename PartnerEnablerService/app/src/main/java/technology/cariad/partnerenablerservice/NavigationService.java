@@ -35,6 +35,7 @@ import android.util.Log;
 
 import androidx.annotation.GuardedBy;
 
+import dagger.hilt.android.qualifiers.ApplicationContext;
 import technology.cariad.partnerenablerservice.INavigationService;
 import technology.cariad.partnerenablerservice.INavAppStateListener;
 import technology.cariad.partnerenablerservice.IActiveRouteUpdateListener;
@@ -43,7 +44,11 @@ import com.volkswagenag.nav.applicationstate.ApplicationStateType;
 import com.volkswagenag.nav.applicationstate.IApplicationStateCallback;
 import com.volkswagenag.nav.route.simplifier.IRouteSimplifier;
 
-public class NavigationService extends INavigationService.Stub {
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+@Singleton
+class NavigationService extends INavigationService.Stub {
     private static final String TAG = "PartnerEnablerService.INavigationService";
 
     private static final String NAV_APPSTATE_ACTION_NAME = "com.volkswagenag.nav.service.ApplicationState.BIND";
@@ -51,9 +56,9 @@ public class NavigationService extends INavigationService.Stub {
 
     private static final String NAV_APP_PACKAGE_NAME = "technology.cariad.navi.audi";
 
-    private Context mContext;
+    private final Context mContext;
 
-    private PartnerAccessManager mPartnerAccessManager;
+    private final PartnerAccessManager mPartnerAccessManager;
 
     /** List of clients listening to Navigation Application State */
     private final RemoteCallbackList<INavAppStateListener> mNavAppStateListeners =
@@ -69,7 +74,6 @@ public class NavigationService extends INavigationService.Stub {
     private NavAppStateServiceConnection mNavAppStateServiceConnection;
     private NavAppStateListener mNavAppStateListener;
     private int mApplicationStateType;
-
     private NavRouteServiceConnection mNavRouteServiceConnection;
     private IRouteSimplifier mRouteSimplifier;
 
@@ -169,7 +173,8 @@ public class NavigationService extends INavigationService.Stub {
         }
     }
 
-    public NavigationService(Context context, PartnerAccessManager partnerAccessManager) {
+    @Inject
+    NavigationService(@ApplicationContext Context context, PartnerAccessManager partnerAccessManager) {
         mContext = context;
         mPartnerAccessManager = partnerAccessManager;
 
@@ -178,6 +183,11 @@ public class NavigationService extends INavigationService.Stub {
 
         mNavRouteServiceConnection = new NavRouteServiceConnection();
         initRouteSimplifierConnection();
+    }
+
+    @Override
+    public int getIfcVersion() {
+        return INavigationService.VERSION;
     }
 
     @Override

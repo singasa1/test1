@@ -30,10 +30,20 @@ import technology.cariad.partnerenablerservice.IActiveRouteUpdateListener;
 interface INavigationService {
 
     /**
+    * Version number of the aidl interface
+    */
+    const int VERSION = 1;
+
+    /**
      * getNavigationApplicationState returns one of the following values
     */
     const int NAV_APP_STATE_NOT_READY = 0;
     const int NAV_APP_STATE_READY = 80;
+
+    /**
+    * Get the AIDL interface version number
+    */
+    int getIfcVersion();
 
     /**
      * This method returns the Navigation Application State

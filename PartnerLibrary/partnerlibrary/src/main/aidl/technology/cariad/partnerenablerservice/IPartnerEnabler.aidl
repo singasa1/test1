@@ -29,6 +29,11 @@ package technology.cariad.partnerenablerservice;
 interface IPartnerEnabler {
 
     /**
+    * Version number of the aidl interface
+    */
+    const int VERSION = 1;
+
+    /**
      * GetVehicleSignalIndicator Binder calls returns one of
      * the following signal indicator value.
     */
@@ -43,6 +48,11 @@ interface IPartnerEnabler {
     const int VEHICLE_LIGHT_STATE_OFF = 0;
     const int VEHICLE_LIGHT_STATE_ON = 1;
     const int VEHICLE_LIGHT_STATE_DAYTIME_RUNNING = 2;
+
+    /**
+    * Get the AIDL interface version number
+    */
+    int getIfcVersion();
 
     /**
      * This method initializes the required components in the PartnerEnablerService.

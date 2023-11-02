@@ -24,14 +24,19 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.qualifiers.ApplicationContext;
 import technology.cariad.partnerverifierlibrary.ISignatureVerifier;
 
-public class SignatureVerifierImpl extends ISignatureVerifier.Stub {
+class SignatureVerifierImpl extends ISignatureVerifier.Stub {
     private static final String TAG = SignatureVerifierImpl.class.getSimpleName();
-    private final Context mContext;
     private static final String METADATA_KEY = "VWAE_Sig_V1";
 
-    public SignatureVerifierImpl(Context context) {
+    private final Context mContext;
+
+    @Inject
+    SignatureVerifierImpl(@ApplicationContext Context context) {
         mContext = context;
     }
 

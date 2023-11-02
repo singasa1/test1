@@ -31,6 +31,16 @@ import technology.cariad.partnerenablerservice.IOdometerValueChangeListener;
 interface IVehicleDrivingService {
 
     /**
+     * Version number of the aidl interface
+    */
+    const int VERSION = 1;
+
+    /**
+     * Get the AIDL interface version number
+    */
+    int getIfcVersion();
+
+    /**
      * This method returns the Car current Odometer value. continuous change prop type
      * @return: It returns value ranges from 0 to 4294967293.
     */

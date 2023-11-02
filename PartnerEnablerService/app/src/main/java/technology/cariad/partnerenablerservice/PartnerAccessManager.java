@@ -14,6 +14,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import dagger.hilt.android.qualifiers.ApplicationContext;
 import technology.cariad.partnerenablerservice.verifierservice.DigitalSignatureVerifier;
 import technology.cariad.partnerverifierlibrary.ISignatureVerifier;
 
@@ -21,14 +25,14 @@ import technology.cariad.partnerverifierlibrary.ISignatureVerifier;
  * Singleton that manages verification of partner calls to the Service.
  * Holds a cache of  verification status of previously verified applications.
  */
+@Singleton
 class PartnerAccessManager {
     private static final String TAG = PartnerAccessManager.class.getSimpleName();
-    private static volatile PartnerAccessManager partnerAccessManagerInstance = null;
 
     // This flag is only for testing purposes, to allow access without verification. This should be set to false in production.
     private static final boolean DEBUG_MODE = true;
 
-    private Context mContext;
+    private final Context mContext;
 
     // This is a HashMap with Key as package names of the calling applications and
     // Value as their respective verification status
@@ -37,23 +41,9 @@ class PartnerAccessManager {
     private ISignatureVerifier mService;
     private SignatureVerifierConnection mServiceConnection;
 
-    private PartnerAccessManager(Context context) {
+    @Inject
+    PartnerAccessManager(@ApplicationContext Context context) {
         mContext = context;
-    }
-
-    /**
-     * Initializes an instance of PartnerAccessManager if not initialized
-     * and returns the Singleton instance.
-     * @param context
-     * @return Singleton instance of PartnerAccessManager.
-     */
-    public static PartnerAccessManager getInstance(Context context) {
-        synchronized (PartnerAccessManager.class) {
-            if (partnerAccessManagerInstance == null) {
-                partnerAccessManagerInstance = new PartnerAccessManager(context);
-            }
-        }
-        return partnerAccessManagerInstance;
     }
 
     /**
@@ -134,9 +124,8 @@ class PartnerAccessManager {
     public void verifyAccessAndPermission(String packageName, String permission) throws SecurityException {
         Log.d(TAG, "Calling app is: " + packageName);
 
-        if (mContext.getPackageManager().checkPermission(
-                permission, mContext.getPackageManager().getNameForUid(Binder.getCallingUid())) != PackageManager.PERMISSION_GRANTED) {
-            Log.e(TAG, "VWAE permission not granted");
+        if (mContext.getPackageManager().checkPermission(permission, packageName) != PackageManager.PERMISSION_GRANTED) {
+            Log.e(TAG, "VWAE permission " + permission + " not granted");
             throw new SecurityException("Permission" + permission + " is required to access API");
         }
 
