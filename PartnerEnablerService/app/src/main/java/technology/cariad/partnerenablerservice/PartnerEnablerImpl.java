@@ -18,18 +18,11 @@
  */
 package technology.cariad.partnerenablerservice;
 
-
-import static android.car.VehicleAreaType.VEHICLE_AREA_TYPE_GLOBAL;
-import static android.car.VehiclePropertyIds.PERF_ODOMETER;
-
 import android.car.Car;
-import android.car.hardware.CarPropertyValue;
 import android.car.hardware.property.CarPropertyManager;
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.os.Binder;
 import android.os.IBinder;
-import android.os.RemoteCallbackList;
 import android.os.RemoteException;
 import android.util.Log;
 
@@ -47,57 +40,15 @@ import dagger.hilt.android.qualifiers.ApplicationContext;
 class PartnerEnablerImpl extends IPartnerEnabler.Stub {
 
     private static final String TAG = "PartnerEnablerService:" + PartnerEnablerImpl.class.getSimpleName();
-    private static final String VWAE_CAR_MILEAGE_PERMISSION = "com.volkswagenag.restricted.permission.READ_CAR_MILEAGE";
 
     private final Context mContext;
+
     private final PartnerAccessManager mPartnerAccessManager;
     private final Provider<ExteriorLightService> mExteriorLightServiceProvider;
     private final Provider<NavigationService> mNavigationServiceProvider;
     private final Provider<VehicleInfoService> mVehicleInfoServiceProvider;
     private final Provider<VehicleDrivingService> mVehicleDrivingServiceProvider;
     private final CarPropertyManager mCarPropertyManager;
-
-    /** List of clients listening to UX restriction events */
-    private final RemoteCallbackList<ICarDataChangeListener> mCarDataChangeListeners =
-            new RemoteCallbackList<>();
-
-
-    /**
-     * {@link CarPropertyEvent} listener registered with the {@link CarPropertyManager} for getting
-     * speed change notifications.
-     */
-    private final CarPropertyManager.CarPropertyEventCallback mCarPropertyEventCallback =
-            new CarPropertyManager.CarPropertyEventCallback() {
-                @Override
-                public void onChangeEvent(CarPropertyValue value) {
-                    if (value == null || value.getStatus() != CarPropertyValue.STATUS_AVAILABLE) {
-                        return;
-                    }
-                    switch(value.getPropertyId()) {
-                        case PERF_ODOMETER:
-                            Log.d(TAG,"Dispatching Odometer values changed to clients: " + value);
-                            int numClients = mCarDataChangeListeners.beginBroadcast();
-                            for (int i = 0; i < numClients; i++) {
-                                ICarDataChangeListener callback = mCarDataChangeListeners.getBroadcastItem(i);
-                                try {
-                                    callback.onMileageValueChanged((float)value.getValue());
-                                } catch (RemoteException ignores) {
-                                    // ignore
-                                }
-                            }
-                            mCarDataChangeListeners.finishBroadcast();
-                            break;
-                        default:
-                            break;
-                    }
-
-                }
-
-                @Override
-                public void onErrorEvent(int propId, int zone) {
-                    Log.e(TAG, "Error in callback for vehicle speed");
-                }
-            };
 
     @Inject
     PartnerEnablerImpl(@ApplicationContext Context context,
@@ -129,57 +80,12 @@ class PartnerEnablerImpl extends IPartnerEnabler.Stub {
             Log.e(TAG, "Failed to get CarPropertyManager");
             throw new IllegalStateException("CAR Property Service not ready");
         }
-
-        if (!mCarPropertyManager.registerCallback(mCarPropertyEventCallback,
-                PERF_ODOMETER,
-                PartnerAPIConstants.PROPERTY_UPDATE_RATE_HZ)) {
-            Log.e(TAG,
-                    "Failed to register callback for PERF_ODOMETER with CarPropertyManager");
-            throw new IllegalArgumentException("Odometer callback registration failed");
-        }
     }
 
     @Override
     public void release() throws SecurityException {
         Log.d(TAG, "release");
         mPartnerAccessManager.verifyAccess(mContext.getPackageManager().getNameForUid(Binder.getCallingUid()));
-    }
-
-    @Override
-    public float getCurrentMileage() throws RemoteException {
-        Log.d(TAG,"getCurrentMileage");
-        mPartnerAccessManager.verifyAccessAndPermission(
-                mContext.getPackageManager().getNameForUid(Binder.getCallingUid()),
-                VWAE_CAR_MILEAGE_PERMISSION);
-        float odometerValue = (float)mCarPropertyManager.getProperty(PERF_ODOMETER, VEHICLE_AREA_TYPE_GLOBAL).getValue();
-        Log.d(TAG,"Odometer Value: " + odometerValue);
-        return odometerValue;
-    }
-
-    @Override
-    public int getTurnSignalIndicator() throws RemoteException {
-        return 0;
-    }
-
-    @Override
-    public int getFogLightsState() throws RemoteException {
-        return 0;
-    }
-
-    @Override
-    public void addCarDataChangeListener(ICarDataChangeListener listener) throws RemoteException{
-        if (listener == null) {
-            throw new IllegalArgumentException("ICarDataChaneListener is null");
-        }
-        mCarDataChangeListeners.register(listener);
-    }
-
-    @Override
-    public void removeCarDataChangeListener(ICarDataChangeListener listener) throws RemoteException{
-        if (listener == null) {
-            throw new IllegalArgumentException("ICarDataChaneListener is null");
-        }
-        mCarDataChangeListeners.unregister(listener);
     }
 
     @Override
