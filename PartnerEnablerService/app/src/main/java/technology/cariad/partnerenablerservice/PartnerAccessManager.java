@@ -86,7 +86,8 @@ class PartnerAccessManager {
      */
     public boolean isAccessAllowed(String packageName) throws RemoteException, IllegalStateException {
         if (!isServiceConnected || mService == null) {
-            throw new IllegalStateException("Service is not connected to verify");
+            //throw new IllegalStateException("Service is not connected to verify");
+            Log.e(TAG,"Service is not connected to verify");
         }
         checkAndUpdateCache(packageName);
         boolean accessAllowed = false;
