@@ -18,10 +18,15 @@
  */
 package com.volkswagenag.partnerlibrary.impl;
 
+import android.app.AlertDialog;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
@@ -32,10 +37,14 @@ import com.volkswagenag.partnerlibrary.PartnerLibraryManager;
 
 import technology.cariad.partnerenablerservice.IPartnerEnabler;
 import com.volkswagenag.partnerlibrary.ILibStateChangeListener;
+import com.volkswagenag.partnerlibrary.R;
 import com.volkswagenag.partnerlibrary.Response;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * <h1>Partner Library</h1>
@@ -55,7 +64,9 @@ public class PartnerLibraryManagerImpl implements PartnerLibraryManager {
 
     private Context mContext;
     private boolean mIsPartnerEnablerServiceConnected = false;
+    private boolean disablePartnerAPI = true;
     private List<ILibStateChangeListener> mClientListeners = new ArrayList<>();
+    private final ScheduledExecutorService scheduledExecutorService;
 
     private static final String partnerApiServiceName = "technology.cariad.partnerenablerservice.enabler";
     private static final String partnerApiServicePackageName = "technology.cariad.partnerenablerservice";
@@ -112,11 +123,17 @@ public class PartnerLibraryManagerImpl implements PartnerLibraryManager {
     private PartnerLibraryManagerImpl(Context context) {
         Log.d(TAG,"PartnerLibrary");
         mContext = context;
+        disablePartnerAPI = true;
+        scheduledExecutorService = Executors.newScheduledThreadPool(1);
     }
 
     @Override
     public Response.Status initialize() {
         Log.d(TAG,"initialize required services");
+        verifyServiceVersion();
+        if (disablePartnerAPI) {
+            return Response.Status.SERVICE_NOT_AVAILABLE;
+        }
         // bind to the enabler service.
         return initService() ? Response.Status.SUCCESS : Response.Status.SERVICE_CONNECTION_FAILURE;
     }
@@ -131,6 +148,9 @@ public class PartnerLibraryManagerImpl implements PartnerLibraryManager {
 
     @Override
     public Response.Status start() {
+        if (disablePartnerAPI) {
+            return Response.Status.SERVICE_NOT_AVAILABLE;
+        }
         Log.d(TAG,"start");
         Response.Status ret = Response.Status.SUCCESS;
         if (mIsPartnerEnablerServiceConnected) {
@@ -154,6 +174,9 @@ public class PartnerLibraryManagerImpl implements PartnerLibraryManager {
 
     @Override
     public Response.Status stop() {
+        if (disablePartnerAPI) {
+            return Response.Status.SERVICE_NOT_AVAILABLE;
+        }
         Log.d(TAG,"stop");
         Response.Status ret = Response.Status.SUCCESS;
         if (mIsPartnerEnablerServiceConnected) {
@@ -175,17 +198,27 @@ public class PartnerLibraryManagerImpl implements PartnerLibraryManager {
 
     @Override
     public void addListener(ILibStateChangeListener listener) {
+        if (disablePartnerAPI) {
+            return;
+        }
         mClientListeners.add(listener);
     }
 
     @Override
     public void removeListener(ILibStateChangeListener listener) {
+        if (disablePartnerAPI) {
+            return;
+        }
         mClientListeners.remove(listener);
     }
 
     @Override
     public Response<CarDataManager> getCarDataManager() {
         Response<CarDataManager> response = new Response<>(Response.Status.SUCCESS);
+        if (disablePartnerAPI) {
+            response.status = Response.Status.SERVICE_NOT_AVAILABLE;
+            return response;
+        }
         if (!mIsPartnerEnablerServiceConnected) {
             response.status = Response.Status.SERVICE_CONNECTION_FAILURE;
             return response;
@@ -197,6 +230,10 @@ public class PartnerLibraryManagerImpl implements PartnerLibraryManager {
     @Override
     public Response<NavigationManager> getNavigationManager() {
         Response<NavigationManager> response = new Response<>(Response.Status.SUCCESS);
+        if (disablePartnerAPI) {
+            response.status = Response.Status.SERVICE_NOT_AVAILABLE;
+            return response;
+        }
         if (!mIsPartnerEnablerServiceConnected) {
             response.status = Response.Status.SERVICE_CONNECTION_FAILURE;
             return response;
@@ -221,5 +258,83 @@ public class PartnerLibraryManagerImpl implements PartnerLibraryManager {
         mServiceConnection = null;
         mIsPartnerEnablerServiceConnected = false;
         Log.d(TAG, "releaseService() unbound.");
+    }
+
+    private void verifyServiceVersion() {
+        disablePartnerAPI = false;
+
+        // check the version on device.
+        if (!isPackageInstalled(partnerApiServicePackageName, mContext.getPackageManager())) {
+            disablePartnerAPI = true;
+            // TODO: update partner that capability is not available on device.
+            return;
+        }
+
+        if (getCurrentVersionPES().equals("1.0")) { // equals skeleton
+            disablePartnerAPI = true;
+            showDialog();
+            // TODO: update partner with service disconnected and pes is getting updated.
+        }
+    }
+
+    private String getCurrentVersionPES() {
+        String version = null;
+        try {
+            mContext.getPackageManager().getApplicationInfo(partnerApiServicePackageName, 0);
+            PackageInfo packageInfo = mContext.getPackageManager().getPackageInfo(partnerApiServicePackageName, 0);
+            Log.i(TAG,"PackageVersionName: " + packageInfo.versionName + ",versionCode; " + packageInfo.getLongVersionCode());
+            version = packageInfo.versionName;
+        }
+        catch (PackageManager.NameNotFoundException e) {
+            // it should not come here as app installed will be checked upon initialization
+            e.printStackTrace();
+        }
+        return version;
+    }
+
+    private boolean isPackageInstalled(String packageName, PackageManager packageManager) {
+        try {
+            packageManager.getPackageInfo(packageName, 0);
+            return true;
+        } catch (PackageManager.NameNotFoundException e) {
+            return false;
+        }
+    }
+
+    private void showDialog() {
+        AlertDialog.Builder builder;
+        builder = new AlertDialog.Builder(mContext);
+        builder.setMessage(R.string.dialog_message) .setTitle(R.string.dialog_title);
+
+        builder.setCancelable(false)
+                .setPositiveButton("Update", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.dismiss();
+                        // productid is the package name
+                        String partnerAPIDeepLink = "ignitemarket://screen?screenName=details&productId="+partnerApiServicePackageName;
+                        mContext.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(partnerAPIDeepLink)));
+                        scheduledExecutorService.scheduleWithFixedDelay(new UpdateCheckerTask(), 0, 30, TimeUnit.SECONDS);
+                    }
+                })
+                .setNegativeButton("Skip", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                });
+        AlertDialog alert = builder.create();
+        alert.show();
+    }
+
+    class UpdateCheckerTask implements Runnable {
+        public UpdateCheckerTask() { }
+        public void run()
+        {
+            // TODO: check logcat for failure logs here.
+            if (!getCurrentVersionPES().equals("1.0")) {
+                // skeleton updated. This logic needs to be checked and updated
+                scheduledExecutorService.shutdown();
+                disablePartnerAPI = false;
+            }
+        }
     }
 }

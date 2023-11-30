@@ -36,7 +36,7 @@ public class Response<T> {
         /**
          * Other internal failure in the partner service
          */
-        INTERNAL_FAILURE,
+        INTERNAL_FAILURE, SERVICE_NOT_AVAILABLE,
     };
     public Status status;
     public T value;
