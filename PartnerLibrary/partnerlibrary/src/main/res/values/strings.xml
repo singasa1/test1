@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="dialog_title">Core Services</string>
+    <string name="dialog_message">Core service needs update. Please update.</string>
+</resources>
