@@ -69,6 +69,13 @@ node(cariad.DEFAULT_NODE) {
                 """
                 cariad.uploadArtifact(name, cariad.ARTIFACTORY_INTERNAL, "partner_api/${env.BUILD_NUMBER}")
             }
+            stage('Publish Document') {
+                def name = "partnerlibrary.tar"
+                sh """
+                    tar cvf partnerlibrary.tar PartnerLibrary/docs/root/technology.cariad.partnerlibrary
+                """
+                cariad.uploadArtifact(name, cariad.ARTIFACTORY_INTERNAL, "partner_api/${env.BUILD_NUMBER}")
+            }
         } catch (err) {
             currentBuild.result = "FAILURE"
             throw err
