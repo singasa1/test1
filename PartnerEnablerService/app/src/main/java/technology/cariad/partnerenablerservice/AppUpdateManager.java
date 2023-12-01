@@ -18,15 +18,20 @@ import com.volkswagenag.ignite.appstore.AppStoreUpdateContainer;
 import com.volkswagenag.ignite.appstore.IAppStoreUpdateListener;
 import com.volkswagenag.partnerlibrary.R;
 
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
 import javax.inject.Singleton;
 
 @Singleton
 public class AppUpdateManager {
     private static final String TAG = AppUpdateManager.class.getSimpleName();
-    private static final String APPSTORE_SERVICE_CLASS = "com.harman.ignite.appstore.services.AppStoreService";
     private static final String PARTNER_API_SERVICE_PACKAGE_NAME = "technology.cariad.partnerenablerservice";
 
     private IAppStoreService mAppStoreService;
+    private final ScheduledExecutorService scheduledExecutorService;
+    private String appStoreVersion;
     private final ServiceConnection appStoreServiceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
@@ -43,20 +48,20 @@ public class AppUpdateManager {
     private final Context mContext;
     public AppUpdateManager(Context context) {
         mContext = context;
+        scheduledExecutorService = Executors.newScheduledThreadPool(1);
+        appStoreVersion = null;
     }
-
-
 
     public void initialize() {
         try {
             Intent appstoreIntent = new Intent();
-            appstoreIntent.setClassName(getAppStorePackageName(mContext.getApplicationContext()), APPSTORE_SERVICE_CLASS);
+            appstoreIntent.setClassName(getAppStorePackageName(mContext.getApplicationContext()),
+                    "com.harman.ignite.appstore.services.AppStoreService");
             boolean bindResult = mContext.bindService(appstoreIntent, appStoreServiceConnection, Context.BIND_AUTO_CREATE);
-            Log.w(TAG, "AppStoreService bindResult: " + bindResult);
+            Log.e(TAG, "AppStoreService bindResult: " + bindResult);
         } catch (SecurityException e) {
             Log.e(TAG, "Could not bind to service. (AppStoreService)" + e.getLocalizedMessage());
         }
-
     }
 
     public void release() {
@@ -92,6 +97,7 @@ public class AppUpdateManager {
     private void compareVersionAndInitiateUpdate(AppStoreUpdateContainer update) {
         // if current version is not available get the version
         String currentVersion = getCurrentVersionPES();
+        appStoreVersion = update.versionName;
         // compare versions and show dialog
         if (currentVersion == null || currentVersion.isEmpty() ||
             update.versionName == null || update.versionName.isEmpty()) {
@@ -100,10 +106,22 @@ public class AppUpdateManager {
 
         String[] currentVersionNumbers = currentVersion.split(".");
         String[] appStoreVersionNumbers = update.versionName.split(".");
-        int maxLen = currentVersionNumbers.length > appStoreVersionNumbers.length ? currentVersionNumbers.length : appStoreVersionNumbers.length;
-        boolean needsUpdate = false;
+        int minLen = currentVersionNumbers.length < appStoreVersionNumbers.length ? currentVersionNumbers.length : appStoreVersionNumbers.length;
+        boolean needsUpdate = true;
+        boolean equal = true;
 
-        // TODO: Check versions and set needs update accordingly.
+
+        for (int i = 0; i < minLen; i++) {
+            if (Integer.parseInt(currentVersionNumbers[i]) > Integer.parseInt(appStoreVersionNumbers[i])) {
+                needsUpdate = false;
+                equal = false;
+            }
+        }
+
+        if (equal && appStoreVersionNumbers.length > currentVersionNumbers.length) {
+            // appstore version has more digits hence set needs update to true
+            needsUpdate = true;
+        }
         
         if (needsUpdate) {
             showDialog(update);
@@ -120,9 +138,10 @@ public class AppUpdateManager {
                     public void onClick(DialogInterface dialog, int id) {
                         dialog.dismiss();
                         // productid is the package name
-                        String partnerAPIDeepLink = "ignitemarket://screen?screenName=details&productId="+update.productId+"&productType="+update.appType;
+                        String partnerAPIDeepLink = "ignitemarket://screen?screenName=details&productId=" + PARTNER_API_SERVICE_PACKAGE_NAME;
                         mContext.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(partnerAPIDeepLink)));
-                        //TODO: update that update in progress to PartnerLibraryManager.
+                        // Scheduled executor service to check the status.
+                        scheduledExecutorService.scheduleWithFixedDelay(new UpdateCheckerTask(), 0, 30, TimeUnit.SECONDS);
                     }
                 })
                 .setNegativeButton("Skip", new DialogInterface.OnClickListener() {
@@ -147,5 +166,30 @@ public class AppUpdateManager {
             e.printStackTrace();
         }
         return version;
+    }
+
+    public String getAppStorePackageName(Context context) {
+        PackageManager pm = context.getPackageManager();
+        String appstoreBasePackage = "com.harman.ignite.appstore";
+        for (PackageInfo packageInfo : pm.getInstalledPackages(0)) {
+            if (packageInfo.packageName.startsWith(appstoreBasePackage)) {
+                return packageInfo.packageName;
+            }
+        }
+        return null;
+    }
+
+    class UpdateCheckerTask implements Runnable {
+        public UpdateCheckerTask() { }
+        public void run()
+        {
+            if (appStoreVersion == null || appStoreVersion.isEmpty()) {
+                scheduledExecutorService.shutdown();
+            }
+            // TODO: check logcat for failure logs here and handle failure.
+            if (getCurrentVersionPES().equals(appStoreVersion)) {
+                scheduledExecutorService.shutdown();
+            }
+        }
     }
 }
