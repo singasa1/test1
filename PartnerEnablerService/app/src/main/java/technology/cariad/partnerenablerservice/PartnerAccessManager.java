@@ -86,6 +86,7 @@ class PartnerAccessManager {
      */
     public boolean isAccessAllowed(String packageName) throws RemoteException, IllegalStateException {
         if (!isServiceConnected || mService == null) {
+            // TODO: Check why service connection is delayed causing exception. Uncomment below lines once that is resolved
             //throw new IllegalStateException("Service is not connected to verify");
             Log.e(TAG,"Service is not connected to verify");
         }

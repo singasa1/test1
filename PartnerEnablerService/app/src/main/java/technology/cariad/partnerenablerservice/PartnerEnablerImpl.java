@@ -57,9 +57,11 @@ public class PartnerEnablerImpl extends IPartnerEnabler.Stub {
         Log.d(TAG, "Calling app is: " + packageName);
         try {
             if (!mPartnerAccessManager.isAccessAllowed(packageName)) {
+                // TODO: Check why service connection is delayed causing exception. Uncomment below lines once that is resolved
                 //throw new SecurityException(
                   //      "The app " + packageName +
                     //            " doesn't have the permission to access Partner API's");
+
                 Log.e(TAG,"The app " + packageName +
                                " doesn't have the permission to access Partner API's");
             }
