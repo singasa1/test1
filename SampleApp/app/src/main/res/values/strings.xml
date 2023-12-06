@@ -1,10 +1,15 @@
 <resources>
-    <string name="app_name">Partner API Demo</string>
+    <string name="app_name">Sample Partner App</string>
     <string name="get">GET</string>
     <string name="start_service">Start service</string>
     <string name="stop_service">Stop service</string>
     <string name="car_data">Car Data</string>
     <string name="navigation">Navigation</string>
+    <string name="current_mileage">Current Mileage </string>
+    <string name="turn_signal_indicator">Turn Signal Indicator </string>
+    <string name="fog_light_state">Fog Light State </string>
+    <string name="steering_angle">Steering Angle </string>
+    <string name="vehicle_identity_number">Vehicle Identity Number </string>
     <string name="listener_updates">Listener Updates:</string>
     <string name="service_state_connecting">Connecting...</string>
     <string name="service_state_ready">Service is ready to use.</string>

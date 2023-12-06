@@ -3,61 +3,163 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/black">
 
     <TextView
-        android:id="@+id/text_api_spinner_info"
-        android:layout_margin="10dp"
+        android:id="@+id/text_car_data"
+        android:layout_margin="20dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="20dp"
+        android:gravity="center"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:textSize="17sp"
-        android:text="@string/api_spinner_info" />
-
-    <Spinner
-        android:id="@+id/spinner_car_data_api_calls"
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:layout_gravity="center"/>
-
-    <TextView
-        android:id="@+id/text_result"
-        android:layout_margin="10dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="" />
-
-    <TextView
-        android:id="@+id/text_listener_heading"
-        android:layout_margin="10dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="25sp"
+        android:textColor="@color/white"
         android:textStyle="bold"
-        android:text="@string/listener_updates" />
-    <TextView
-        android:id="@+id/text_listener_update_mileage"
-        android:layout_margin="10dp"
-        android:layout_width="wrap_content"
+        android:textSize="30sp"
+        android:text="CAR DATA" />
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="" />
-    <TextView
-        android:id="@+id/text_listener_update_fog_lights"
-        android:layout_margin="10dp"
-        android:layout_width="wrap_content"
+        android:weightSum="100">
+
+        <TextView
+            android:id="@+id/vehicle_identification_number"
+            android:layout_margin="10dp"
+            android:layout_width="70dp"
+            android:layout_height="wrap_content"
+            android:textSize="25sp"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:layout_weight="20"
+            android:gravity="right"
+            android:text="@string/vehicle_identity_number" />
+        <TextView
+            android:id="@+id/text_vehicle_identification_number"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:textSize="25sp"
+            android:textColor="@color/white"
+            android:layout_weight="5"
+            android:gravity="left"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="" />
-    <TextView
-        android:id="@+id/text_listener_update_steering_angle"
-        android:layout_margin="10dp"
-        android:layout_width="wrap_content"
+        android:weightSum="100">
+        <TextView
+            android:id="@+id/current_mileage"
+            android:layout_margin="10dp"
+            android:layout_width="70dp"
+            android:layout_height="wrap_content"
+            android:textSize="25sp"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:layout_weight="20"
+            android:gravity="right"
+            android:text="@string/current_mileage" />
+
+        <TextView
+            android:id="@+id/text_listener_update_mileage"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:textSize="25sp"
+            android:textColor="@color/white"
+            android:layout_weight="50"
+            android:gravity="left"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="" />
-    <TextView
-        android:id="@+id/text_listener_update_turn_signal_indicator"
-        android:layout_margin="10dp"
-        android:layout_width="wrap_content"
+        android:weightSum="100">
+        <TextView
+            android:id="@+id/turn_signal_indicator"
+            android:layout_margin="10dp"
+            android:layout_width="70dp"
+            android:layout_height="wrap_content"
+            android:textSize="25sp"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:layout_weight="20"
+            android:gravity="right"
+            android:text="@string/turn_signal_indicator" />
+        <TextView
+            android:id="@+id/text_listener_update_turn_signal_indicator"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:textSize="25sp"
+            android:textColor="@color/white"
+            android:layout_weight="50"
+            android:gravity="left"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="" />
+        android:weightSum="100">
+        <TextView
+            android:id="@+id/fog_light_state"
+            android:layout_margin="10dp"
+            android:layout_width="70dp"
+            android:layout_height="wrap_content"
+            android:textSize="25sp"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:layout_weight="20"
+            android:gravity="right"
+            android:text="@string/fog_light_state" />
+        <TextView
+            android:id="@+id/text_listener_update_fog_lights"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:textSize="25sp"
+            android:textColor="@color/white"
+            android:layout_weight="50"
+            android:gravity="left"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:weightSum="100">
+
+        <TextView
+            android:id="@+id/steering_angle"
+            android:layout_margin="10dp"
+            android:layout_width="70dp"
+            android:layout_height="wrap_content"
+            android:textSize="25sp"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:layout_weight="20"
+            android:gravity="right"
+            android:text="@string/steering_angle" />
+        <TextView
+            android:id="@+id/text_listener_update_steering_angle"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:textSize="25sp"
+            android:textColor="@color/white"
+            android:layout_weight="50"
+            android:gravity="left"
+            android:textStyle="bold" />
+    </LinearLayout>
 
 </LinearLayout>
