@@ -39,7 +39,7 @@ public class CarDataActivity extends AppCompatActivity implements MileageListene
     // NOTE: Donot change the order - only add new ones at the end.
     // {@link CarDataActivity#onItemSelected} should be changed if the order in this array is changed.
     private String[] mCarDataAPIMethods = {
-            "getCurrentMileage",
+            "RichaaagetCurrentMileage",
             "getTurnSignalIndicator",
             "getFogLightsState",
             "getSteeringAngle",
