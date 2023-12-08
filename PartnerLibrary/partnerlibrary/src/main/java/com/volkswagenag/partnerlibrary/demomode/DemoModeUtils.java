@@ -1,6 +1,26 @@
+/*
+ * CONFIDENTIAL CARIAD Estonia AS
+ *
+ * (c) 2023 CARIAD Estonia AS, All rights reserved.
+ *
+ * NOTICE: All information contained herein is, and remains the property of CARIAD Estonia AS (registry code 14945253).
+ * The intellectual and technical concepts contained herein are proprietary to CARIAD Estonia AS. and may be covered by
+ * patents, patents in process, and are protected by trade secret or copyright law.
+ * Usage or dissemination of this information or reproduction of this material is strictly forbidden unless prior
+ * written permission is obtained from CARIAD Estonia AS.
+ * The copyright notice above does not evidence any actual or intended publication or disclosure of this source code,
+ * which includes information that is confidential and/or proprietary, and is a trade secret of CARIAD Estonia AS.
+ * Any reproduction, modification, distribution, public performance, or public display of or through use of this source
+ * code without the prior written consent of CARIAD Estonia AS is strictly prohibited and in violation of applicable
+ * laws and international treaties. The receipt or possession of this source code and/ or related information does not
+ * convey or imply any rights to reproduce, disclose or distribute its contents or to manufacture, use or sell anything
+ * that it may describe in whole or in part.
+ */
 package com.volkswagenag.partnerlibrary.demomode;
 
 import android.content.Context;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -13,7 +33,11 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
 public class DemoModeUtils {
 
     /**
@@ -30,15 +54,18 @@ public class DemoModeUtils {
 
     private static final String TAG = DemoModeUtils.class.getSimpleName();
 
-    private static final String DEMO_MODE_PROPERTY = "volkswagenag.partnerapi.demomode";
-    private static final String PERSIST_DEMO_MODE_PROPERTY = "persist.volkswagenag.partnerapi.demomode";
+    private static final String DEMO_MODE_PROPERTY = "volkswagenag.parterapi.demomode";
+    private static final String PERSIST_DEMO_MODE_PROPERTY = "persist.volkswagenag.parterapi.demomode";
     private static final String GET_PROP_LOCATION = "/system/bin/getprop";
+
+    private static final String CARIAD_VWAE_RESTRICTED_NAMESPACE = "com.volkswagenag.restricted.";
 
     /**
      * Read JSONObject from the file specified by fileName. The should be located in the context's
-     * external Directory /sdcard/Android/data/{app package}/files/
+     * external Directory /sdcard/Android/data/{app-package-name}/files/
+     * Note: app-package-name is the package name of the app this library will be included in.
      * @param context
-     * @param fileName fileName of the file present in /sdcard/Android/data/{app package}/files/
+     * @param fileName fileName of the file present in /sdcard/Android/data/{app-package-name}/files/
      * @return JSONObject of the contents obtained from the file
      * @throws IOException
      * @throws JSONException
@@ -58,9 +85,9 @@ public class DemoModeUtils {
     }
 
     /**
-     * Returns whether the demo mode is enabled or not depending on the property values.
-     * @return boolean true  if property {@link DemoModeUtils#DEMO_MODE_PROPERTY} or
-     *                       {@link DemoModeUtils#PERSIST_DEMO_MODE_PROPERTY} are enabled.
+     * Returns the property {@link DemoModeUtils#DEMO_MODE_PROPERTY} value in boolean.
+     * @return boolean true if {@link DemoModeUtils#DEMO_MODE_PROPERTY} or
+     *                      {@link DemoModeUtils#PERSIST_DEMO_MODE_PROPERTY} are enabled
      *                 false otherwise
      */
     public static boolean isDemoModeEnabled() {
@@ -69,12 +96,12 @@ public class DemoModeUtils {
             Process getDemoModeProp = Runtime.getRuntime().exec(new String[]{GET_PROP_LOCATION, DEMO_MODE_PROPERTY});
             BufferedReader reader = new BufferedReader(new InputStreamReader(getDemoModeProp.getInputStream()));
             boolean demoModeProp = Boolean.parseBoolean(reader.readLine());
-            Log.d(TAG, "property " + DEMO_MODE_PROPERTY + "value" + demoModeProp);
+            Log.d(TAG, "property " + DEMO_MODE_PROPERTY + " value: " + demoModeProp);
 
             getDemoModeProp = Runtime.getRuntime().exec(new String[]{GET_PROP_LOCATION, PERSIST_DEMO_MODE_PROPERTY});
             reader = new BufferedReader(new InputStreamReader(getDemoModeProp.getInputStream()));
             boolean persistDemoModeProp = Boolean.parseBoolean(reader.readLine());
-            Log.d(TAG, "property " + PERSIST_DEMO_MODE_PROPERTY + "value" + persistDemoModeProp);
+            Log.d(TAG, "property " + PERSIST_DEMO_MODE_PROPERTY + " value: " + persistDemoModeProp);
 
             return demoModeProp || persistDemoModeProp;
         } catch (IOException e) {
@@ -112,5 +139,26 @@ public class DemoModeUtils {
             list.add(converter.convert(jsonArray.getString(i)));
         }
         return list;
+    }
+
+    public static Set<String> getFilteredPermissionList(Context context) {
+        Set<String> filteredPermissions = new HashSet<>();
+        try {
+            PackageInfo packageInfo = context
+                    .getPackageManager()
+                    .getPackageInfo(
+                            context.getPackageName(),
+                            PackageManager.GET_PERMISSIONS);
+
+            for (String permission : packageInfo.requestedPermissions) {
+                Log.d(TAG, "permission Name: " + permission);
+                if (permission.startsWith(CARIAD_VWAE_RESTRICTED_NAMESPACE)) {
+                    filteredPermissions.add(permission);
+                }
+            }
+        } catch (PackageManager.NameNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+        return filteredPermissions;
     }
 }

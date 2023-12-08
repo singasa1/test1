@@ -1,11 +1,33 @@
+/*
+ * CONFIDENTIAL CARIAD Estonia AS
+ *
+ * (c) 2023 CARIAD Estonia AS, All rights reserved.
+ *
+ * NOTICE: All information contained herein is, and remains the property of CARIAD Estonia AS (registry code 14945253).
+ * The intellectual and technical concepts contained herein are proprietary to CARIAD Estonia AS. and may be covered by
+ * patents, patents in process, and are protected by trade secret or copyright law.
+ * Usage or dissemination of this information or reproduction of this material is strictly forbidden unless prior
+ * written permission is obtained from CARIAD Estonia AS.
+ * The copyright notice above does not evidence any actual or intended publication or disclosure of this source code,
+ * which includes information that is confidential and/or proprietary, and is a trade secret of CARIAD Estonia AS.
+ * Any reproduction, modification, distribution, public performance, or public display of or through use of this source
+ * code without the prior written consent of CARIAD Estonia AS is strictly prohibited and in violation of applicable
+ * laws and international treaties. The receipt or possession of this source code and/ or related information does not
+ * convey or imply any rights to reproduce, disclose or distribute its contents or to manufacture, use or sell anything
+ * that it may describe in whole or in part.
+ */
 package com.volkswagenag.partnerlibrary.demomode;
 
 import android.content.Context;
 import android.util.Log;
 
+import androidx.annotation.RequiresPermission;
+
 import com.volkswagenag.partnerlibrary.CarDataManager;
 import com.volkswagenag.partnerlibrary.FogLightStateListener;
 import com.volkswagenag.partnerlibrary.MileageListener;
+import com.volkswagenag.partnerlibrary.PartnerLibraryManager;
+import com.volkswagenag.partnerlibrary.Response;
 import com.volkswagenag.partnerlibrary.SteeringAngleListener;
 import com.volkswagenag.partnerlibrary.TurnSignalListener;
 import com.volkswagenag.partnerlibrary.VehicleLightState;
@@ -17,6 +39,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -25,7 +48,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class CarDataManagerDemoModeImpl implements CarDataManager {
 
-    private static final String TAG = PartnerLibraryDemoModeImpl.class.getSimpleName();
+    private static final String TAG = CarDataManagerDemoModeImpl.class.getSimpleName();
     private static final String CAR_DATA_FILE_NAME = "car_data.json";
 
     private final Context mContext;
@@ -35,6 +58,8 @@ public class CarDataManagerDemoModeImpl implements CarDataManager {
     private final HashSet<FogLightStateListener> mFogLightStateListener = new HashSet<>();
     private final HashSet<SteeringAngleListener> mSteeringAngleListener = new HashSet<>();
     private final ScheduledExecutorService mSchedulerService;
+    private final Set<String> mPermissionsRequested;
+
     private final Runnable runnable = new Runnable() {
         @Override
         public void run() {
@@ -45,7 +70,7 @@ public class CarDataManagerDemoModeImpl implements CarDataManager {
     private ScheduledFuture<?> mChangeValuesAtFixedRateFuture;
 
     //cache
-    private AtomicInteger mIndex = new AtomicInteger(0);
+    private final AtomicInteger mIndex = new AtomicInteger(0);
     private int mMaxValueOfIndex;
     private int mChangeFrequencySecs;
     private List<Float> mMileageList;
@@ -54,10 +79,11 @@ public class CarDataManagerDemoModeImpl implements CarDataManager {
     private List<Float> mSteeringAngleList;
     private String mVehicleIdentityNumber;
 
-    public CarDataManagerDemoModeImpl(Context context) {
+    public CarDataManagerDemoModeImpl(Context context, Set<String> permissionsRequested) throws JSONException, IOException{
         mContext = context;
         mSchedulerService = Executors.newScheduledThreadPool(1);
         try {
+            mPermissionsRequested = permissionsRequested;
             initializeCache();
         } catch (JSONException e) {
             throw new RuntimeException(e);
@@ -68,7 +94,7 @@ public class CarDataManagerDemoModeImpl implements CarDataManager {
     }
 
     /**
-     * Starts frequency scheduler runnable, that runs every {@link mChangeFrequencySecs} seconds and
+     * Starts freqeuncy scheduler runnable, that runs every {@link mChangeFrequencySecs} seconds and
      * updates values and triggers listeners if necessary.
      */
     public void startScheduler() {
@@ -85,68 +111,115 @@ public class CarDataManagerDemoModeImpl implements CarDataManager {
     }
 
     @Override
-    public void registerMileageListener(MileageListener mileageListener) {
+    @RequiresPermission(PartnerLibraryManager.PERMISSION_RECEIVE_CAR_MILEAGE_INFO)
+    public Response.Status registerMileageListener(MileageListener mileageListener) {
+        if (!mPermissionsRequested.contains(PartnerLibraryManager.PERMISSION_RECEIVE_CAR_MILEAGE_INFO)) {
+            return Response.Status.PERMISSION_DENIED;
+        }
         mMileageListeners.add(mileageListener);
+        return Response.Status.SUCCESS;
     }
 
     @Override
-    public void unregisterMileageListener(MileageListener mileageListener) {
+    public Response.Status unregisterMileageListener(MileageListener mileageListener) {
         mMileageListeners.remove(mileageListener);
+        return Response.Status.SUCCESS;
     }
 
     @Override
-    public float getCurrentMileage() {
-        return mMileageList.get(mIndex.get() % mMileageList.size());
+    @RequiresPermission(PartnerLibraryManager.PERMISSION_RECEIVE_CAR_MILEAGE_INFO)
+    public Response<Float> getCurrentMileage() {
+        if (!mPermissionsRequested.contains(PartnerLibraryManager.PERMISSION_RECEIVE_CAR_MILEAGE_INFO)) {
+            return new Response(Response.Status.PERMISSION_DENIED);
+        }
+        return new Response(Response.Status.SUCCESS, mMileageList.get(mIndex.get() % mMileageList.size()).floatValue());
     }
 
     @Override
-    public void registerTurnSignalListener(TurnSignalListener turnSignalListener) {
+    @RequiresPermission(PartnerLibraryManager.PERMISSION_RECEIVE_TURN_SIGNAL_INDICATOR)
+    public Response.Status registerTurnSignalListener(TurnSignalListener turnSignalListener) {
+        if (!mPermissionsRequested.contains(PartnerLibraryManager.PERMISSION_RECEIVE_TURN_SIGNAL_INDICATOR)) {
+            return Response.Status.PERMISSION_DENIED;
+        }
         mTurnSignalListener.add(turnSignalListener);
+        return Response.Status.SUCCESS;
     }
 
     @Override
-    public void unregisterTurnSignalListener(TurnSignalListener turnSignalListener) {
+    public Response.Status unregisterTurnSignalListener(TurnSignalListener turnSignalListener) {
         mTurnSignalListener.remove(turnSignalListener);
+        return Response.Status.SUCCESS;
     }
 
     @Override
-    public VehicleSignalIndicator getTurnSignalIndicator() {
-        return mTurnSignalIndicatorList.get(mIndex.get() % mTurnSignalIndicatorList.size());
+    @RequiresPermission(PartnerLibraryManager.PERMISSION_RECEIVE_TURN_SIGNAL_INDICATOR)
+    public Response<VehicleSignalIndicator> getTurnSignalIndicator() {
+        if (!mPermissionsRequested.contains(PartnerLibraryManager.PERMISSION_RECEIVE_TURN_SIGNAL_INDICATOR)) {
+            return new Response(Response.Status.PERMISSION_DENIED);
+        }
+        return new Response(Response.Status.SUCCESS,
+                mTurnSignalIndicatorList.get(mIndex.get() % mTurnSignalIndicatorList.size()));
     }
 
     @Override
-    public void registerFogLightStateListener(FogLightStateListener lightStateListener) {
+    @RequiresPermission(PartnerLibraryManager.PERMISSION_RECEIVE_FOG_LIGHTS)
+    public Response.Status registerFogLightStateListener(FogLightStateListener lightStateListener) {
+        if (!mPermissionsRequested.contains(PartnerLibraryManager.PERMISSION_RECEIVE_FOG_LIGHTS)) {
+            return Response.Status.PERMISSION_DENIED;
+        }
         mFogLightStateListener.add(lightStateListener);
+        return Response.Status.SUCCESS;
     }
 
     @Override
-    public void unregisterFogLightStateListener(FogLightStateListener lightStateListener) {
+    public Response.Status unregisterFogLightStateListener(FogLightStateListener lightStateListener) {
         mFogLightStateListener.remove(lightStateListener);
+        return Response.Status.SUCCESS;
     }
 
     @Override
-    public VehicleLightState getFogLightsState() {
-        return mFogLightsStateList.get(mIndex.get() % mFogLightsStateList.size());
+    @RequiresPermission(PartnerLibraryManager.PERMISSION_RECEIVE_FOG_LIGHTS)
+    public Response<VehicleLightState> getFogLightsState() {
+        if (!mPermissionsRequested.contains(PartnerLibraryManager.PERMISSION_RECEIVE_FOG_LIGHTS)) {
+            return new Response(Response.Status.PERMISSION_DENIED);
+        }
+        return new Response(Response.Status.SUCCESS,
+                mFogLightsStateList.get(mIndex.get() % mFogLightsStateList.size()));
     }
 
     @Override
-    public void registerSteeringAngleListener(SteeringAngleListener steeringAngleListener) {
+    @RequiresPermission(PartnerLibraryManager.PERMISSION_RECEIVE_STEERING_ANGLE_INFO)
+    public Response.Status registerSteeringAngleListener(SteeringAngleListener steeringAngleListener) {
+        if (!mPermissionsRequested.contains(PartnerLibraryManager.PERMISSION_RECEIVE_STEERING_ANGLE_INFO)) {
+            return Response.Status.PERMISSION_DENIED;
+        }
         mSteeringAngleListener.add(steeringAngleListener);
+        return Response.Status.SUCCESS;
     }
 
     @Override
-    public void unregisterSteeringAngleListener(SteeringAngleListener steeringAngleListener) {
+    public Response.Status unregisterSteeringAngleListener(SteeringAngleListener steeringAngleListener) {
         mSteeringAngleListener.remove(steeringAngleListener);
+        return Response.Status.SUCCESS;
     }
 
     @Override
-    public float getSteeringAngle() {
-        return mSteeringAngleList.get(mIndex.get() % mSteeringAngleList.size());
+    @RequiresPermission(PartnerLibraryManager.PERMISSION_RECEIVE_STEERING_ANGLE_INFO)
+    public Response<Float> getSteeringAngle() {
+        if (!mPermissionsRequested.contains(PartnerLibraryManager.PERMISSION_RECEIVE_STEERING_ANGLE_INFO)) {
+            return new Response(Response.Status.PERMISSION_DENIED);
+        }
+        return new Response(Response.Status.SUCCESS,
+                mSteeringAngleList.get(mIndex.get() % mSteeringAngleList.size()).floatValue());
     }
 
     @Override
-    public String getVehicleIdentityNumber() {
-        return mVehicleIdentityNumber;
+    @RequiresPermission(PartnerLibraryManager.PERMISSION_RECEIVE_CAR_INFO_VIN)
+    public Response<String> getVehicleIdentityNumber() {
+        if (!mPermissionsRequested.contains(PartnerLibraryManager.PERMISSION_RECEIVE_CAR_INFO_VIN)) {
+            return new Response(Response.Status.PERMISSION_DENIED);
+        }
+        return new Response(Response.Status.SUCCESS, mVehicleIdentityNumber);
     }
 
     /**

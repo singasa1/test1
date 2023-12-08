@@ -17,32 +17,13 @@
  * that it may describe in whole or in part.
  */
 
-package technology.cariad.partnerenablerservice;
+package com.volkswagenag.partnerlibrary.impl;
 
-// Declare any non-default types here with import statements
 
-interface ICarDataChangeListener {
-    /**
-     * Binder callback for changes to the Mileage/Odometer
-     * @hide
-     */
-    void onMileageValueChanged(float mileageValue) = 0;
-
-    /**
-     * Binder callback for changes to the FogLights
-     * @hide
-     */
-    void onFogLightsChanged(int fogLightState) = 1;
-
-    /**
-     * Binder callback for changes to Steering Angle
-     * @hide
-    */
-    void onSteeringAngleChanged(float steeringAngle) = 2;
-
-    /**
-     * Binder callback for changes to the TurnSignalIndicator
-     * @hide
-    */
-    void onTurnSignalStateChanged(int signalIndicator) = 3;
+/**
+ * Partner API Constants for Java Applications
+ */
+class PartnerAPIConstants {
+    /* Exterior Light Service id */
+    public static final String EXTERIOR_LIGHT = "EXTERIOR_LIGHT_SERVICE";
 }

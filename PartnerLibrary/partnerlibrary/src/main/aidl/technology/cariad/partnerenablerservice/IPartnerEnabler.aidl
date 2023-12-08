@@ -19,14 +19,19 @@
 package technology.cariad.partnerenablerservice;
 
 // Declare any non-default types here with import statements
-import technology.cariad.partnerenablerservice.ICarDataChangeListener;
+
 
 /**
- * Interface used to interact with the PartnerEnablerService.  Mostly this is used by the
+ * Interface used to interact with the PartnerEnablerService. Mostly this is used by the
  * PartnerLibrary class.
  * {@hide}
  */
 interface IPartnerEnabler {
+
+    /**
+    * Version number of the aidl interface
+    */
+    const int VERSION = 1;
 
     /**
      * GetVehicleSignalIndicator Binder calls returns one of
@@ -45,55 +50,23 @@ interface IPartnerEnabler {
     const int VEHICLE_LIGHT_STATE_DAYTIME_RUNNING = 2;
 
     /**
+    * Get the AIDL interface version number
+    */
+    int getIfcVersion();
+
+    /**
      * This method initializes the required components in the PartnerEnablerService.
     */
-    void initialize() = 0;
+    void initialize();
 
     /**
      * This method releases/destroy the components created in the PartnerEnablerService.
     */
-    void release() = 2;
+    void release();
 
     /**
-     * This method returns the Car current Odometer value. continuous change prop type
-     * @return: It returns value ranges from 0 to 4294967293.
+    * Returns the IBinder for the given service name
+    * List of available ServiceName Strings are defined in @link#PartnerAPIConstants.
     */
-    float getCurrentMileage() = 3;
-
-    /**
-     * This method returns the Car current signal indicator value. on_change prop type
-     * 0 - None
-     * 1 - Right
-     * 2 - Left
-    */
-    int getTurnSignalIndicator() = 4;
-
-    /**
-     * This method returns the Car fog light state. on_change prop type
-     * 0 - OFF
-     * 1 - ON
-     * 2 - DAYLIGHT_RUNNING
-    */
-    int getFogLightsState() = 5;
-
-    /**
-     * This method returns the Car steering angle in degrees. positive - right; negative - left. continuous change prop type.
-     * @return: It returns value ranges from -1200 to 1200.
-    */
-    float getSteeringAngle() = 6;
-
-    /**
-     * This method returns the Car VIN Number.
-    */
-    String getVehicleIdentityNumber() = 7;
-
-    /**
-     * Registers a listener @link#ICarDataChangeListener to be called when the car data changes.
-    */
-    void addCarDataChangeListener(in ICarDataChangeListener listener) = 8;
-
-    /**
-    * Removes the provided listener from receiving the callbacks.
-    */
-    void removeCarDataChangeListener(in ICarDataChangeListener listener) = 9;
+    IBinder getAPIService(in String serviceName);
 }

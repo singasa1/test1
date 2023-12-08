@@ -4,6 +4,7 @@
     <string name="start_service">Start service</string>
     <string name="stop_service">Stop service</string>
     <string name="car_data">Car Data</string>
+    <string name="navigation">Navigation</string>
     <string name="listener_updates">Listener Updates:</string>
     <string name="service_state_connecting">Connecting...</string>
     <string name="service_state_ready">Service is ready to use.</string>
