@@ -36,9 +36,9 @@ class PartnerAccessManager {
 
     // This is a HashMap with Key as package names of the calling applications and
     // Value as their respective verification status
-    private Map<String, Boolean> accessCache = Collections.synchronizedMap(new HashMap());
-    private boolean isServiceConnected = false;
-    private ISignatureVerifier mService;
+    private Map<String, Boolean> mAccessCache = Collections.synchronizedMap(new HashMap());
+    private boolean mIsServiceConnected = false;
+    private ISignatureVerifier mSignatureVerifierService;
     private SignatureVerifierConnection mServiceConnection;
 
     @Inject
@@ -50,7 +50,7 @@ class PartnerAccessManager {
      * Initialize and connect to VerifierService.
      */
     public void initialize() {
-        if (!isServiceConnected || mService == null) {
+        if (!mIsServiceConnected || mSignatureVerifierService == null) {
             mServiceConnection = new SignatureVerifierConnection();
             Intent i = new Intent(mContext, DigitalSignatureVerifier.class);
             boolean ret = mContext.bindService(i, mServiceConnection, Context.BIND_AUTO_CREATE);
@@ -62,15 +62,15 @@ class PartnerAccessManager {
      * Clean up cache and service connection.
      */
     public void cleanUp() {
-        synchronized (accessCache) {
-            accessCache = null;
+        synchronized (mAccessCache) {
+            mAccessCache = null;
         }
         if (mServiceConnection != null) {
             mContext.unbindService(mServiceConnection);
             mServiceConnection = null;
         }
-        isServiceConnected = false;
-        mService = null;
+        mIsServiceConnected = false;
+        mSignatureVerifierService = null;
     }
 
     /**
@@ -84,7 +84,7 @@ class PartnerAccessManager {
     public boolean isAccessAllowed(String packageName) throws RemoteException, IllegalStateException {
         //if (DEBUG_MODE) return true;
 
-        if (!isServiceConnected || mService == null) {
+        if (!mIsServiceConnected || mSignatureVerifierService == null) {
             // TODO: Check why service connection is delayed causing exception. Uncomment below lines once that is resolved
             //throw new IllegalStateException("Service is not connected to verify");
             Log.d(TAG, "Service is not connected to verify");
@@ -92,8 +92,8 @@ class PartnerAccessManager {
 
         checkAndUpdateCache(packageName);
         boolean accessAllowed = false;
-        synchronized (accessCache) {
-            accessAllowed = accessCache.get(packageName);
+        synchronized (mAccessCache) {
+            accessAllowed = mAccessCache.get(packageName);
         }
         return accessAllowed;
     }
@@ -138,9 +138,9 @@ class PartnerAccessManager {
     }
 
     private void checkAndUpdateCache(String packageName) throws RemoteException {
-        synchronized (accessCache) {
-            if (!accessCache.containsKey(packageName)) {
-                accessCache.put(packageName, mService.verifyDigitalSignature(packageName));
+        synchronized (mAccessCache) {
+            if (!mAccessCache.containsKey(packageName)) {
+                mAccessCache.put(packageName, mSignatureVerifierService.verifyDigitalSignature(packageName));
             }
         }
     }
@@ -149,15 +149,15 @@ class PartnerAccessManager {
 
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            mService = ISignatureVerifier.Stub.asInterface((IBinder) service);
+            mSignatureVerifierService = ISignatureVerifier.Stub.asInterface((IBinder) service);
             Log.d(TAG, "onServiceConnected");
-            isServiceConnected = true;
+            mIsServiceConnected = true;
         }
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
-            mService = null;
-            isServiceConnected = false;
+            mSignatureVerifierService = null;
+            mIsServiceConnected = false;
             Log.d(TAG, "onServiceDisconnected");
         }
     }

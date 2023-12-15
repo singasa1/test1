@@ -69,8 +69,14 @@ public class NavigationManagerDemoModeImpl implements NavigationManager {
     public NavigationManagerDemoModeImpl(Context context, Set<String> permissionsRequested) throws JSONException, IOException {
         mContext = context;
         mSchedulerService = Executors.newScheduledThreadPool(1);
-        mPermissionsRequested = permissionsRequested;
-        initializeCache();
+        try {
+            mPermissionsRequested = permissionsRequested;
+            initializeCache();
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         logCache();
     }
 

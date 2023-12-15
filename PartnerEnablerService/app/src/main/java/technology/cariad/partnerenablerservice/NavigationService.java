@@ -47,6 +47,11 @@ import com.volkswagenag.nav.route.simplifier.IRouteSimplifier;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+/**
+ * Server side implementation of INavigationService AIDL stub.
+ * This class implements the service connection with Cariad Navigation app and get the nav appstate,
+ * active route in the polyline format.
+ */
 @Singleton
 class NavigationService extends INavigationService.Stub {
     private static final String TAG = "PartnerEnablerService.INavigationService";
@@ -78,8 +83,8 @@ class NavigationService extends INavigationService.Stub {
     private IRouteSimplifier mRouteSimplifier;
 
     /**
-     * This class represents the actual service connection. It casts the bound
-     * stub implementation of the service to the AIDL interface.
+     * This class represents the actual Nav Application State service connection. It casts the bound
+     * stub implementation of the service to the IApplicationState AIDL interface.
      */
     class NavAppStateServiceConnection implements ServiceConnection {
 
@@ -111,6 +116,10 @@ class NavigationService extends INavigationService.Stub {
         }
     }
 
+    /**
+     * This class represents the actual Nav RouteSimplifier Service connection. It casts the bound
+     * stub implementation of the service to the IRouteSimplifier AIDL interface.
+     */
     class NavRouteServiceConnection implements ServiceConnection {
 
         public void onServiceConnected(ComponentName name, IBinder boundService) {
@@ -140,6 +149,11 @@ class NavigationService extends INavigationService.Stub {
         }
     }
 
+    /**
+     * IApplicationStateCallback Callback Interface implementation
+     * Gets invoked when navigation application State changes
+     *
+     */
     class NavAppStateListener extends IApplicationStateCallback.Stub {
         //@Override
         public void onCurrentState(ApplicationStateType applicationStateType) {
@@ -173,6 +187,12 @@ class NavigationService extends INavigationService.Stub {
         }
     }
 
+    /**
+     * Create an instance of {@link NavigationService}.
+     *
+     * @param context the context
+     * @param partnerAccessManager the PartnerAccessManager
+     */
     @Inject
     NavigationService(@ApplicationContext Context context, PartnerAccessManager partnerAccessManager) {
         mContext = context;
@@ -185,11 +205,21 @@ class NavigationService extends INavigationService.Stub {
         initRouteSimplifierConnection();
     }
 
+    /**
+     * Gets the hardcoded ifc version of INavigationService AIDL.
+     *
+     * @return An {@code int} representing ifc version no.
+     */
     @Override
     public int getIfcVersion() {
         return INavigationService.VERSION;
     }
 
+    /**
+     * Returns the cached the Navigation Application State.
+     *
+     * @return An {@code int} representing passenger's seat location.
+     */
     @Override
     public int getNavigationApplicationState() {
         // Permission check
@@ -205,19 +235,31 @@ class NavigationService extends INavigationService.Stub {
         return NAV_APP_STATE_READY;
     }
 
+    /**
+     * Saves the client listener callback handler
+     *
+     * @param {@link INavAppStateListener} representing NavAppStatelistener.
+     */
     @Override
     public void addNavAppStateListener(INavAppStateListener listener) {
         Log.d(TAG,"addNavAppStateListener");
 
-        mPartnerAccessManager.verifyAccessAndPermission(
-                mContext.getPackageManager().getNameForUid(Binder.getCallingUid()),
-                PartnerAPIConstants.PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE);
         if (listener == null) {
             throw new IllegalArgumentException("INavAppStateListener is null");
         }
+
+        mPartnerAccessManager.verifyAccessAndPermission(
+                mContext.getPackageManager().getNameForUid(Binder.getCallingUid()),
+                PartnerAPIConstants.PERMISSION_RECEIVE_NAV_ACTIVE_ROUTE);
+
         mNavAppStateListeners.register(listener);
     }
 
+    /**
+     * clears the registered client listener callback handler
+     *
+     * @param {@link INavAppStateListener} representing NavAppStatelistener.
+     */
     @Override
     public void removeNavAppStateListener(INavAppStateListener listener) {
         if (listener == null) {
@@ -226,6 +268,11 @@ class NavigationService extends INavigationService.Stub {
         mNavAppStateListeners.unregister(listener);
     }
 
+    /**
+     * Gets the active route from the RouteSimplifierService.
+     *
+     * @return Returns the activeRoute string in polyline format.
+     */
     @Override
     public String getActiveRoute() {
         mPartnerAccessManager.verifyAccessAndPermission(

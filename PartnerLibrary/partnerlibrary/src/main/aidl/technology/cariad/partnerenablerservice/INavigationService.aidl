@@ -23,8 +23,7 @@ import technology.cariad.partnerenablerservice.INavAppStateListener;
 import technology.cariad.partnerenablerservice.IActiveRouteUpdateListener;
 
 /**
- * Interface used to interact with the NavigationService in PartnerEnablerService.  Mostly this is used by the
- * PartnerLibrary class.
+ * Interface used to interact with the NavigationService in PartnerEnablerService.
  * {@hide}
  */
 interface INavigationService {

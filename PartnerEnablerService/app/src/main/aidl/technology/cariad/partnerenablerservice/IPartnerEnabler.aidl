@@ -22,8 +22,7 @@ package technology.cariad.partnerenablerservice;
 
 
 /**
- * Interface used to interact with the PartnerEnablerService. Mostly this is used by the
- * PartnerLibrary class.
+ * Interface used to interact with the PartnerEnablerService.
  * {@hide}
  */
 interface IPartnerEnabler {

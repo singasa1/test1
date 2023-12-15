@@ -36,6 +36,9 @@ import dagger.hilt.InstallIn;
 import dagger.hilt.android.components.ServiceComponent;
 import dagger.hilt.android.qualifiers.ApplicationContext;
 
+/**
+ * Server side implementation of IPartnerEnabler AIDL stub.
+ */
 @Singleton
 class PartnerEnablerImpl extends IPartnerEnabler.Stub {
 
@@ -50,6 +53,17 @@ class PartnerEnablerImpl extends IPartnerEnabler.Stub {
     private final Provider<VehicleDrivingService> mVehicleDrivingServiceProvider;
     private final CarPropertyManager mCarPropertyManager;
 
+    /**
+     * Create an instance of {@link PartnerEnablerImpl}.
+     *
+     * @param context the context
+     * @param partnerAccessManager the PartnerAccessManager
+     * @param exteriorLightServiceProvider the Provider<ExteriorLightService>
+     * @param navigationServiceProvider the Provider<NavigationService>
+     * @param vehicleInfoServiceProvider the Provider<VehicleInfoService>
+     * @param vehicleDrivingServiceProvider the Provider<VehicleDrivingService>
+     * @param carPropertyManager the CarPropertyManager
+     */
     @Inject
     PartnerEnablerImpl(@ApplicationContext Context context,
                        PartnerAccessManager partnerAccessManager,
@@ -66,11 +80,20 @@ class PartnerEnablerImpl extends IPartnerEnabler.Stub {
         mVehicleDrivingServiceProvider = vehicleDrivingServiceProvider;
         mCarPropertyManager = carPropertyManager;
     }
+
+    /**
+     * Gets the hardcoded ifc version of PartnerEnablerService.
+     *
+     * @return An {@code int} representing ifc version no.
+     */
     @Override
     public int getIfcVersion() {
         return IPartnerEnabler.VERSION;
     }
 
+    /**
+     * It verifies the partnertoken of the app that is calling this intialize api.
+     */
     @Override
     public void initialize() throws SecurityException {
         Log.d(TAG, "initialize");
@@ -88,6 +111,11 @@ class PartnerEnablerImpl extends IPartnerEnabler.Stub {
         mPartnerAccessManager.verifyAccess(mContext.getPackageManager().getNameForUid(Binder.getCallingUid()));
     }
 
+    /**
+     * Gets the internal specific service binder handler for the given serviceName.
+     *
+     * @return An {@Binder IBinder} representing service binder.
+     */
     @Override
     public IBinder getAPIService(String serviceName) throws RemoteException {
         Log.i(TAG, "calling getAPIService for service:" + serviceName);

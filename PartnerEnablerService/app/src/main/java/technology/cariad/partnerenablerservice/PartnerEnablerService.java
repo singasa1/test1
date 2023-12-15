@@ -29,6 +29,10 @@ import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
 
+/**
+ * PartnerEnablerService is an android service.
+ * This service get Started when clients trying to bind to this service.
+ */
 @AndroidEntryPoint
 public class PartnerEnablerService extends Service {
     private static final String TAG = PartnerEnablerService.class.getSimpleName();
@@ -69,7 +73,6 @@ public class PartnerEnablerService extends Service {
     private void release() {
         if (mPartnerEnablerImpl != null) {
             mPartnerEnablerImpl.release();
-//            mPartnerEnablerService = null;
         }
     }
 

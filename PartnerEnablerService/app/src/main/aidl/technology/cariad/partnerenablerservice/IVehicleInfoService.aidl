@@ -21,7 +21,6 @@ package technology.cariad.partnerenablerservice;
 /**
  * Interface used to interact with the VehicleInfoService in PartnerEnablerService. This interface supports
  * APIs to get static vehicle information.
- * Mostly this is used by the PartnerLibrary class.
  * {@hide}
  */
 interface IVehicleInfoService {

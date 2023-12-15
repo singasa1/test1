@@ -29,6 +29,11 @@ import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
 
+/**
+ * DigitalSignatureVerifier is an android service.
+ * It returns the ISignatureVerifier AIDL interface handler to the client who try to bind to this service.
+ * Get Started when clients(PartnerAccessManager is one) trying to bind to this service.
+ */
 @AndroidEntryPoint
 public class DigitalSignatureVerifier extends Service {
     private static final String TAG = DigitalSignatureVerifier.class.getSimpleName();

@@ -25,7 +25,6 @@ import technology.cariad.partnerenablerservice.IOdometerValueChangeListener;
 /**
  * Interface used to interact with the VehicleDrivingService in PartnerEnablerService. This interface supports
  * APIs to get vehicle driving related information.
- * Mostly this is used by the PartnerLibrary class.
  * {@hide}
  */
 interface IVehicleDrivingService {
