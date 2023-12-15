@@ -161,11 +161,13 @@ Demo mode is a state in the PartnerLibrary that can be enabled using an adb prop
 
 #### Steps to enable demo mode:
 
-1. Push car_data.json and navigation_data.json files to '/sdcard/Android/data/{your-app-package-name}/files/'. Make sure to change {your-package-name} to your applications package name.
+1. Push car_data.json and navigation_data.json files to '/mnt/user/{your-user-ID}/emulated/{your-user-ID}/Android/data/{your-app-package-name}/files/'. Make sure to change {your-package-name} to your applications package name and {your-user-id} to the User ID in which your package is running.
+  
 ```
 $ adb root
-$ adb push /json-file-location/car_data.json /sdcard/Android/data/{your-app-package-name}/files/
-$ adb push /json-file-location/navigation_data.json /sdcard/Android/data/{your-app-package-name}/files/
+$ adb push <path of navigation_data.json> /mnt/user/{your-user-ID}/emulated/{your-user-ID}/Android/data/{your-app-package-name}/files/
+$ adb push <path to the car_data.json> /mnt/user/{your-user-ID}/emulated/{your-user-ID}/Android/data/{your-app-package-name}/files/
+
 ```
 
 2. Use below commands to set the demo mode property
