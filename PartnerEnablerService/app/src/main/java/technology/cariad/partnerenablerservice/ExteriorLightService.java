@@ -41,6 +41,11 @@ import javax.inject.Singleton;
 
 import dagger.hilt.android.qualifiers.ApplicationContext;
 
+/**
+ * Server side implementation of IExteriorLightService AIDL stub.
+ * This class registers the CarPropertyEvent Call back with CarPropertyManager for the following VHAL property
+ * TURN_SIGNAL_STATE, FOG_LIGHTS_STATE. Notify the registered clients if there is a change in the TurnlSignalState/FogLightState.
+ */
 @Singleton
 class ExteriorLightService extends IExteriorLightService.Stub {
     private static final String TAG = "PartnerEnablerService.ExteriorLightService";
@@ -122,12 +127,13 @@ class ExteriorLightService extends IExteriorLightService.Stub {
     @Override
     public int getTurnSignalIndicator() throws RemoteException {
         Log.d(TAG,"getTurnSignalIndicator");
-        mPartnerAccessManager.verifyAccessAndPermission(mContext.getPackageManager().getNameForUid(Binder.getCallingUid()),
-                PartnerAPIConstants.PERMISSION_RECEIVE_TURN_SIGNAL_INDICATOR);
-
         if (mCarPropertyManager == null) {
             throw new IllegalStateException("CAR Property Service not ready");
         }
+
+        mPartnerAccessManager.verifyAccessAndPermission(mContext.getPackageManager().getNameForUid(Binder.getCallingUid()),
+                PartnerAPIConstants.PERMISSION_RECEIVE_TURN_SIGNAL_INDICATOR);
+
         int turnSignalIndicator = (int)mCarPropertyManager.getProperty(TURN_SIGNAL_STATE, VEHICLE_AREA_TYPE_GLOBAL).getValue();
         Log.d(TAG,"TurnSignalState Value: " + turnSignalIndicator);
         return turnSignalIndicator;
@@ -136,12 +142,12 @@ class ExteriorLightService extends IExteriorLightService.Stub {
     @Override
     public void addTurnSignalStateListener(ITurnSignalStateListener listener) throws RemoteException {
         Log.d(TAG,"addTurnSignalStateListener");
-        mPartnerAccessManager.verifyAccessAndPermission(mContext.getPackageManager().getNameForUid(Binder.getCallingUid()),
-                PartnerAPIConstants.PERMISSION_RECEIVE_TURN_SIGNAL_INDICATOR);
-
         if (listener == null) {
             throw new IllegalArgumentException("ITurnSignalStateListener is null");
         }
+
+        mPartnerAccessManager.verifyAccessAndPermission(mContext.getPackageManager().getNameForUid(Binder.getCallingUid()),
+                PartnerAPIConstants.PERMISSION_RECEIVE_TURN_SIGNAL_INDICATOR);
 
         // check any client listener is registered before. If not registered, register the client listener
         // and register callback with CarPropertyManager for specific VHAL Property id
@@ -177,12 +183,14 @@ class ExteriorLightService extends IExteriorLightService.Stub {
     public int getFogLightsState() throws RemoteException {
         // Permission check
         Log.d(TAG,"getFogLightsState");
-        mPartnerAccessManager.verifyAccessAndPermission(mContext.getPackageManager().getNameForUid(Binder.getCallingUid()),
-                PartnerAPIConstants.PERMISSION_RECEIVE_FOG_LIGHTS);
-
         if (mCarPropertyManager == null) {
             throw new IllegalStateException("CAR Property Service not ready");
         }
+
+        mPartnerAccessManager.verifyAccessAndPermission(mContext.getPackageManager().getNameForUid(Binder.getCallingUid()),
+                PartnerAPIConstants.PERMISSION_RECEIVE_FOG_LIGHTS);
+
+
 
         int fogLightState = (int)mCarPropertyManager.getProperty(FOG_LIGHTS_STATE, VEHICLE_AREA_TYPE_GLOBAL).getValue();
         Log.d(TAG,"FogLightsState Value: " + fogLightState);
@@ -192,11 +200,11 @@ class ExteriorLightService extends IExteriorLightService.Stub {
     @Override
     public void addFogLightStateListener(IFogLightStateListener listener) throws RemoteException {
         Log.d(TAG,"addFogLightStateListener");
-        mPartnerAccessManager.verifyAccessAndPermission(mContext.getPackageManager().getNameForUid(Binder.getCallingUid()), PartnerAPIConstants.PERMISSION_RECEIVE_FOG_LIGHTS);
-
         if (listener == null) {
             throw new IllegalArgumentException("IFogLightStateListener is null");
         }
+
+        mPartnerAccessManager.verifyAccessAndPermission(mContext.getPackageManager().getNameForUid(Binder.getCallingUid()), PartnerAPIConstants.PERMISSION_RECEIVE_FOG_LIGHTS);
 
         // check any client listener is registered before. If not registered, register the client listener
         // and register callback with CarPropertyManager for specific VHAL Property id

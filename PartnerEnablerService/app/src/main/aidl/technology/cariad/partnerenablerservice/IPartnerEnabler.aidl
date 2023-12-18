@@ -41,7 +41,7 @@ interface IPartnerEnabler {
     const int VEHICLE_SIGNAL_INDICATOR_LEFT = 2;
 
     /**
-     * GetFogLisghState Binder calls may returns one of
+     * GetFogLightsState Binder calls may returns one of
      * the following light state.
     */
     const int VEHICLE_LIGHT_STATE_OFF = 0;

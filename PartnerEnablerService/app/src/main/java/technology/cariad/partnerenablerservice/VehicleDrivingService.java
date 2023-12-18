@@ -41,6 +41,11 @@ import technology.cariad.partnerenablerservice.PartnerAPIConstants;
 import technology.cariad.partnerenablerservice.ISteeringAngleChangeListener;
 import technology.cariad.partnerenablerservice.IOdometerValueChangeListener;
 
+/**
+ * Server side implementation of IVehicleDrivingService AIDL stub.
+ * This class registers the CarPropertyEventCallback with CarPropertyManager for the following VHAL property
+ * PERF_STEERING_ANGLE, PERF_ODOMETER. Notify the registered clients if there is a change in the SteeringAngle/OdometerValue.
+ */
 @Singleton
 class VehicleDrivingService extends IVehicleDrivingService.Stub {
     private static final String TAG = "PartnerEnablerService.VehicleDrivingService";
@@ -121,13 +126,13 @@ class VehicleDrivingService extends IVehicleDrivingService.Stub {
     }
 
     public float getCurrentMileage() {
-        mPartnerAccessManager.verifyAccessAndPermission(
-                mContext.getPackageManager().getNameForUid(Binder.getCallingUid()),
-                PartnerAPIConstants.PERMISSION_RECEIVE_CAR_MILEAGE_INFO);
-
         if (mCarPropertyManager == null) {
             throw new IllegalStateException("Service not initialized properly");
         }
+
+        mPartnerAccessManager.verifyAccessAndPermission(
+                mContext.getPackageManager().getNameForUid(Binder.getCallingUid()),
+                PartnerAPIConstants.PERMISSION_RECEIVE_CAR_MILEAGE_INFO);
 
         float odometerValue = (float)mCarPropertyManager.getProperty(PERF_ODOMETER, VEHICLE_AREA_TYPE_GLOBAL).getValue();
         Log.d(TAG,"Odometer Value: " + odometerValue);
@@ -137,12 +142,12 @@ class VehicleDrivingService extends IVehicleDrivingService.Stub {
     @Override
     public void addOdometerValueChangeListener(IOdometerValueChangeListener listener) throws RemoteException {
         Log.d(TAG,"addOdometerValueChangeListener");
-        mPartnerAccessManager.verifyAccessAndPermission(mContext.getPackageManager().getNameForUid(Binder.getCallingUid()),
-                PartnerAPIConstants.PERMISSION_RECEIVE_CAR_MILEAGE_INFO);
-
         if (listener == null) {
             throw new IllegalArgumentException("IOdomterValueChangedListener is null");
         }
+
+        mPartnerAccessManager.verifyAccessAndPermission(mContext.getPackageManager().getNameForUid(Binder.getCallingUid()),
+                PartnerAPIConstants.PERMISSION_RECEIVE_CAR_MILEAGE_INFO);
 
         // check any client listener is registered before. If not registered, register the client listener
         // and register callback with CarPropertyManager for specific VHAL Property id
@@ -176,13 +181,13 @@ class VehicleDrivingService extends IVehicleDrivingService.Stub {
 
     @Override
     public float getSteeringAngle() {
-        mPartnerAccessManager.verifyAccessAndPermission(
-                mContext.getPackageManager().getNameForUid(Binder.getCallingUid()),
-                PartnerAPIConstants.PERMISSION_RECEIVE_STEERING_ANGLE_INFO);
-
         if (mCarPropertyManager == null) {
             throw new IllegalStateException("Service not initialized properly");
         }
+
+        mPartnerAccessManager.verifyAccessAndPermission(
+                mContext.getPackageManager().getNameForUid(Binder.getCallingUid()),
+                PartnerAPIConstants.PERMISSION_RECEIVE_STEERING_ANGLE_INFO);
 
         float steeringAngle = (float) mCarPropertyManager.getProperty(PERF_STEERING_ANGLE, VEHICLE_AREA_TYPE_GLOBAL).getValue();
         Log.d(TAG, "get Steering Angle value: " + steeringAngle);
@@ -192,13 +197,13 @@ class VehicleDrivingService extends IVehicleDrivingService.Stub {
     @Override
     public void addSteeringAngleChangeListener(ISteeringAngleChangeListener listener) {
         Log.d(TAG,"registerSteeringAngleChangeListener");
-        mPartnerAccessManager.verifyAccessAndPermission(mContext.getPackageManager().getNameForUid(
-                        Binder.getCallingUid()),
-                PartnerAPIConstants.PERMISSION_RECEIVE_STEERING_ANGLE_INFO);
-
         if (listener == null) {
             throw new IllegalArgumentException("ISteeringAngleChangeListener is null");
         }
+
+        mPartnerAccessManager.verifyAccessAndPermission(mContext.getPackageManager().getNameForUid(
+                        Binder.getCallingUid()),
+                PartnerAPIConstants.PERMISSION_RECEIVE_STEERING_ANGLE_INFO);
 
         // check any client listener is registered before. If not registered, register the client listener
         // and register callback with CarPropertyManager for specific VHAL Property id

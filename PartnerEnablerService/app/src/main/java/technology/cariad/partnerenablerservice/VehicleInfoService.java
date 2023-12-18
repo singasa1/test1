@@ -18,6 +18,10 @@ import javax.inject.Singleton;
 
 import dagger.hilt.android.qualifiers.ApplicationContext;
 
+/**
+ * Server side implementation of IVehicleInfoService AIDL stub.
+ * This class reads the static VHAL property INFO_VIN from the CarPropertyManager and notify the registered clients.
+ */
 @Singleton
 class VehicleInfoService extends IVehicleInfoService.Stub {
     private static final String TAG = "PartnerEnablerService.VehicleInfoService";
@@ -42,13 +46,15 @@ class VehicleInfoService extends IVehicleInfoService.Stub {
 
     @Override
     public String getVehicleIdentityNumber() {
+        if (mCarPropertyManager == null) {
+            throw new IllegalStateException("Service not initialize properly");
+        }
+
         mPartnerAccessManager.verifyAccessAndPermission(mContext.getPackageManager().getNameForUid(
                 Binder.getCallingUid()),
                 PartnerAPIConstants.PERMISSION_RECEIVE_CAR_INFO_VIN);
 
-        if (mCarPropertyManager == null) {
-            throw new IllegalStateException("Service not initialize properly");
-        }
+
 
         String vin = (String) mCarPropertyManager.getProperty(INFO_VIN, VEHICLE_AREA_TYPE_GLOBAL).getValue();
         Log.d(TAG, "VIN number: " + vin);

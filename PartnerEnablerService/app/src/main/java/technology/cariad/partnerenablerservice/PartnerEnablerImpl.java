@@ -103,6 +103,7 @@ class PartnerEnablerImpl extends IPartnerEnabler.Stub {
             Log.e(TAG, "Failed to get CarPropertyManager");
             throw new IllegalStateException("CAR Property Service not ready");
         }
+
     }
 
     @Override
