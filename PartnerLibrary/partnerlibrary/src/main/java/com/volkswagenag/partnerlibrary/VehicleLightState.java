@@ -19,9 +19,24 @@
 
 package com.volkswagenag.partnerlibrary;
 
+/**
+ * Vehicle Lights state representation.
+ *
+ * @author CARIAD Inc
+ * @version 1.0
+ * @since 2023-04-20
+ */
 public enum VehicleLightState {
-    PERMISSION_DENIED,
+    /**
+     * Lights are turned off.
+     */
     OFF,
+    /**
+     * Lights are turned on.
+     */
     ON,
+    /**
+     * Lights are set to Daytime running.
+     */
     DAYTIME_RUNNING,
 }

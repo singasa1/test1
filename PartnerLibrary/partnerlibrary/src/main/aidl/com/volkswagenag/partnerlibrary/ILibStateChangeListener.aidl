@@ -19,11 +19,12 @@
 
 package com.volkswagenag.partnerlibrary;
 
-// Declare any non-default types here with import statements
-
+/**
+* AIDL Listener interface to listen to PartnerEnabler service connection state changes.
+*/
 interface ILibStateChangeListener {
     /**
-     * Callback to trigger once Partner Enabler service connection state changes
+     * Callback to trigger once Partner Enabler service connection state changes.
      */
     void onStateChanged(boolean isReady);
 }

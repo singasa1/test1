@@ -19,9 +19,24 @@
 
 package com.volkswagenag.partnerlibrary;
 
+/**
+ * Vehicle Signal Indicator state representation.
+ *
+ * @author CARIAD Inc
+ * @version 1.0
+ * @since 2023-04-20
+ */
 public enum VehicleSignalIndicator {
-    PERMISSION_DENIED,
+    /**
+     * Signal Indicator is not active.
+     */
     NONE,
+    /**
+     * Right signal indicator is active.
+     */
     RIGHT,
+    /**
+     * Left signal indicator is active.
+     */
     LEFT,
 }

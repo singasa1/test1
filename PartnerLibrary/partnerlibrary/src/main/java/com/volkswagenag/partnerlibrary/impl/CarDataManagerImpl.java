@@ -25,267 +25,390 @@ import static technology.cariad.partnerenablerservice.IPartnerEnabler.VEHICLE_SI
 import static technology.cariad.partnerenablerservice.IPartnerEnabler.VEHICLE_SIGNAL_INDICATOR_NONE;
 import static technology.cariad.partnerenablerservice.IPartnerEnabler.VEHICLE_SIGNAL_INDICATOR_RIGHT;
 
+import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
+
+import androidx.annotation.RequiresPermission;
 
 import com.volkswagenag.partnerlibrary.CarDataManager;
 import com.volkswagenag.partnerlibrary.FogLightStateListener;
 import com.volkswagenag.partnerlibrary.MileageListener;
+import com.volkswagenag.partnerlibrary.PartnerLibraryManager;
+import com.volkswagenag.partnerlibrary.Response;
 import com.volkswagenag.partnerlibrary.SteeringAngleListener;
 import com.volkswagenag.partnerlibrary.TurnSignalListener;
 import com.volkswagenag.partnerlibrary.VehicleLightState;
 import com.volkswagenag.partnerlibrary.VehicleSignalIndicator;
 
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.Set;
 
-import technology.cariad.partnerenablerservice.ICarDataChangeListener;
+import technology.cariad.partnerenablerservice.IExteriorLightService;
+import technology.cariad.partnerenablerservice.IVehicleInfoService;
+import technology.cariad.partnerenablerservice.IVehicleDrivingService;
 import technology.cariad.partnerenablerservice.IPartnerEnabler;
+import technology.cariad.partnerenablerservice.ITurnSignalStateListener;
+import technology.cariad.partnerenablerservice.ISteeringAngleChangeListener;
+import technology.cariad.partnerenablerservice.IOdometerValueChangeListener;
+import technology.cariad.partnerenablerservice.IFogLightStateListener;
 
 /**
- * <h1>Partner Library</h1>
- * Partner Library provides wrapper apis for different app developers.
- * It has signature verification apis and other apis for getting the Active Route, Interior/Exterior Light status.
+ * <h1>CarDataManagerImpl</h1>
+ * Car Data Manager Impl provides implementation for CarDataManager wrapper apis for Vehicle data like mileage, steering angle etc.
+ * Note: {@link PartnerLibraryManager#initialize()} must be called, to bind to the PartnerEnablerService,
+ * before calling any methods in this interface.
  *
- * @author Sathya Singaravelu
+ * @author CARIAD Inc
  * @version 1.0
  * @since 2023-04-20
  */
 public class CarDataManagerImpl implements CarDataManager {
     private static final String TAG = CarDataManagerImpl.class.getSimpleName();
+    private static final String EXTERIOR_LIGHT_SERVICE = "EXTERIOR_LIGHT_SERVICE";
+    private static final String VEHICLE_INFO_SERVICE = "VEHICLE_INFO_SERVICE";
+    private static final String VEHICLE_DRIVING_SERVICE = "VEHICLE_DRIVING_SERVICE";
 
-    private IPartnerEnabler mService;
+    private final IPartnerEnabler mService;
 
-    private ICarDataChangeListener mCarDataChangeListener = new CarDataChangeListener();
+    private final IOdometerValueChangeListener mOdometerValueChangeListener = new OdometerValueChangeListener();
+    private final ITurnSignalStateListener mTurnSignalStateListener = new TurnSignalStateListener();
+    private final ISteeringAngleChangeListener mSteeringAngleChangeListener = new SteeringAngleChangeListener();
+    private final IFogLightStateListener mFogLightStateListener = new FogLightsStateListener();
 
-    private HashSet<MileageListener> mMileageListeners = new HashSet<>();
-    private HashSet<TurnSignalListener> mTurnSignalListener = new HashSet<>();
-    private HashSet<FogLightStateListener> mFogLightStateListener = new HashSet<>();
-    private HashSet<SteeringAngleListener> mSteeringAngleListener = new HashSet<>();
+    private final Set<MileageListener> mMileageListenersList = Collections.synchronizedSet(new HashSet<>());
+    private final Set<TurnSignalListener> mTurnSignalListenersList = Collections.synchronizedSet(new HashSet<>());
+    private final Set<FogLightStateListener> mFogLightListenersList = Collections.synchronizedSet(new HashSet<>());
+    private final Set<SteeringAngleListener> mSteeringAngleListenersList = Collections.synchronizedSet(new HashSet<>());
+
+    private IExteriorLightService mExteriorLightService;
+    private IVehicleInfoService mVehicleInfoService;
+    private IVehicleDrivingService mVehicleDrivingService;
 
     public CarDataManagerImpl(IPartnerEnabler service) {
         Log.d(TAG,"CarDataManager");
         mService = service;
-        addCarDataListener();
     }
 
-    private void addCarDataListener() {
+    @Override
+    @RequiresPermission(PartnerLibraryManager.PERMISSION_RECEIVE_CAR_MILEAGE_INFO)
+    public Response<Float> getCurrentMileage() {
+        Response<Float> response = new Response<>(Response.Status.VALUE_NOT_AVAILABLE, 0.0f);
         try {
-            if (!isClientListenerNotRegistered()) {
-                mService.addCarDataChangeListener(mCarDataChangeListener);
+            if (mVehicleDrivingService == null) {
+                initVehicleDrivingService();
             }
-        } catch (RemoteException e) {
-            throw new RuntimeException(e);
+            response.value = mVehicleDrivingService.getCurrentMileage();
+            response.status = Response.Status.SUCCESS;
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
+            response.status = Response.Status.INTERNAL_FAILURE;
+        } catch (SecurityException e) {
+            e.printStackTrace();
+            Log.d(TAG, e.getMessage());
+            response.status = Response.Status.PERMISSION_DENIED;
+        } catch (RuntimeException | RemoteException e) {
+            e.printStackTrace();
+            response.status = Response.Status.SERVICE_COMMUNICATION_FAILURE;
         }
+        return response;
     }
 
-    private void removeCarDataListener() {
-        try {
-            if (isClientListenerNotRegistered()) {
-                mService.removeCarDataChangeListener(mCarDataChangeListener);
-            }
-        } catch (RemoteException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private boolean isClientListenerNotRegistered() {
-        boolean retVal = false;
-        if (mMileageListeners.isEmpty() && mTurnSignalListener.isEmpty() &&
-                mFogLightStateListener.isEmpty() && mSteeringAngleListener.isEmpty()) {
-            retVal = true;
-        }
-        return retVal;
-    }
-
-    /**
-     * This method is to add the listener to get Odometer/Mileage value.
-     * @param mileageListerer MileageListener object from client/app.
-     * if client doesn't have permission to access odometer value, it doesn't add this listener
-     */
-    public void registerMileageListener(MileageListener mileageListener) {
+    @Override
+    @RequiresPermission(PartnerLibraryManager.PERMISSION_RECEIVE_CAR_MILEAGE_INFO)
+    public Response.Status registerMileageListener(MileageListener mileageListener) {
         // Add this client to listeners only if it has permission to access the odometer value by calling getCurrentMileage
-        if (getCurrentMileage() != -1) {
-            mMileageListeners.add(mileageListener);
-        }
-    }
-
-    /**
-     * This method is to remove the listener.
-     */
-    public void unregisterMileageListener(MileageListener mileageListener) {
-        mMileageListeners.remove(mileageListener);
-        removeCarDataListener();
-    }
-
-    /**
-     * This method gets the Car current Odometer value from PartnerEnablerService
-     * @return float - return current odometer value in Kilometer
-     * -1 - if permission to access the odometer api is denied
-     *  0 - if there is no odometer value/vhal property available.
-     */
-    public float getCurrentMileage() {
-        float mileage = 0.0f;
+        Response.Status status;
         try {
-            mileage = mService.getCurrentMileage(); // TODO: Do we need to return some value if there is a permission failure or just throwing security exception is good enough
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        } catch (RuntimeException e) {
-            e.printStackTrace();
-            if (e instanceof SecurityException) {
-                Log.d(TAG, e.getMessage());
-                mileage = -1;
+            if (mVehicleDrivingService == null) {
+                initVehicleDrivingService();
             }
+            mVehicleDrivingService.addOdometerValueChangeListener(mOdometerValueChangeListener);
+            mMileageListenersList.add(mileageListener);
+            status = Response.Status.SUCCESS;
+        } catch (IllegalStateException | IllegalArgumentException e) {
+            e.printStackTrace();
+            status = Response.Status.INTERNAL_FAILURE;
+        } catch (SecurityException e) {
+            e.printStackTrace();
+            Log.d(TAG, e.getMessage());
+            status = Response.Status.PERMISSION_DENIED;
+        } catch (RuntimeException | RemoteException re) {
+            status = Response.Status.SERVICE_COMMUNICATION_FAILURE;
+            Log.e(TAG, "getVehicleDrivingService: remoteException " + re);
         }
-        return mileage;
+        return status;
     }
 
-    /**
-     * This method is to add the listener to get Vehicle Turn Signal State value.
-     * @param turnSignalListener TurnSignalListener object from client/app.
-     * if client doesn't have permission to access the turn signal indicator value, it doesn't add this listener
-     */
-    public void registerTurnSignalListener(TurnSignalListener turnSignalListener) {
-        // Add this client to listeners only if it has permission to access the turn signal indicator value by calling getTurnSignalIndicator
-        if (getTurnSignalIndicator() != VehicleSignalIndicator.PERMISSION_DENIED) {
-            mTurnSignalListener.add(turnSignalListener);
+    @Override
+    public Response.Status unregisterMileageListener(MileageListener mileageListener) {
+        mMileageListenersList.remove(mileageListener);
+        if (mMileageListenersList.isEmpty()) {
+            Response.Status status;
+            try {
+                if (mVehicleDrivingService == null) {
+                    initVehicleDrivingService();
+                }
+                mVehicleDrivingService.removeOdometerValueChangeListener(mOdometerValueChangeListener);
+
+                status = Response.Status.SUCCESS;
+            } catch (IllegalStateException | IllegalArgumentException e) {
+                e.printStackTrace();
+                status = Response.Status.INTERNAL_FAILURE;
+            } catch (RuntimeException | RemoteException re) {
+                status = Response.Status.SERVICE_COMMUNICATION_FAILURE;
+                Log.e(TAG, "getExteriorLightService: remoteException " + re);
+            }
+            return status;
         }
+        return Response.Status.SUCCESS;
     }
 
-    /**
-     * This method is to remove the listener.
-     */
-    public void unregisterTurnSignalListener(TurnSignalListener turnSignalListener) {
-        mTurnSignalListener.remove(turnSignalListener);
-        removeCarDataListener();
-    }
-
-    /**
-     * This method gets the current turn signal indicator value from PartnerEnablerService
-     * @return VehicleSignalIndicator - return current signal indicator value(PermissionDenied/None/Right/Left).
-     *
-     */
-    public VehicleSignalIndicator getTurnSignalIndicator() {
-        VehicleSignalIndicator indicator = VehicleSignalIndicator.NONE;
+    @Override
+    @RequiresPermission(PartnerLibraryManager.PERMISSION_RECEIVE_TURN_SIGNAL_INDICATOR)
+    public Response<VehicleSignalIndicator> getTurnSignalIndicator() {
+        Response<VehicleSignalIndicator> response = new Response<>(Response.Status.VALUE_NOT_AVAILABLE, VehicleSignalIndicator.NONE);
         try {
-            int retVal = mService.getTurnSignalIndicator();
-            indicator = convertTurnSignalIndicator(retVal);
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        } catch (RuntimeException e) {
-            e.printStackTrace();
-            if (e instanceof SecurityException) {
-                Log.d(TAG, e.getMessage());
-                indicator = VehicleSignalIndicator.PERMISSION_DENIED;
+            if (mExteriorLightService == null) {
+                initExteriorLightService();
             }
+//            response.value = convertTurnSignalIndicator(mService.getTurnSignalIndicator());
+            response.value = convertTurnSignalIndicator(mExteriorLightService.getTurnSignalIndicator());
+            response.status = Response.Status.SUCCESS;
+        } catch (IllegalStateException | IllegalArgumentException e) {
+            e.printStackTrace();
+            response.status = Response.Status.INTERNAL_FAILURE;
+        } catch (SecurityException e) {
+            e.printStackTrace();
+            Log.d(TAG, e.getMessage());
+            response.status = Response.Status.PERMISSION_DENIED;
+        } catch (RuntimeException | RemoteException e) {
+            e.printStackTrace();
+            response.status = Response.Status.SERVICE_COMMUNICATION_FAILURE;
         }
-        return indicator;
+        return response;
     }
 
-    /**
-     * This method is to add the listener to get Fog Lights State value.
-     * @param lightStateListener FogLightStateListener object from client/app.
-     * if client doesn't have permission to access the fog light state value, it doesn't add this listener
-     */
-    public void registerFogLightStateListener(FogLightStateListener lightStateListener) {
-        // Add this client to listeners only if it has permission to access the fog light state value by calling getFogLightState
-        if (getFogLightsState() != VehicleLightState.PERMISSION_DENIED) {
-            mFogLightStateListener.add(lightStateListener);
-        }
-    }
-
-    /**
-     * This method is to remove the listener.
-     */
-    public void unregisterFogLightStateListener(FogLightStateListener lightStateListener) {
-        mFogLightStateListener.remove(lightStateListener);
-        removeCarDataListener();
-    }
-
-    /**
-     * This method gets the current fog lights state from PartnerEnablerService
-     * @return VehicleLightState - return current fog light state value(PermissionDenied/Off/On/DayTimeRunning).
-     */
-    public VehicleLightState getFogLightsState() {
-        VehicleLightState lightState = VehicleLightState.OFF;
+    @Override
+    @RequiresPermission(PartnerLibraryManager.PERMISSION_RECEIVE_TURN_SIGNAL_INDICATOR)
+    public Response.Status registerTurnSignalListener(TurnSignalListener turnSignalListener) {
+        Response.Status status;
         try {
-            int retVal = mService.getFogLightsState();
-            lightState = convertToVehicleLightState(retVal);
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        } catch (RuntimeException e) {
-            e.printStackTrace();
-            if (e instanceof SecurityException) {
-                Log.d(TAG, e.getMessage());
-                lightState = VehicleLightState.PERMISSION_DENIED;
+            if (mExteriorLightService == null) {
+                initExteriorLightService();
             }
+            mExteriorLightService.addTurnSignalStateListener(mTurnSignalStateListener);
+            mTurnSignalListenersList.add(turnSignalListener);
+            status = Response.Status.SUCCESS;
+        } catch (IllegalStateException | IllegalArgumentException e) {
+            e.printStackTrace();
+            status = Response.Status.INTERNAL_FAILURE;
+        } catch (SecurityException e) {
+            e.printStackTrace();
+            Log.d(TAG, e.getMessage());
+            status = Response.Status.PERMISSION_DENIED;
+        } catch (RuntimeException | RemoteException re) {
+            status = Response.Status.SERVICE_COMMUNICATION_FAILURE;
+            Log.e(TAG, "getExteriorLightService: remoteException " + re);
         }
-        return lightState;
+        return status;
     }
 
-    /**
-     * This method is to add the listener to get steering angle value.
-     * @param steeringAngleListener SteeringAngleListener object from client/app.
-     * if client doesn't have permission to access the fog light state value, it doesn't add this listener
-     */
-    public void registerSteeringAngleListener(SteeringAngleListener steeringAngleListener) {
-        // Add this client to listeners only if it has permission to access the steering angle value by calling getSteeringAngle
-        if (getSteeringAngle() != -1) {
-            mSteeringAngleListener.add(steeringAngleListener);
+    @Override
+    public Response.Status unregisterTurnSignalListener(TurnSignalListener turnSignalListener) {
+        mTurnSignalListenersList.remove(turnSignalListener);
+        if (mTurnSignalListenersList.isEmpty()) {
+            Response.Status status;
+            try {
+                if (mExteriorLightService == null) {
+                    initExteriorLightService();
+                }
+                mExteriorLightService.removeTurnSignalStateListener(mTurnSignalStateListener);
+                status = Response.Status.SUCCESS;
+            } catch (IllegalStateException | IllegalArgumentException e) {
+                e.printStackTrace();
+                status = Response.Status.INTERNAL_FAILURE;
+            } catch (RuntimeException | RemoteException re) {
+                status = Response.Status.SERVICE_COMMUNICATION_FAILURE;
+                Log.e(TAG, "getExteriorLightService: remoteException " + re);
+            }
+            return status;
         }
+        return Response.Status.SUCCESS;
     }
 
-    /**
-     * This method is to remove the listener.
-     */
-    public void unregisterSteeringAngleListener(SteeringAngleListener steeringAngleListener) {
-        mSteeringAngleListener.remove(steeringAngleListener);
-        removeCarDataListener();
-    }
-
-    /**
-     * This method returns the Car steering angle in degrees. positive - right; negative - left.
-     *  @return float - return current steering angle value in degrees.
-     * -1 - if permission to access the steering angle api is denied
-     * positive value - right
-     * negative value - left
-     */
-    public float getSteeringAngle() {
-        float steeringAngle = 0;
+    @Override
+    @RequiresPermission(PartnerLibraryManager.PERMISSION_RECEIVE_FOG_LIGHTS)
+    public Response<VehicleLightState> getFogLightsState() {
+        Response<VehicleLightState> response = new Response<>(Response.Status.VALUE_NOT_AVAILABLE, VehicleLightState.OFF);
         try {
-            steeringAngle = mService.getSteeringAngle(); // TODO: Do we need to return some value if there is a permission failure or just throwing security exception is good enough
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        } catch (RuntimeException e) {
-            e.printStackTrace();
-            if (e instanceof SecurityException) {
-                Log.d(TAG, e.getMessage());
-                steeringAngle = -1;
+            if (mExteriorLightService == null) {
+                initExteriorLightService();
             }
+//            response.value = convertToVehicleLightState(mService.getFogLightsState());
+            response.value = convertToVehicleLightState(mExteriorLightService.getFogLightsState());
+            response.status = Response.Status.SUCCESS;
+        } catch (IllegalStateException | IllegalArgumentException e) {
+            e.printStackTrace();
+            response.status = Response.Status.INTERNAL_FAILURE;
+        } catch (SecurityException e) {
+            e.printStackTrace();
+            Log.d(TAG, e.getMessage());
+            response.status = Response.Status.PERMISSION_DENIED;
+        } catch (RuntimeException | RemoteException e) {
+            e.printStackTrace();
+            response.status = Response.Status.SERVICE_COMMUNICATION_FAILURE;
         }
-        return steeringAngle;
+        return response;
     }
 
-    /**
-     * This method returns the Car VIN Number.
-     *  @return int - return car VIN no
-     *  -1 - if permission to access the vin no . else return valid vin no,
-     */
-    public String getVehicleIdentityNumber() {
-        String vinNo = null;
+    @Override
+    @RequiresPermission(PartnerLibraryManager.PERMISSION_RECEIVE_FOG_LIGHTS)
+    public Response.Status registerFogLightStateListener(FogLightStateListener lightStateListener) {
+        Response.Status status;
         try {
-            vinNo = mService.getVehicleIdentityNumber();
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        } catch (RuntimeException e) {
-            e.printStackTrace();
-            if (e instanceof SecurityException) {
-                Log.d(TAG, e.getMessage());
-                Integer ret = -1;
-                vinNo = ret.toString();
+            if (mExteriorLightService == null) {
+                initExteriorLightService();
             }
+            mExteriorLightService.addFogLightStateListener(mFogLightStateListener);
+            mFogLightListenersList.add(lightStateListener);
+            status = Response.Status.SUCCESS;
+        } catch (IllegalStateException | IllegalArgumentException e) {
+            e.printStackTrace();
+            status = Response.Status.INTERNAL_FAILURE;
+        } catch (SecurityException e) {
+            e.printStackTrace();
+            Log.d(TAG, e.getMessage());
+            status = Response.Status.PERMISSION_DENIED;
+        } catch (RuntimeException | RemoteException re) {
+            status = Response.Status.SERVICE_COMMUNICATION_FAILURE;
+            Log.e(TAG, "getExteriorLightService: remoteException " + re);
         }
-        Log.d(TAG,"VinNo: " + Integer.parseInt(vinNo));
-        return vinNo;
+        return status;
+    }
+
+    @Override
+    public Response.Status unregisterFogLightStateListener(FogLightStateListener lightStateListener) {
+        mFogLightListenersList.remove(lightStateListener);
+        if (mFogLightListenersList.isEmpty()) {
+            Response.Status status;
+            try {
+                if (mExteriorLightService == null) {
+                    initExteriorLightService();
+                }
+                mExteriorLightService.removeFogLightStateListener(mFogLightStateListener);
+
+                status = Response.Status.SUCCESS;
+            } catch (IllegalStateException | IllegalArgumentException e) {
+                e.printStackTrace();
+                status = Response.Status.INTERNAL_FAILURE;
+            } catch (RuntimeException | RemoteException re) {
+                status = Response.Status.SERVICE_COMMUNICATION_FAILURE;
+                Log.e(TAG, "getExteriorLightService: remoteException " + re);
+            }
+            return status;
+        }
+        return Response.Status.SUCCESS;
+    }
+
+    @Override
+    @RequiresPermission(PartnerLibraryManager.PERMISSION_RECEIVE_STEERING_ANGLE_INFO)
+    public Response<Float> getSteeringAngle() {
+        Response<Float> response = new Response<>(Response.Status.VALUE_NOT_AVAILABLE, 0.0f);
+        try {
+            if (mVehicleDrivingService == null) {
+                initVehicleDrivingService();
+            }
+            response.value = mVehicleDrivingService.getSteeringAngle();
+            response.status = Response.Status.SUCCESS;
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
+            response.status = Response.Status.INTERNAL_FAILURE;
+        } catch (SecurityException e) {
+            e.printStackTrace();
+            Log.d(TAG, e.getMessage());
+            response.status = Response.Status.PERMISSION_DENIED;
+        } catch (RuntimeException | RemoteException e) {
+            e.printStackTrace();
+            response.status = Response.Status.SERVICE_COMMUNICATION_FAILURE;
+        }
+        return response;
+    }
+
+    @Override
+    @RequiresPermission(PartnerLibraryManager.PERMISSION_RECEIVE_STEERING_ANGLE_INFO)
+    public Response.Status registerSteeringAngleListener(SteeringAngleListener steeringAngleListener) {
+        // Add this client to listeners only if it has permission to access the steering angle value
+        Response.Status status;
+        try {
+            if (mVehicleDrivingService == null) {
+                initVehicleDrivingService();
+            }
+            mVehicleDrivingService.addSteeringAngleChangeListener(mSteeringAngleChangeListener);
+            mSteeringAngleListenersList.add(steeringAngleListener);
+            status = Response.Status.SUCCESS;
+        } catch (IllegalStateException | IllegalArgumentException e) {
+            e.printStackTrace();
+            status = Response.Status.INTERNAL_FAILURE;
+        } catch (SecurityException e) {
+            e.printStackTrace();
+            Log.d(TAG, e.getMessage());
+            status = Response.Status.PERMISSION_DENIED;
+        } catch (RuntimeException | RemoteException re) {
+            status = Response.Status.SERVICE_COMMUNICATION_FAILURE;
+            Log.e(TAG, "getVehicleDrivingService: remoteException " + re);
+        }
+        return status;
+    }
+
+    @Override
+    public Response.Status unregisterSteeringAngleListener(SteeringAngleListener steeringAngleListener) {
+        mSteeringAngleListenersList.remove(steeringAngleListener);
+        if (mSteeringAngleListenersList.isEmpty()) {
+            Response.Status status;
+            try {
+                if (mVehicleDrivingService == null) {
+                    initVehicleDrivingService();
+                }
+                mVehicleDrivingService.removeSteeringAngleChangeListener(mSteeringAngleChangeListener);
+
+                status = Response.Status.SUCCESS;
+            } catch (IllegalStateException | IllegalArgumentException e) {
+                e.printStackTrace();
+                status = Response.Status.INTERNAL_FAILURE;
+            } catch (RuntimeException | RemoteException re) {
+                status = Response.Status.SERVICE_COMMUNICATION_FAILURE;
+                Log.e(TAG, "getVehicleDrivingService: remoteException " + re);
+            }
+            return status;
+        }
+        return Response.Status.SUCCESS;
+    }
+
+    @Override
+    @RequiresPermission(PartnerLibraryManager.PERMISSION_RECEIVE_CAR_INFO_VIN)
+    public Response<String> getVehicleIdentityNumber() {
+        Response<String> response = new Response<>(Response.Status.VALUE_NOT_AVAILABLE, null);
+        try {
+            if (mVehicleInfoService == null) {
+                initVehicleInfoService();
+            }
+            response.value = mVehicleInfoService.getVehicleIdentityNumber();
+            response.status = Response.Status.SUCCESS;
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
+            response.status = Response.Status.INTERNAL_FAILURE;
+        } catch (SecurityException e) {
+            e.printStackTrace();
+            Log.d(TAG, e.getMessage());
+            response.status = Response.Status.PERMISSION_DENIED;
+        } catch (RuntimeException | RemoteException e) {
+            e.printStackTrace();
+            response.status = Response.Status.SERVICE_COMMUNICATION_FAILURE;
+        }
+        Log.d(TAG,"VinNo: " + response.value);
+        return response;
     }
 
     private VehicleLightState convertToVehicleLightState(int lightState) {
@@ -322,35 +445,75 @@ public class CarDataManagerImpl implements CarDataManager {
         return turnSignalIndicator;
     }
 
-    private class CarDataChangeListener extends ICarDataChangeListener.Stub {
+    private void initExteriorLightService() throws RemoteException {
+        IBinder binder = mService.getAPIService(EXTERIOR_LIGHT_SERVICE);
+        Log.i(TAG, "getExteriorLightService binder=" + binder);
+        mExteriorLightService = (IExteriorLightService) IExteriorLightService.Stub.asInterface(binder);
+    }
+
+    private void initVehicleInfoService() throws RemoteException {
+        IBinder binder = mService.getAPIService(VEHICLE_INFO_SERVICE);
+        Log.i(TAG, "VehicleInfoService binder=" + binder);
+        mVehicleInfoService = (IVehicleInfoService)IVehicleInfoService.Stub.asInterface(binder);
+    }
+
+    private void initVehicleDrivingService() throws RemoteException {
+        IBinder binder = mService.getAPIService(VEHICLE_DRIVING_SERVICE);
+        Log.i(TAG, "VehicleDrivingService binder=" + binder);
+        mVehicleDrivingService = (IVehicleDrivingService)IVehicleDrivingService.Stub.asInterface(binder);
+    }
+
+    private class OdometerValueChangeListener extends IOdometerValueChangeListener.Stub {
         public void onMileageValueChanged(float mileageValue) {
             Log.d(TAG, "calling listener onMileageValueChanged with value: " + mileageValue);
-            for(MileageListener listener: mMileageListeners) {
-                listener.onMileageValueChanged(mileageValue);
+            synchronized (mMileageListenersList) {
+                for (MileageListener listener : mMileageListenersList) {
+                    listener.onMileageValueChanged(mileageValue);
+                }
             }
         }
+    }
 
-        public void onFogLightsChanged(int fogLightState) {
+    private class TurnSignalStateListener extends ITurnSignalStateListener.Stub {
+
+        @Override
+        public void onTurnSignalStateChanged(int signalIndicator) throws RemoteException {
+            Log.d(TAG, "calling listener onTurnSignalStateChangedListener with value: " + signalIndicator);
+
+            synchronized (mTurnSignalListenersList) {
+                for(TurnSignalListener listener: mTurnSignalListenersList) {
+                    VehicleSignalIndicator indicator = convertTurnSignalIndicator(signalIndicator);
+                    listener.onTurnSignalStateChanged(indicator);
+                }
+            }
+        }
+    }
+
+    private class SteeringAngleChangeListener extends ISteeringAngleChangeListener.Stub {
+        @Override
+        public void onSteeringAngleChanged(float steeringAngle) throws RemoteException {
+            Log.d(TAG, "calling listener onSteeringAngleLisenter with value: " + steeringAngle);
+            synchronized ((mSteeringAngleListenersList)) {
+                for (SteeringAngleListener listener : mSteeringAngleListenersList) {
+                    listener.onSteeringAngleChanged(steeringAngle);
+                }
+            }
+        }
+    }
+
+    private class FogLightsStateListener extends IFogLightStateListener.Stub {
+
+        @Override
+        public void onFogLightsChanged(int fogLightState) throws RemoteException {
             Log.d(TAG, "calling listener onFogLightStateChange with value: " + fogLightState);
-            for(FogLightStateListener listener: mFogLightStateListener) {
-                VehicleLightState lightState = convertToVehicleLightState(fogLightState);
-                listener.onFogLightsChanged(lightState);
-            }
-        }
 
-        public void onSteeringAngleChanged(float steeringAngle) {
-            Log.d(TAG, "calling listener onSteeringAngleChanged with value: " + steeringAngle);
-            for(SteeringAngleListener listener: mSteeringAngleListener) {
-                listener.onSteeringAngleChanged(steeringAngle);
-            }
-        }
-
-        public void onTurnSignalStateChanged(int signalIndicator) {
-            Log.d(TAG, "calling listener onTurnSignalStateChanged with value: " + signalIndicator);
-            for(TurnSignalListener listener: mTurnSignalListener) {
-                VehicleSignalIndicator indicator = convertTurnSignalIndicator(signalIndicator);
-                listener.onTurnSignalStateChanged(indicator);
+            synchronized (mFogLightListenersList) {
+                for(FogLightStateListener listener: mFogLightListenersList) {
+                    VehicleLightState lightState = convertToVehicleLightState(fogLightState);
+                    listener.onFogLightsChanged(lightState);
+                }
             }
         }
     }
 }
+

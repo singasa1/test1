@@ -18,55 +18,124 @@
  */
 package technology.cariad.partnerenablerservice;
 
-
+import android.car.Car;
+import android.car.hardware.property.CarPropertyManager;
 import android.content.Context;
 import android.os.Binder;
+import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
 
-public class PartnerEnablerImpl extends IPartnerEnabler.Stub {
+import androidx.annotation.GuardedBy;
+
+import javax.inject.Inject;
+import javax.inject.Provider;
+import javax.inject.Singleton;
+
+import dagger.hilt.InstallIn;
+import dagger.hilt.android.components.ServiceComponent;
+import dagger.hilt.android.qualifiers.ApplicationContext;
+
+/**
+ * Server side implementation of IPartnerEnabler AIDL stub.
+ */
+@Singleton
+class PartnerEnablerImpl extends IPartnerEnabler.Stub {
 
     private static final String TAG = "PartnerEnablerService:" + PartnerEnablerImpl.class.getSimpleName();
-    private final Context mContext;
-    private PartnerAccessManager mPartnerAccessManager;
 
-    PartnerEnablerImpl(Context context, PartnerAccessManager partnerAccessManager) {
+    private final Context mContext;
+
+    private final PartnerAccessManager mPartnerAccessManager;
+    private final Provider<ExteriorLightService> mExteriorLightServiceProvider;
+    private final Provider<NavigationService> mNavigationServiceProvider;
+    private final Provider<VehicleInfoService> mVehicleInfoServiceProvider;
+    private final Provider<VehicleDrivingService> mVehicleDrivingServiceProvider;
+    private final CarPropertyManager mCarPropertyManager;
+
+    /**
+     * Create an instance of {@link PartnerEnablerImpl}.
+     *
+     * @param context the context
+     * @param partnerAccessManager the PartnerAccessManager
+     * @param exteriorLightServiceProvider the Provider<ExteriorLightService>
+     * @param navigationServiceProvider the Provider<NavigationService>
+     * @param vehicleInfoServiceProvider the Provider<VehicleInfoService>
+     * @param vehicleDrivingServiceProvider the Provider<VehicleDrivingService>
+     * @param carPropertyManager the CarPropertyManager
+     */
+    @Inject
+    PartnerEnablerImpl(@ApplicationContext Context context,
+                       PartnerAccessManager partnerAccessManager,
+                       Provider<ExteriorLightService> exteriorLightServiceProvider,
+                       Provider<NavigationService> navigationServiceProvider,
+                       Provider<VehicleInfoService> vehicleInfoServiceProvider,
+                       Provider<VehicleDrivingService> vehicleDrivingServiceProvider,
+                       CarPropertyManager carPropertyManager) {
         mContext = context;
         mPartnerAccessManager = partnerAccessManager;
+        mExteriorLightServiceProvider = exteriorLightServiceProvider;
+        mNavigationServiceProvider = navigationServiceProvider;
+        mVehicleInfoServiceProvider = vehicleInfoServiceProvider;
+        mVehicleDrivingServiceProvider = vehicleDrivingServiceProvider;
+        mCarPropertyManager = carPropertyManager;
     }
 
+    /**
+     * Gets the hardcoded ifc version of PartnerEnablerService.
+     *
+     * @return An {@code int} representing ifc version no.
+     */
+    @Override
+    public int getIfcVersion() {
+        return IPartnerEnabler.VERSION;
+    }
+
+    /**
+     * It verifies the partnertoken of the app that is calling this intialize api.
+     */
     @Override
     public void initialize() throws SecurityException {
         Log.d(TAG, "initialize");
-        verifyAccess(mContext.getPackageManager().getNameForUid(Binder.getCallingUid()));
+        mPartnerAccessManager.verifyAccess(mContext.getPackageManager().getNameForUid(Binder.getCallingUid()));
+
+        if (mCarPropertyManager == null) {
+            Log.e(TAG, "Failed to get CarPropertyManager");
+            throw new IllegalStateException("CAR Property Service not ready");
+        }
+
     }
 
     @Override
     public void release() throws SecurityException {
         Log.d(TAG, "release");
-        verifyAccess(mContext.getPackageManager().getNameForUid(Binder.getCallingUid()));
+        mPartnerAccessManager.verifyAccess(mContext.getPackageManager().getNameForUid(Binder.getCallingUid()));
     }
 
     /**
-     * Check if access is allowed and throw SecurityException if the access is not allowed for the
-     * package.
-     * @param packageName package name of the application to which access is verified.
-     * @throws SecurityException if the access is not allowed.
+     * Gets the internal specific service binder handler for the given serviceName.
+     *
+     * @return An {@Binder IBinder} representing service binder.
      */
-    private void verifyAccess(String packageName) throws SecurityException {
-        Log.d(TAG, "Calling app is: " + packageName);
-        try {
-            if (!mPartnerAccessManager.isAccessAllowed(packageName)) {
-                // TODO: Check why service connection is delayed causing exception. Uncomment below lines once that is resolved
-                //throw new SecurityException(
-                  //      "The app " + packageName +
-                    //            " doesn't have the permission to access Partner API's");
-
-                Log.e(TAG,"The app " + packageName +
-                               " doesn't have the permission to access Partner API's");
-            }
-        } catch (RemoteException e) {
-            e.printStackTrace();
+    @Override
+    public IBinder getAPIService(String serviceName) throws RemoteException {
+        Log.i(TAG, "calling getAPIService for service:" + serviceName);
+        switch (serviceName) {
+            case PartnerAPIConstants.EXTERIOR_LIGHT_SERVICE:
+                Log.i(TAG, " getAPIService: mExteriorLightService=" + mExteriorLightServiceProvider.get());
+                return mExteriorLightServiceProvider.get();
+            case PartnerAPIConstants.NAVIGATION_SERVICE:
+                Log.i(TAG, " getAPIService: mNavigationService=" + mNavigationServiceProvider.get());
+                return mNavigationServiceProvider.get();
+            case PartnerAPIConstants.VEHICLE_INFO_SERVICE:
+                Log.i(TAG, "getAPIService: mVehicleInfoService = " + mVehicleInfoServiceProvider.get());
+                return mVehicleInfoServiceProvider.get();
+            case PartnerAPIConstants.VEHICLE_DRIVING_SERVICE:
+                Log.i(TAG, "getAPIService: mVehicleDrivingService = " + mVehicleDrivingServiceProvider.get());
+                return mVehicleDrivingServiceProvider.get();
+            default:
+                Log.w(TAG, "getAPIService for unknown service:" + serviceName);
+                return null;
         }
     }
 }

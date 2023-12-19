@@ -20,12 +20,20 @@ package technology.cariad.partnerenablerservice;
 
 import android.app.Service;
 import android.content.Intent;
-import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
+
+/**
+ * PartnerEnablerService is an android service.
+ * This service get Started when clients trying to bind to this service.
+ */
+@AndroidEntryPoint
 public class PartnerEnablerService extends Service {
     private static final String TAG = PartnerEnablerService.class.getSimpleName();
 
@@ -33,14 +41,13 @@ public class PartnerEnablerService extends Service {
     private static final int NOTIFICATION_ID = 555;
 
     // declaring PartnerEnabler binder instance
-    private PartnerEnablerImpl mService;
-    private PartnerAccessManager mPartnerAccessManager;
+    @Inject PartnerEnablerImpl mPartnerEnablerImpl;
+    @Inject PartnerAccessManager mPartnerAccessManager;
 
     @Override
     public void onCreate() {
         Log.d(TAG,"onCreate");
         super.onCreate();
-        mPartnerAccessManager = PartnerAccessManager.getInstance(this);
         mPartnerAccessManager.initialize();
     }
 
@@ -61,15 +68,11 @@ public class PartnerEnablerService extends Service {
     }
 
     private void init() {
-        if (mService == null) {
-            mService = new PartnerEnablerImpl(this, mPartnerAccessManager);
-        }
     }
 
     private void release() {
-        if (mService != null) {
-            mService.release();
-            mService = null;
+        if (mPartnerEnablerImpl != null) {
+            mPartnerEnablerImpl.release();
         }
     }
 
@@ -77,7 +80,6 @@ public class PartnerEnablerService extends Service {
     @Override
     public IBinder onBind(Intent intent) {
         Log.d(TAG,"onBind: ");
-        init();
-        return mService;
+        return mPartnerEnablerImpl;
     }
 }

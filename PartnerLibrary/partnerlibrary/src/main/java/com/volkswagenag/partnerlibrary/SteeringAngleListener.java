@@ -19,6 +19,18 @@
 
 package com.volkswagenag.partnerlibrary;
 
+/**
+ * Listener for Steering angle value changes.
+ *
+ * @author CARIAD Inc
+ * @version 1.0
+ * @since 2023-04-20
+ */
 public interface SteeringAngleListener {
+    /**
+     * Callback called when the steering angle value changes.
+     *
+     * @param steeringAngle
+     */
     public abstract void onSteeringAngleChanged(float steeringAngle);
 }

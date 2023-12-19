@@ -24,14 +24,25 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.qualifiers.ApplicationContext;
 import technology.cariad.partnerverifierlibrary.ISignatureVerifier;
 
-public class SignatureVerifierImpl extends ISignatureVerifier.Stub {
+/**
+ * Server side implementation of IPartnerEnabler AIDL stub.
+ * Responsible for verifying the authToken of the given package.
+ * Forms the authToken at run time using PackageManager apis and
+ * compare it with the metadata of the given package manifest xml file
+ */
+class SignatureVerifierImpl extends ISignatureVerifier.Stub {
     private static final String TAG = SignatureVerifierImpl.class.getSimpleName();
-    private final Context mContext;
     private static final String METADATA_KEY = "VWAE_Sig_V1";
 
-    public SignatureVerifierImpl(Context context) {
+    private final Context mContext;
+
+    @Inject
+    SignatureVerifierImpl(@ApplicationContext Context context) {
         mContext = context;
     }
 
