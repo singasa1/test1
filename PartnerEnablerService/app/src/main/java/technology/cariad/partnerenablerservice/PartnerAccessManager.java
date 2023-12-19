@@ -48,7 +48,7 @@ class PartnerAccessManager {
     private static final String TAG = PartnerAccessManager.class.getSimpleName();
 
     // This flag is only for testing purposes, to allow access without verification. This should be set to false in production.
-    private static final boolean DEBUG_MODE = true;
+    private static final boolean DEBUG_MODE = false;
 
     private final Context mContext;
 
@@ -100,7 +100,7 @@ class PartnerAccessManager {
      * @throws IllegalStateException
      */
     public boolean isAccessAllowed(String packageName) throws RemoteException, IllegalStateException {
-        //if (DEBUG_MODE) return true;
+        if (DEBUG_MODE) return true;
 
         if (!mIsServiceConnected || mSignatureVerifierService == null) {
             // TODO: Check why service connection is delayed causing exception. Uncomment below lines once that is resolved
@@ -126,10 +126,7 @@ class PartnerAccessManager {
         Log.d(TAG, "Calling app is: " + packageName);
         try {
             if (!isAccessAllowed(packageName)) {
-                //throw new SecurityException(
-                  //      "The app " + packageName +
-                    //            " doesn't have the permission to access Partner API's");
-                    Log.d(TAG,
+                throw new SecurityException(
                         "The app " + packageName +
                                 " doesn't have the permission to access Partner API's");
             }
